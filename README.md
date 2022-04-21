@@ -1,3 +1,5 @@
+
+
 # 一、环境准备
 
 ## 1.1、安装软件虚拟机软件
@@ -1138,21 +1140,41 @@ modules为其子模块
 
 ![image-20220415233604112](image/1.8.9.2.4.png)
 
-##### 3、push到github
+##### 3、推送到github
+
+###### 1、push到github
 
 ![image-20220415232020970](image/1.8.9.3.1.png)
 
+###### 2、点击Push
+
 ![image-20220415232141259](image/1.8.9.3.2.png)
 
-
+###### 3、貌似没有提交上去
 
 可以看到貌似没有提交上去，但是多了一个提示，说master分支9分钟前提交了推送
 
 ![image-20220415233124651](image/1.8.9.3.3.png)
 
-切换到master分支即可看到推送
+###### 4、切换到master分支即可看到推送
 
 ![image-20220415233445609](image/1.8.9.3.4.png)
+
+###### 5、修改默认分支
+
+点击项目的Settings --> Branches --> 交换按钮
+
+![image-20220420151036687](image/1.8.9.3.5.1.png)
+
+![image-20220420151614271](image/1.8.9.3.5.2.png)
+
+可以看到已经修改了默认分支
+
+![image-20220420151906389](image/1.8.9.3.5.3.png)
+
+###### 6、全局修改默认分支
+
+![image-20220420152513761](image/1.8.9.3.6.png)
 
 #### 1.8.10、初始数据库
 
@@ -2058,7 +2080,7 @@ ps:头一次听说这个类型
 
 或者可以把gulimall_wms的undo_log表删掉，重新生成一下就行了(提供的源代码没有这个类)
 
-# 二、开发gulimall-product模块
+# 二、开发各个模块
 
 ## 2.1、整合Myabatis-plus
 
@@ -2220,4 +2242,1114 @@ class GulimallProductApplicationTests {
 ```
 
 ![image-20220417223437629](image/2.1.3.3.png)
+
+## 2.2、分布式组件
+
+Spring Clould 官方文档: https://spring.io/projects/spring-cloud
+
+Spring Clould Alibaba中文文档:  [spring-cloud-alibaba/README-zh.md at 2021.x · alibaba/spring-cloud-alibaba (github.com)](https://github.com/alibaba/spring-cloud-alibaba/blob/2021.x/README-zh.md)
+
+#### 2.2.1、分布式组件选择
+
+| 功能                           | 官方组件  | 使用组件 |
+| ------------------------------ | --------- | -------- |
+| 注册中心 Service Discovery     | Eureka    | Nacos    |
+| 配置中心                       | Eureka    | Nacos    |
+| 网关 Intelligent Routing       | Zuul      |          |
+| 断路保护 Circuit Breaker       | Hystrix   |          |
+| 负载均衡                       | Ribbon    | Ribbon   |
+| 声明式HTTP客户端(远程调用服务) | OpenFeign |          |
+| 限流、熔断、降级               | Hystrix   | Sentinel |
+| API网关                        | Gateway   |          |
+| 调用链监控                     | Sleuth    |          |
+| 分布式事务                     |           | Seata    |
+
+#### 2.2.2、版本选择
+
+官方给出的版本选择方案
+
+![image-20220420160016157](image/2.2.2.1.png)
+
+本项目的Spring Boot版本为2.1.8.RELEASE,因此选择的版本为Spring Clould Alibaba版本为2.1.0.RELEASE
+
+#### 2.2.3、使用nacos做注册中心
+
+nacos官方文档: [什么是 Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)
+
+nacos中文文档: [spring-cloud-alibaba/readme-zh.md at 2021.x · alibaba/spring-cloud-alibaba (github.com)](https://github.com/alibaba/spring-cloud-alibaba/blob/2021.x/spring-cloud-alibaba-examples/nacos-example/nacos-discovery-example/readme-zh.md)
+
+##### 1、版本管理
+
+在gulimall-common模块使用dependencyManagement导入spring-cloud-alibaba
+
+dependencyManagement中定义的只是依赖的声明，并不实现引入，因此子项目需要显式的声明需要用的依赖。
+
+在dependencyManagement元素中声明所依赖的jar包的版本号等信息，
+
+那么所有子项目再次引入此依赖jar包时则无需显式的列出版本号。
+
+Maven会沿着父子层级向上寻找拥有dependencyManagement 元素的项目，然后使用它指定的版本号。
+
+```
+<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.1.0.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+</dependencyManagement>
+```
+
+![image-20220420162913989](image/2.2.3.1.png)
+
+##### 2、导入nacos依赖
+
+在gulimall-common模块添加nacos依赖
+
+```
+<dependency>
+   <groupId>com.alibaba.cloud</groupId>
+   <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+```
+
+![image-20220420163122905](image/2.2.3.2.png)
+
+##### 3、下载nacos
+
+下载网址: https://github.com/alibaba/nacos/releases?page=3
+
+![image-20220420164306469](image/2.2.3.3.png)
+
+##### 4、启动nacos
+
+Windows电脑双击这个
+
+![image-20220420164810978](image/2.2.3.4.png)
+
+##### 5、配置server-addr
+
+向gulimall-coupon模块的配置文件配置server-addr
+
+![image-20220420165428491](image/2.2.3.5.png)
+
+##### 6、启动类添加服务发现注解
+
+向gulimall-coupon模块启动类添加服务发现注解
+
+```
+@EnableDiscoveryClient
+```
+
+![image-20220420165730434](image/2.2.3.6.png)
+
+##### 7、运行模块
+
+运行模块之前,nacos必须先启动
+
+##### 8、查看服务列表
+
+浏览器输入网址: http://127.0.0.1:8848/nacos
+
+用户名和密码都为 nacos
+
+发现没有服务
+
+![image-20220420170334442](image/2.2.3.8.1.png)
+
+##### 9、向模块起个应用名
+
+向gulimall-coupon模块的配置文件添加application.name
+
+```
+application:
+  name: gulimall-coupon
+```
+
+![image-20220420170616761](image/2.2.3.9.png)
+
+##### 10、重新运行模块
+
+可以发现已经注册到注册中心了
+
+![image-20220420170856578](image/2.2.3.10.png)
+
+同理，配置其他模块
+
+#### 2.2.4、使用OpenFeign
+
+##### 1、服务提供方
+
+###### 1、导入OpenFeign依赖
+
+在gulimall-coupon模块导入OpenFeign依赖
+
+```
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+![image-20220420172517011](image/2.2.4.1.1.png)
+
+###### 2、编写服务提供者方法
+
+在gulimall-coupon模块com.atguigu.gulimall.coupon.controller.CouponController类写测试方法
+
+```java
+@RequestMapping("/member/list")
+public R memberCoupons(){
+    CouponEntity couponEntity = new CouponEntity();
+    couponEntity.setCouponName("满100减10");
+    return R.ok().put("coupons",Arrays.asList(couponEntity));
+}
+```
+
+![image-20220420182639300](image/2.2.4.1.2.png)
+
+##### 2、服务消费方
+
+###### 1、导入OpenFeign依赖
+
+在gulimall-member模块导入OpenFeign依赖
+
+```
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+![image-20220420174057200](image/2.2.4.2.1.png)
+
+###### 2、编写一个接口
+
+编写一个接口，告诉Spring Clould这个接口需要调用远程服务
+
+这个接口写调用哪个服务的哪些请求
+
+在gulimall-member模块下新建一个CouponFeignService接口
+
+里面指明服务名，服务的请求路径
+
+```java
+@FeignClient("gulimall-coupon")
+public interface CouponFeignService {
+    @RequestMapping("/coupon/coupon/member/list")
+    public R memberCoupons();
+}
+```
+
+![image-20220420175322853](image/2.2.4.2.2.png)
+
+###### 3、开启远程调用功能
+
+在该接口上加入@EnableFeignClients注解
+
+```
+@EnableFeignClients(basePackages = "com.atguigu.gulimall.member.feign")
+```
+
+![image-20220420180212771](image/2.2.4.2.3.png)
+
+###### 4、编写测试方法
+
+```java
+@Autowired
+CouponFeignService couponFeignService;
+
+/**
+ * Openfeign消费方测试
+ * @return
+ */
+@RequestMapping("/coupons")
+public R test(){
+    MemberEntity memberEntity = new MemberEntity();
+    memberEntity.setNickname("张三");
+
+    R memberCoupons = couponFeignService.memberCoupons();
+
+    Object coupons = memberCoupons.get("coupons");
+    return R.ok().put("member",memberEntity).put("coupons",coupons);
+}
+```
+
+![image-20220420182836260](image/2.2.4.2.4.png)
+
+###### 5、IDEA检测到不能自动注入
+
+```java
+Could not autowire. No beans of 'CouponFeignService' type found. 
+```
+
+```
+无法自动注入。 找不到“CouponFeignService”类型的 bean。
+```
+
+![image-20220420204800914](image/2.2.4.2.5.1.png)
+
+其实可以注入成功，只是IDEA检测到该接口没有注入到Spring容器，其实使用@EnableFeignClients注解后在运行时会注入到容器中的
+
+如果不想看到红色的报错，可以在该接口添加@Component显示的注入到Spring容器
+
+![image-20220420204958874](image/2.2.4.2.5.2.png)
+
+###### 6、出现报错
+
+```
+Field couponFeignService in com.atguigu.gulimall.member.controller.MemberController 
+required a bean of type 'com.atguigu.gulimall.member.feign.CouponFeignService' that could not be found.
+```
+
+```
+com.atguigu.gulimall.member.controller.MemberController 中的字段 couponFeignService
+需要一个找不到的“com.atguigu.gulimall.member.feign.CouponFeignService”类型的 bean。
+```
+
+![image-20220420183126942](image/2.2.4.2.6.1.png)
+
+发现我nacos、应用名和@EnableDiscoveryClient没配:fearful:
+
+![image-20220420210157633](image/2.2.4.2.6.2.png)
+
+![image-20220420212650943](image/2.2.4.2.6.3.png)
+
+###### 7、配置后还是这个错误
+
+我根据我以前学的Spring Coluld,将@EnableFeignClients注解移动到启动类后，不报错了
+
+![image-20220420213042506](image/2.2.4.2.7.1.png)
+
+![image-20220420213113511](image/2.2.4.2.7.2.png)
+
+###### 8、运行结果
+
+![image-20220420213405308](image/2.2.4.2.8.1.png)
+
+可以看到远程调用已经成功了
+
+![image-20220420214052566](image/2.2.4.2.8.2.png)
+
+ps:可以使用JSON-Handle或JSONViewer等类似插件，优雅地显示json数据
+
+![image-20220420214401033](image/2.2.4.2.8.3.png)
+
+#### 2.2.5、使用nacos做配置中心
+
+nacos中文文档: https://github.com/alibaba/spring-cloud-alibaba/blob/2021.x/spring-cloud-alibaba-examples/nacos-example/nacos-config-example/readme-zh.md
+
+##### 1、添加依赖
+
+首先，修改 pom.xml 文件，引入 Nacos Config Starter。
+
+```
+<dependency>
+     <groupId>com.alibaba.cloud</groupId>
+     <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+ </dependency>
+```
+
+在gulimall-common模块的pom文件中添加依赖
+
+##### 2、配置元数据
+
+在应用的 /src/main/resources/bootstrap.properties 配置文件中配置 Nacos Config 元数据
+
+```
+ spring.application.name=nacos-config-example
+ spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+```
+
+在gulimall-coupon模块resources新建bootstrap.properties配置文件
+
+在SpringBoot中默认是不支持bootstrap.properties属性文件的。我们需要映入SpringCloud的依赖才可以。
+
+bootstrap.properties中定义的文件信息会先与application.properties中的信息加载
+
+bootstrap.properties配置文件添加应用名和nacos的服务地址
+
+```
+spring.application.name=gulimall-coupon
+
+spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+```
+
+![image-20220420224604205](image/2.2.5.2.png)
+
+##### 3、测试
+
+##### **传统配置文件方式**
+
+###### 1、配置名字和年龄
+
+在gulimall-coupon模块的resources文件夹下的application.properites文件中配置名字和年龄
+
+```
+user.name=zhangsan
+user.age=18
+```
+
+![image-20220420233123899](image/2.2.5.3.1.1.png)
+
+###### 2、注入
+
+在gulimall-coupon模块下的com.atguigu.gulimall.coupon.controller的CouponController类注入name和age
+
+```
+@Value("${user.name}")
+private String name;
+@Value("${user.age}")
+private String age;
+```
+
+###### 3、编写测试方法
+
+```
+@RequestMapping("/test")
+public R test(){
+   return R.ok().put("name",name).put("age",age);
+}
+```
+
+![image-20220420234000328](image/2.2.5.3.1.3.png)
+
+###### 4、测试
+
+浏览器输入url:   http://127.0.1.1:7000/coupon/coupon/test
+
+![image-20220420234136265](image/2.2.5.3.1.4.png)
+
+发现name不对，这是因为读取到了操作系统当前的用户名
+
+###### 5、添加前缀
+
+```
+coupon.user.name=zhangsan
+coupon.user.age=18
+```
+
+```
+@Value("${coupon.user.name}")
+private String name;
+@Value("${coupon.user.age}")
+```
+
+6、重新测试
+
+重新运行模块，在浏览器中输入url: http://127.0.1.1:7000/coupon/coupon/test
+
+传统方式的缺点是修改配置后需要重新运行模块，且多台机器运行该项目需要全部手动修改并重启
+
+![image-20220420234656928](image/2.2.5.3.1.6.png)
+
+##### 配置中心方式
+
+应用会从 Nacos Config 中获取相应的配置，并添加在 Spring Environment 的 PropertySources 中。
+
+这里我们使用 @Value 注解来将对应的配置注入到 CouponController 的 name 和 age 字段，并添加 @RefreshScope 打开动态刷新功能
+
+###### 1、先运行项目，查看name
+
+可以看到 propertySources=[NacosPropertySource {name='gulimall-coupon.properties'}]}
+
+中的name为gulimall-coupon.properties
+
+![image-20220420235738102](image/2.2.5.3.2.1.png)
+
+###### 2、添加配置
+
+![image-20220421000138394](image/2.2.5.3.2.2.1.png)
+
+![image-20220421000645898](image/2.2.5.3.2.2.2.png)
+
+###### 3、添加@RefreshScope注解
+
+在com.atguigu.gulimall.coupon.controller.CouponController类上添加@RefreshScope注解(别加错位置)，重启模块
+
+![image-20220421000800138](image/2.2.5.3.2.3.png)
+
+###### 4、查看配置是否生效
+
+先优先使用配置中心有的配置
+
+url: http://127.0.1.1:7000/coupon/coupon/test
+
+重启模块后，刷新页面，发现配置已生效
+
+![image-20220421001305567](image/2.2.5.3.2.4.png)
+
+###### 5、修改配置
+
+![image-20220421001648097](image/2.2.5.3.2.5.1.png)
+
+![image-20220421001935546](image/2.2.5.3.2.5.2.png)
+
+###### 6、查看配置是否更新
+
+url: http://127.0.1.1:7000/coupon/coupon/test
+
+**不重启项目**，刷新页面，查看配置是否更新
+
+可以发现，配置已更新
+
+![image-20220421002046300](image/2.2.5.3.2.6.png)
+
+##### 4、总结
+
+如何使用Nacos作为配置中心统一管理配置
+
+###### 1、引入依赖
+
+```
+<dependency>
+     <groupId>com.alibaba.cloud</groupId>
+     <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+ </dependency>
+```
+
+###### 2、创建一个bootstrap.properties
+
+```
+ spring.application.name=nacos-config-example
+ spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+```
+
+###### 3、添加默认规则
+
+需要给配置中心默认添加一个叫数据集(Data Id) gulimall-coupon.properties。默认规则，应用名. propert
+
+###### 4、给应用名.properties添加任何配置
+
+###### 5、动态获取配置
+
+@RefreshScope:动态获取并刷新配置
+@Value( "${配置项的名}"):获取到配置。
+如果配置中心和当前应用的配置文件中都配置了相同的项，优先使用配置中心的配置。
+
+##### 5、命名空间:配置隔离
+
+默认: public(保留空间); 默认新增的所有配置都在public空间。
+
+##### 开发，测试，生产 环境隔离
+
+开发，测试，生产 利用命名空间来做环境隔离。
+
+注意:在bootstrap. properties;配置上，需要使用哪个命名空间下的配置
+spring. cloud. nacos . config . namespace=9de62e44- cd2a-4a82- bf5c-95878bd5e871
+
+步骤：
+
+###### 1、新建命名空间
+
+![image-20220421083744445](image/2.2.5.5.1.png)
+
+###### 2、配置命名空间
+
+可以先克隆配置
+
+![image-20220421084332990](image/2.2.5.5.2.1.png)
+
+修改test命名空间配置
+
+![image-20220421084602762](image/2.2.5.5.2.2.png)
+
+![image-20220421090127015](image/2.2.5.5.2.3.png)
+
+###### 3、使用test命名空间
+
+复制命名空间的唯一标识
+
+![image-20220421084946774](image/2.2.5.5.3.1.png)
+
+在bootstrap.properties中配置使用哪个命名空间
+
+```
+spring.cloud.nacos.config.namespace=6a781746-404e-4318-af52-abba2f20a03f
+```
+
+![image-20220421085044718](image/2.2.5.5.3.2.png)
+
+###### 4、查看结果
+
+可以发现配置已生效
+
+![image-20220421085522923](image/2.2.5.5.4.png)
+
+##### 微服务之间互相隔离配置
+
+每一个微服务之间互相隔离配置，每一个微服务都创建自己的命名空间，只加载自己命名空间下的所有配置
+
+###### 1、新建coupon命名空间
+
+###### 2、配置命名空间
+
+###### 3、使用coupon命名空间
+
+复制coupon命名空间唯一标识
+
+![image-20220421090259982](image/2.2.5.5.5.png)
+
+使用coupon命名空间
+
+![image-20220421090528249](image/2.2.5.5.6.png)
+
+###### 4、查看结果
+
+重启模块，刷新页面，可以发现配置已生效
+
+![image-20220421090828699](image/2.2.5.5.7.png)
+
+##### 6、配置集
+
+配置集：所有的配置的集合
+
+##### 7、配置集ID
+
+配置集ID(Data ID)：类似文件名。
+
+##### 8、配置分组
+
+默认所有的配置集都属于: DEFAULT_ GROUP
+项目中的使用:每个微服务创建自己的命名空间，使用配置分组区分环境，dev,test, prod
+
+###### 1、配置各环境
+
+![image-20220421092351920](image/2.2.5.8.1.png)
+
+![image-20220421092742678](image/2.2.5.8.2.png)
+
+###### 2、使用分组
+
+在gulimall-coupon模块的bootstrap.properties配置文件中添加配置
+
+```
+spring.cloud.nacos.config.group=dev
+```
+
+![image-20220421092916969](image/2.2.5.8.3.png)
+
+###### 3、查看结果
+
+重启模块，刷新页面,可以发现配置已生效
+
+![image-20220421093123128](image/2.2.5.8.4.png)
+
+分组也可以应用在不同的场景下
+
+![image-20220421093506380](image/2.2.5.8.5.png)
+
+##### 9、加载多个配置集
+
+1、微服务任何配置信息，任何配置文件都可以放在配置中心中
+2、只需要在bootstrap. properties说明加载配置中心中哪些配置文件即可
+3、@Value, @ConfigurationProperties。。。
+以前SpringBoot任何方法从配置文件中获取值，都能使用。
+配置中心有的优先使用配置中心中的。
+
+```
+datasource.yml
+mybatis.yml
+other.yml
+```
+
+###### 1、新建多个配置文件
+
+新建datasource配置文件
+
+![image-20220421095255291](image/2.2.5.9.1.png)
+
+同理，新建其他配置文件
+
+###### 2、使用配置文件
+
+在gulimall-coupon模块的bootstrap.properties配置文件中添加配置
+
+```
+#数据集id
+spring.cloud.nacos.config.ext-config[0].data-id=datasource.yml
+#数据分组
+spring.cloud.nacos.config.ext-config[0].group=dev
+#动态刷新
+spring.cloud.nacos.config.ext-config[0].refresh=true
+
+spring.cloud.nacos.config.ext-config[1].data-id=mybatis.yml
+spring.cloud.nacos.config.ext-config[1].group=dev
+spring.cloud.nacos.config.ext-config[1].refresh=true
+
+spring.cloud.nacos.config.ext-config[2].data-id=other.yml
+spring.cloud.nacos.config.ext-config[2].group=dev
+spring.cloud.nacos.config.ext-config[2].refresh=true
+```
+
+新版本需要使用extension-configs
+
+```
+#数据集id
+spring.cloud.nacos.config.ext-configs[0].data-id=datasource.yml
+#数据分组
+spring.cloud.nacos.config.ext-configs[0].group=dev
+#动态刷新
+spring.cloud.nacos.config.ext-configs[0].refresh=true
+
+spring.cloud.nacos.config.ext-configs[1].data-id=mybatis.yml
+spring.cloud.nacos.config.ext-configs[1].group=dev
+spring.cloud.nacos.config.ext-configs[1].refresh=true
+
+spring.cloud.nacos.config.ext-configs[2].data-id=other.yml
+spring.cloud.nacos.config.ext-configs[2].group=dev
+spring.cloud.nacos.config.ext-configs[2].refresh=true
+```
+
+![image-20220421101749656](image/2.2.5.9.2.png)
+
+###### 3、取消以前的配置
+
+![image-20220421102004314](image/2.2.5.9.3.png)
+
+###### 4、查看结果
+
+查看配置中心多配置文件是否生效
+
+url: http://127.0.1.1:7000/coupon/coupon/test
+
+![image-20220421102103191](image/2.2.5.9.4.1.png)
+
+url: http://127.0.1.1:7000/coupon/coupon/list
+
+![image-20220421102152644](image/2.2.5.9.4.2.png)
+
+###### 5、读取到的配置文件
+
+可以发现读取了4个配置文件
+
+gulimall-coupon.properties 为默认读取到的
+
+![image-20220421102354574](image/2.2.5.9.5.1.png)
+
+#### 2.2.6、使用GateWay
+
+官方文档：[Spring Cloud Gateway](https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/)
+
+选带GA的
+
+![image-20220421104925894](image/2.2.6.0.png)
+
+##### 1、概念
+
+- **Route**: The basic building block of the gateway. It is defined by an ID, a destination URI, a collection of predicates, and a collection of filters. A route is matched if the aggregate predicate is true.
+
+  路由：网关的基本构建块。 它由ID，目的地URI，谓词集合和滤波器集合定义。 如果总谓词是真的，则匹配路由
+
+- **Predicate**: This is a [Java 8 Function Predicate](https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html). The input type is a [Spring Framework `ServerWebExchange`](https://docs.spring.io/spring/docs/5.0.x/javadoc-api/org/springframework/web/server/ServerWebExchange.html). This lets you match on anything from the HTTP request, such as headers or parameters.
+
+  断言：这是一个Java 8函数断言。 输入类型是Spring Framework ServerWebExchange。 这使您可以匹配HTTP请求的任何内容，例如标题或参数。
+
+- **Filter**: These are instances of [`GatewayFilter`](https://github.com/spring-cloud/spring-cloud-gateway/tree/2.2.x/spring-cloud-gateway-server/src/main/java/org/springframework/cloud/gateway/filter/GatewayFilter.java) that have been constructed with a specific factory. Here, you can modify requests and responses before or after sending the downstream request.
+
+  过滤器：这些是已使用特定工厂构建的GateWayFilter的实例。 在这里，您可以在发送下游请求之前或之后修改请求和响应。
+
+##### 2、工作流程
+
+![Spring Cloud Gateway Diagram](image/2.2.6.2.png)
+
+##### 3、新建网关模块
+
+```
+com.atguigu.gulimall
+gulimall-gateway
+API网关
+com.atguigu.gulimall.gateway
+```
+
+![image-20220421150929959](image/2.2.6.3.1.png)
+
+![image-20220421110049376](image/2.2.6.3.2.png)
+
+我还是复制了资料提供的pom文件
+
+pom文件为赤红色，可以右键 --> Add as Maven Project
+
+<img src="image/2.2.6.3.3.png" alt="image-20220421151407018" style="zoom:50%;" />
+
+##### 4、依赖common工程
+
+```
+<dependency>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-common</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+![image-20220421151648004](image/2.2.6.4.png)
+
+##### 5、修改测试类
+
+```
+package com.atguigu.gulimall.gateway;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class GulimallGatewayApplicationTests {
+
+    @Test
+    public void contextLoads() {
+    }
+
+}
+```
+
+![image-20220421152341608](image/2.2.6.5.png)
+
+##### 6、配置注册中心
+
+在gulimall-gateway模块的application.properties文件中配置注册中心
+
+```
+spring.cloud.nacos.discovery.server-addr=127.0.0.1:8848
+spring.application.name=gulimall-gateway
+server.port=88
+```
+
+![image-20220421161950767](image/2.2.6.6.png)
+
+##### 7、新建网关命名空间
+
+![image-20220421152939717](image/2.2.6.7.png)
+
+##### 8、添加配置中心
+
+在ulimall-gateway模块的resources目录下新建bootstrap.properties文件并添加配置
+
+namespace为gateway命名空间的唯一标识
+
+```
+spring.application.name=gulimall-gateway
+spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+spring.cloud.nacos.config.namespace=8b0687c0-b126-4fd1-bbe0-ef8ae8da674e
+```
+
+![image-20220421154416975](image/2.2.6.8.png)
+
+启动类加上@EnableDiscoveryClient注解
+
+![image-20220421154939921](image/2.2.6.8.2.png)
+
+##### 9、添加配置
+
+![image-20220421154238581](image/2.2.6.9.png)
+
+##### 10、运行项目
+
+运行项目发现报DataSource的错误
+
+这是因为依赖了gulimall-connon模块，ulimall-connon模块依赖了mysql数据库
+
+![image-20220421154537896](image/2.2.6.10.png)
+
+##### 11、解决方法
+
+修改@SpringBootApplication注解，排除DataSource自动配置
+
+```
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+```
+
+或者排除spring-boot-starter-jdbc
+
+```
+<dependency>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-common</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <exclusions>
+      <exclusion>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-jdbc</artifactId>
+      </exclusion>
+   </exclusions>
+</dependency>
+```
+
+![image-20220421161552174](image/2.2.6.11.png)
+
+##### 12、运行项目
+
+发现网关是使用Netty做服务器的，Netty有非常高的网络性能
+
+![image-20220421162238622](image/2.2.6.12.png)
+
+##### 13、配置路由规则
+
+在application.yml中配置
+
+The preceding route matches if the request contained a `green` query parameter
+
+如果请求包含“green”查询参数，则前面的路由匹配。
+
+请求的url带target参数,例如：http://127.0.0.1:88/hello?target=123
+
+```
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: baidu_routs
+        uri: https://www.baidu.com/
+        predicates:
+        - Query=target
+```
+
+The preceding route matches if the request contained a `red` query parameter whose value matched the `gree.` regexp, so `green` and `greet` would match.
+
+如果请求包含红色查询参数，其值与 gre 匹配，则前面的路由匹配。 正则表达式，所以 green 和 greet 会匹配。
+
+如果请求的target参数的值为baidu(可以为正则表达式),则转发到https://www.baidu.com/
+
+如果请求的target参数的值为qq(可以为正则表达式),则转发到https://www.qq.com/
+
+```
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: baidu_routs
+        uri: https://www.baidu.com/
+        predicates:
+        - Query=target,baidu
+      - id: qq_routs
+        uri: https://www.qq.com/
+        predicates:
+        - Query=target,qq
+```
+
+![image-20220421221723803](image/2.2.6.13.png)
+
+##### 14、查看结果
+
+运行模块查看结果
+
+http://127.0.0.1:88/hello?target=baidu
+
+![image-20220421221951169](image/2.2.6.14.1.png)
+
+发现报错(如果不报错的话会把/hello带上,即https://www.baidu.com/hello)
+
+输入http://127.0.0.1:88/?target=baidu 访问到百度
+
+![image-20220421222247428](image/2.2.6.14.2.png)
+
+输入http://127.0.0.1:88/?target=qq 访问到qq
+
+![image-20220421222358232](image/2.2.6.14.3.png)
+
+##### 15、mvn install报错
+
+###### 1、模块重复
+
+我在使用Maven Helper的clear install命令后，报了一个错误
+
+<img src="image/2.2.6.15.1.1.png" alt="image-20220421162757416" style="zoom:50%;" />
+
+<img src="image/2.2.6.15.1.2.png" alt="image-20220421162757416" style="zoom:50%;" />
+
+com.atguigu.gulimall:gulimall:0.0.1-SNAPSHOT (B:\gulimall\pom.xml)的第21行有一个错误
+
+```
+ Some problems were encountered while processing the POMs:
+'modules.module[8]' specifies duplicate child module gulimall-common @ line 21, column 17
+```
+
+```
+处理POMS时遇到了一些问题：
+'modules.module[8]' 指定重复的子模块 gulimall-common @ line 21, column 17
+```
+
+![image-20220421163000016](image/2.2.6.15.1.3.png)
+
+最后发现我gulimall-common写重了，删掉第21行就行了(因该是我先写了，生成gulimall-common模块的时候又给我添加了一个)
+
+###### 2、没有找到JUnit4Provider
+
+修改后又报了个错java.lang.ClassNotFoundException: org.apache.maven.surefire.junit4.JUnit4Provider
+
+![image-20220421184935882](image/2.2.6.15.2.1.png)
+
+方法一：
+
+这个类是surefire-junit4里面的，可以添加这个依赖
+
+```
+<dependency>
+    <groupId>org.apache.maven.surefire</groupId>
+    <artifactId>surefire-junit4</artifactId>
+    <version>2.21.0</version>
+</dependency>
+```
+
+方法二：
+
+maven3使用junit4时需指定org.apache.maven.surefire为surefire-junit47,不然会报异常
+
+```
+Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:2.22.2:test (default-test) on project gulimall-coupon: There are test failures.
+```
+
+```
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>2.12</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-junit47</artifactId>
+            <version>2.12</version>
+        </dependency>
+    </dependencies>
+</plugin>
+```
+
+方法三：
+
+跳过测试
+
+```
+<plugin>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>2.22.2</version>
+    <configuration>
+        <skipTests>true</skipTests>
+    </configuration>
+</plugin>
+```
+
+![image-20220421223620570](image/2.2.6.15.2.2.png)
+
+###### 3、报了很长的错误
+
+```
+he POM for org.springframework.boot:spring-boot-loader-tools:jar:2.1.8.RELEASE is invalid, transitive dependencies (if any) will not be available, enable debug logging for more details
+```
+
+```
+org.springframework.boot:spring-boot-loader-tools:jar:2.1.8.RELEASE 的 POM 无效，传递依赖项（如果有）将不可用，启用调试日志以获取更多详细信息
+```
+
+```
+Caused by: java.lang.ClassNotFoundException: org.springframework.boot.loader.tools.LaunchScript
+```
+
+```
+[WARNING] Error injecting: org.springframework.boot.maven.RepackageMojo
+java.lang.NoClassDefFoundError:org/springframework/boot/loader/tools/Repackager$MainClassTimeoutWarningListener
+```
+
+```
+Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:2.1.8.RELEASE:repackage (repackage) on project gulimall-coupon: Execution repackage of goal org.springframework.boot:spring-boot-maven-plugin:2.1.8.RELEASE:repackage failed: A required class was missing while executing org.springframework.boot:spring-boot-maven-plugin:2.1.8.RELEASE:repackage: org/springframework/boot/loader/tools/LaunchScript
+```
+
+<img src="image/2.2.6.15.3.1.png" alt="image-20220421212448715" style="zoom: 10%;" />
+
+找了好久,最后删除这个插件解决了
+
+![image-20220421212858602](image/2.2.6.15.3.2.png)
+
+![image-20220421213003177](image/2.2.6.15.3.3.png)
+
+同理将其他gulimall模块(除了gulmall-common模块和gulimall根项目)的配置文件的这个部分
+
+```
+<build>
+   <plugins>
+      <plugin>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+   </plugins>
+</build>
+```
+
+修改改为
+
+```
+<build>
+   <plugins>
+      <!--maven3使用junit4时需指定org.apache.maven.surefire为surefire-junit47,不然会报异常-->
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-surefire-plugin</artifactId>
+         <version>2.12</version>
+         <dependencies>
+            <dependency>
+               <groupId>org.apache.maven.surefire</groupId>
+               <artifactId>surefire-junit47</artifactId>
+               <version>2.12</version>
+            </dependency>
+         </dependencies>
+      </plugin>
+   </plugins>
+</build>
+```
+
+由于renren-fast已经跳过了单元测试，所以只需要删掉spring-boot-mavne-plugin插件就行了
+
+![image-20220421214431880](image/2.2.6.15.3.4.png)
+
+renren-gengerator同gulimall模块(除了gulmall-common模块和gulimall根项目)一样配置
+
+右击gulimall根项目--> Run Maven -->clean install
+
+<img src="image/2.2.6.15.3.5.png" alt="image-20220421215238864" style="zoom:50%;" />
+
+可以看到所有项目构建成功
+
+![image-20220421215407027](image/2.2.6.15.3.6.png)
+
+###### 4、离线安装jar包
+
+**使用mvn install命令将下载好的jar安装至本地仓库中**
+
+例如想使用如下依赖
+
+```
+<dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>2.18.1</version>
+</dependency>
+```
+
+下载的jar包名为maven-surefire-plugin-2.18.1.jar
+
+```
+mvn install:install-file
+-Dfile=./maven-surefire-plugin-2.18.1.jar
+-DgroupId=org.apache.maven.plugins
+-DartifactId=maven-surefire-plugin
+-Dversion=2.18.1
+-Dpackaging=jar
+```
+
+-Dfile ：下载的jar包的路径
+-DgroupId：maven引用中的groupId，如下边的那个maven引用
+-DartifactId ： 这个是artifactId
+-Dversion：是版本号
+-Dpackaging：一般都是jar，因为你引入的就是jar包
+
+因此命令为:(命令需要在一行)
+
+```
+mvn install:install-file -Dfile=./maven-surefire-plugin-2.18.1.jar -DgroupId=org.apache.maven.plugins -DartifactId=maven-surefire-plugin -Dversion=2.18.1 -Dpackaging=jar
+```
 

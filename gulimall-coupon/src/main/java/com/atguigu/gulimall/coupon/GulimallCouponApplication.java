@@ -2,7 +2,12 @@ package com.atguigu.gulimall.coupon;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+/**
+ * @author 无名氏
+ */
+@EnableDiscoveryClient
 @SpringBootApplication
 public class GulimallCouponApplication {
 
