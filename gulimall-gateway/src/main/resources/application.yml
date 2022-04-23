@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: baidu_routs
+        uri: https://www.baidu.com/
+        predicates:
+        - Query=target,baidu
+      - id: qq_routs
+        uri: https://www.qq.com/
+        predicates:
+        - Query=target,qq
