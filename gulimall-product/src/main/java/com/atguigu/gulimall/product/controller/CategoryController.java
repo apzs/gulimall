@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,13 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 列表
+     * 查询分类几子分类，以树状形式组装
      */
-    @RequestMapping("/list")
-        public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryService.queryPage(params);
+    @RequestMapping("/list/tree")
+        public R list(){
+        List<CategoryEntity> list = categoryService.listWithTree();
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", list);
     }
 
 
@@ -48,7 +49,7 @@ public class CategoryController {
         public R info(@PathVariable("catId") Long catId){
 		CategoryEntity category = categoryService.getById(catId);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
@@ -58,6 +59,17 @@ public class CategoryController {
         public R save(@RequestBody CategoryEntity category){
 		categoryService.save(category);
 
+        return R.ok();
+    }
+
+    /**
+     * 修改节点的树形结构
+     */
+    @RequestMapping("/update/sort")
+    public R updateSort(@RequestBody CategoryEntity[] category){
+        if (category!=null && category.length>0) {
+            categoryService.updateBatchById(Arrays.asList(category));
+        }
         return R.ok();
     }
 
@@ -73,10 +85,18 @@ public class CategoryController {
 
     /**
      * 删除
+     * @RequestBody ;获取请求体，必须发送POST请求
+     * SpringMVC自动将请求体的数据(json) ，转为对应的对象
      */
     @RequestMapping("/delete")
         public R delete(@RequestBody Long[] catIds){
-		categoryService.removeByIds(Arrays.asList(catIds));
+
+		//检查当前删除的菜单是否被别的地方引用
+		//categoryService.removeByIds(Arrays.asList(catIds));
+
+		//批量删除
+		categoryService.removeMenuByIds(Arrays.asList(catIds));
+
 
         return R.ok();
     }

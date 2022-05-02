@@ -2,11 +2,32 @@ spring:
   cloud:
     gateway:
       routes:
-      - id: baidu_routs
-        uri: https://www.baidu.com/
-        predicates:
-        - Query=target,baidu
-      - id: qq_routs
-        uri: https://www.qq.com/
-        predicates:
-        - Query=target,qq
+        - id: baidu_routs
+          uri: https://www.baidu.com/
+          predicates:
+            - Query=target,baidu
+
+        - id: qq_routs
+          uri: https://www.qq.com/
+          predicates:
+            - Query=target,qq
+
+        - id: product_route
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            #http://localhost:88/api/product/category/list/tree 变为 http://localhost:10000/product/category/list/tree
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            # (?<segment>/?.*) 和 $\{segment} 为固定写法
+            #路径重写,将请求由 http://localhost:88/api/captcha.jpg 变为 http://localhost:8080/renren-fast/captcha.jpg
+            - RewritePath=/api/(?<segment>/?.*),/renren-fast/$\{segment}
+logging:
+  level:
+    root: debug

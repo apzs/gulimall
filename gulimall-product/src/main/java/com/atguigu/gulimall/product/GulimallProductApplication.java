@@ -3,12 +3,14 @@ package com.atguigu.gulimall.product;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * @author 无名氏
  * @date 2022/4/17
- * @Description: TODO
+ * @Description:
  */
+@EnableDiscoveryClient
 @MapperScan("com.atguigu.gulimall.product.dao")
 @SpringBootApplication
 public class GulimallProductApplication {

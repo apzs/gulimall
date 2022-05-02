@@ -1,11 +1,14 @@
 package com.atguigu.gulimall.product.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
+
+import javax.print.attribute.standard.MediaSize;
 
 /**
  * 商品三级分类
@@ -22,11 +25,12 @@ public class CategoryEntity implements Serializable {
 	/**
 	 * 分类id
 	 */
-	@TableId
+	@TableId(type = IdType.AUTO)
 	private Long catId;
 	/**
 	 * 分类名称
 	 */
+	@TableField("name")
 	private String name;
 	/**
 	 * 父分类id
@@ -39,6 +43,7 @@ public class CategoryEntity implements Serializable {
 	/**
 	 * 是否显示[0-不显示，1显示]
 	 */
+	@TableLogic(value = "1",delval = "0")
 	private Integer showStatus;
 	/**
 	 * 排序
@@ -56,5 +61,11 @@ public class CategoryEntity implements Serializable {
 	 * 商品数量
 	 */
 	private Integer productCount;
+
+	/**
+	 * 子分类
+	 */
+	@TableField(exist = false)
+	private List<CategoryEntity> children;
 
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @author 无名氏
  * @date 2022/4/20
- * @Description: TODO
+ * @Description:
  */
 //@EnableFeignClients(basePackages = "com.atguigu.gulimall.member.feign")
 @Component
