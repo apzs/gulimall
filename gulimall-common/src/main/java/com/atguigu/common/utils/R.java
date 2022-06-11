@@ -8,6 +8,7 @@
 
 package com.atguigu.common.utils;
 
+import com.atguigu.common.exception.BizCodeException;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -41,6 +42,10 @@ public class R extends HashMap<String, Object> {
 		return r;
 	}
 
+	public static R error(BizCodeException bizCodeException){
+		return error(bizCodeException.getCode(),bizCodeException.getMsg());
+	}
+
 	public static R ok(String msg) {
 		R r = new R();
 		r.put("msg", msg);
@@ -57,8 +62,13 @@ public class R extends HashMap<String, Object> {
 		return new R();
 	}
 
+	@Override
 	public R put(String key, Object value) {
 		super.put(key, value);
 		return this;
+	}
+
+	public Integer getCode(){
+		return (Integer) this.get("code");
 	}
 }

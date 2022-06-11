@@ -1,5 +1,156 @@
 
 
+# 零、项目简介
+
+## 1、项目背景
+
+### 1、电商模式
+
+市面上有 5 种常见的电商模式 B2B、B2C、C2B、C2C、O2O；
+
+###### 1、B2B 模式
+
+B2B (Business to Business)， 是指商家与商家建立的商业关系。 如：阿里巴巴
+
+###### 2、B2C 模式
+
+B2C (Business to Consumer)， 就是我们经常看到的供应商直接把商品卖给用户，即“商对客” 模式，也就是通常说的商业零售，直接面向消费者销售产品和服务。如：苏宁易购、京东、   天猫、小米商城
+
+###### 3、C2B 模式
+
+C2B (Customer to Business)，即消费者对企业。先有消费者需求产生而后有企业生产，即先有消费者提出需求，后有生产企业按需求组织生产
+
+###### 4、C2C 模式
+
+C2C (Customer to Consumer) ，客户之间自己把东西放上网去卖，如：淘宝，闲鱼
+
+###### 5、O2O 模式
+
+O2O 即 Online To Offline，也即将线下商务的机会与互联网结合在了一起，让互联网成为线下交易的前台。线上快速支付，线下优质服务。如：饿了么，美团，淘票票，京东到家
+
+### 2、谷粒商城
+
+谷粒商城是一个 B2C 模式的电商平台，销售自营商品给客户。
+
+
+
+## 2、项目架构图
+
+#### 1、项目微服务架构图
+
+![项目微服务架构图](image/0.2.1.jpg)
+
+#### 2、微服务划分图
+
+![image-20220504220244014](image/0.2.2.png)
+
+#### 3、项目技术&特色
+
+- 前后分离开发，并开发基于 vue 的后台管理系统
+- SpringCloud 全新的解决方案
+- 应用监控、限流、网关、熔断降级等分布式方案 全方位涉及
+- 透彻讲解分布式事务、分布式锁等分布式系统的难点
+- 分析高并发场景的编码方式，线程池，异步编排等使用
+- 压力测试与性能优化
+- 各种集群技术的区别以及使用
+- CI/CD 使用
+- ...
+
+#### 4、项目前置要求
+
+学习项目的前置知识
+
+- 熟悉 SpringBoot 以及常见整合方案
+- 了解 SpringCloud
+- 熟悉 git，maven
+- 熟悉 linux，redis，docker 基本操作
+- 了解 html，css，js，vue
+- 熟练使用 idea 开发项目
+
+
+
+## 3、分布式基础概念
+
+### 1、微服务
+
+微服务架构风格，就像是把一个**单独的应用程序**开发为一套**小服务**，每个**小服务**运行在**自己**的**进程**中，并使用轻量级机制通信，通常是 HTTP API。这些服务围绕业务能力来构建， 并通过完全自动化部署机制来独立部署。这些服务使用不同的编程语言书写，以及不同数据存储技术，并保持最低限度的集中式管理。
+简而言之：拒绝大型单体应用，基于业务边界进行服务微化拆分，各个服务独立部署运行。
+
+### 2、集群&分布式&节点
+
+集群是个物理形态，分布式是个工作方式。
+只要是一堆机器，就可以叫集群，他们是不是一起协作着干活，这个谁也不知道；
+
+《分布式系统原理与范型》定义：
+“分布式系统是若干独立计算机的集合，这些计算机对于用户来说就像单个相关系统”  分布式系统（distributed system）是建立在网络之上的软件系统。
+
+分布式是指将不同的业务分布在不同的地方。
+
+集群指的是将几台服务器集中在一起，实现同一业务。
+
+例如：**京东是一个分布式系统，众多业务运行在不同的机器**，所有业务构成一个大型的**业务集群**。每一个小的业务，比如用户系统，访问压力大的时候一台服务器是不够的。我们就  应该将用户系统部署到多个服务器，也就是**每一个业务系统也可以做集群化**；
+
+分布式中的每一个节点，都可以做集群。而集群并不一定就是分布式的。
+
+**节点：集群中的一个服务器**
+
+### 3、远程调用
+
+在分布式系统中，各个服务可能处于不同主机，但是服务之间不可避免的需要互相调用，我   们称为远程调用。
+SpringCloud 中使用 HTTP+JSON 的方式完成远程调用
+
+![image-20220504222238745](image/0.3.3.png)
+
+### 4、负载均衡
+
+![image-20220504222308871](image/0.3.4.png)
+
+分布式系统中，A 服务需要调用 B 服务，B 服务在多台机器中都存在，A 调用任意一个服务器均可完成功能。
+为了使每一个服务器都不要太忙或者太闲，我们可以负载均衡的调用每一个服务器，提  升网站的健壮性。
+常见的负载均衡算法：
+
+- 轮询：为第一个请求选择健康池中的第一个后端服务器，然后按顺序往后依次选择，直  到最后一个，然后循环。
+- 最小连接：优先选择连接数最少，也就是压力最小的后端服务器，在会话较长的情况下  可以考虑采取这种方式。
+- 散列：根据请求源的 IP 的散列（hash）来选择要转发的服务器。这种方式可以一定程度上保证特定用户能连接到相同的服务器。如果你的应用需要处理状态而要求用户能连接到和之前相同的服务器，可以考虑采取这种方式。
+
+### 5、服务注册/发现&注册中心
+
+![image-20220504221059549](image/0.3.5.png)
+
+A 服务调用 B 服务，A 服务并不知道 B 服务当前在哪几台服务器有，哪些正常的，哪些服务已经下线。解决这个问题可以引入注册中心；
+
+如果某些服务下线，我们其他人可以实时的感知到其他服务的状态，从而避免调用不可用的服务
+
+
+
+### 6、配置中心
+
+![image-20220504222150042](image/0.3.6.png)
+
+每一个服务最终都有大量的配置，并且每个服务都可能部署在多台机器上。我们经常需要变   更配置，我们可以让每个服务在配置中心获取自己的配置。
+
+**配置中心用来集中管理微服务的配置信息。**
+
+### 7、服务熔断&服务降级
+
+![image-20220504222346644](image/0.3.7.png)
+
+在微服务架构中，微服务之间通过网络进行通信，存在相互依赖，当其中一个服务不可用时，有可能会造成雪崩效应。要防止这样的情况，必须要有容错机制来保护服务。
+
+##### 1、服务熔断
+
+a.设置服务的超时，当被调用的服务经常失败到达某个阈值，我们可以开启断路保护机制，后来的请求不再去调用这个服务。本地直接返回默认的数据
+
+##### 2、服务降级
+
+a.在运维期间，当系统处于高峰期，系统资源紧张，我们可以让非核心业务降级运行。降级：某些服务不处理，或者简单处理【抛异常、返回 NULL、调用 Mock 数据、调用 Fallback 处理逻辑】。
+
+### 8、API 网关
+
+![image-20220504222406801](image/0.3.8.png)
+
+在微服务架构中，API       Gateway       作为整体架构的重要组件，它抽象了**微服务中都需要的公共功能**，同时提供了客户端**负载均衡**，**服务自动熔断**，**灰度发布**，**统一认证**，**限流流控**，**日志统计**等丰富的功能，帮助我们解决很多 API 管理难题。
+
 # 一、环境准备
 
 ## 1.1、安装软件虚拟机软件
@@ -282,7 +433,7 @@ sudo mkdir -p /etc/docker
 ```linux
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
-  "registry-mirrors": ["https://84qg2i6j.mirror.aliyuncs.com"]
+  "registry-mirrors": ["https://82m9ar63.mirror.aliyuncs.com"]
 }
 EOF
 ```
@@ -1564,6 +1715,8 @@ npm run dev
 
 #### 1.9.5、没有验证码:rage:
 
+##### 1、没有验证码
+
 没有验证码是因为我使用的是资料提供的代码，而不是renren-fast-vue
 
 renren-fast-vue没有这个问题，而资料提供的是请求给了网关(88端口)
@@ -1572,13 +1725,19 @@ renren-fast-vue没有这个问题，而资料提供的是请求给了网关(88�
 
 ![没有验证码](image/1.9.5.1.png)
 
+##### 2、查看请求
+
 查看请求可以看到，请求的路径localhost:88/api
 
 ![请求的路径localhost:88/api](image/1.9.5.2.png)
 
+##### 3、 查看后台
+
 而后台的路径为localhost:8080/renren-fast
 
 ![后台的路径为localhost:8080/renren-fast](image/1.9.5.3.png)
+
+##### 4、修改前台请求路径
 
 将前端请求路径改为
 
@@ -1587,6 +1746,8 @@ http://localhost:8080/renren-fast
 ```
 
 ![修改前端请求路径](image/1.9.5.4.png)
+
+##### 5、查看结果
 
 可以看到有验证码了
 
@@ -1682,6 +1843,8 @@ tablePrefix=pms_
 #### 1.10.8、复制文件
 
 将生成的main复制到gulimall_product的src目录下
+
+**生成的文件最好都保存，其他文件后面也会用到的**
 
 点击模块，单击右键--> Show in Explorer可以打开该模块所在位置
 
@@ -2009,12 +2172,13 @@ server:
 
 #### 1.10.10、生成其他模块代码
 
-| 项目名          | 模块名 | 数据库名     | 表前缀 |
-| --------------- | ------ | ------------ | ------ |
-| gulimall-coupon | coupon | gulimall_sms | sms_   |
-| gulimall-member | member | gulimall_ums | ums_   |
-| gulimall-order  | order  | gulimall_oms | oms_   |
-| gulimall-ware   | ware   | gulimall_wms | wms_   |
+| 项目名                                         | 模块名  | 数据库名     | 表前缀 |
+| ---------------------------------------------- | ------- | ------------ | ------ |
+| gulimall-coupon                                | coupon  | gulimall_sms | sms_   |
+| gulimall-member                                | member  | gulimall_ums | ums_   |
+| gulimall-order                                 | order   | gulimall_oms | oms_   |
+| gulimall-product(刚刚已经生成了，不用再次生成) | product | gulimall_pms | pms_   |
+| gulimall-ware                                  | ware    | gulimall_wms | wms_   |
 
 ##### 1、修改数据库
 
@@ -2067,9 +2231,17 @@ import org.junit.jupiter.api.Test;
 
 ![这个测试类导的包和一些其他的模块不一样](image/1.10.10.3.2.png)
 
-##### 4、删除resources下的src文件夹
+##### 4、~~删除resources下的src文件夹~~
 
-resources下的src文件夹为vue文件，后续用不到，删除即可
+**~~resources下的src文件夹为vue文件，后续用不到，删除即可~~**
+
+**一定不要删，可以复制到其他地方，再把这个项目里面的删掉**
+
+**一定不要删，可以复制到其他地方，再把这个项目里面的删掉**
+
+**一定不要删，可以复制到其他地方，再把这个项目里面的删掉**
+
+这些文件后面会用到的，最好都不要删，先保存好
 
 ![删除resources下的src文件夹](image/1.10.10.4.png)
 
@@ -2541,9 +2713,11 @@ Could not autowire. No beans of 'CouponFeignService' type found.
 
 ![IDEA检测到不能自动注入](image/2.2.4.2.5.1.png)
 
-其实可以注入成功，只是IDEA检测到该接口没有注入到Spring容器，其实使用`@EnableFeignClients`注解后在运行时会注入到容器中的
+其实可以注入成功，接口没有实现类，接口是没有办法创建实例的，因此也就无法注入到ioc容器
 
-如果不想看到红色的报错，可以在该接口添加`@Component`显示的注入到Spring容器
+只是IDEA检测到该接口没有注入到ioc容器，其实使用`@EnableFeignClients`注解后在运行时会注入到容器中的
+
+如果不想看到红色的报错，可以在该接口添加`@Component`显式的注入到ioc容器
 
 ![可以在该接口添加@Component显示的注入到Spring容器](image/2.2.4.2.5.2.png)
 
@@ -5250,7 +5424,7 @@ vue init webpack appname
 
 vue 脚手架使用 webpack 模板初始化一个 appname 项目
 
-1、'vue' 不是内部或外部命令，也不是可运行的程序
+###### 1、'vue' 不是内部或外部命令，也不是可运行的程序
 
 ```
 npm init webpack vue-demo
@@ -5258,7 +5432,7 @@ npm init webpack vue-demo
 
 ![初始化 vue 项目](image/3.3.9.3.1.png)
 
-2、卸载vue/cli-init
+###### 2、卸载vue/cli-init
 
 ```
 npm uninstall -g @vue/cli-init
@@ -5266,7 +5440,7 @@ npm uninstall -g @vue/cli-init
 
 ![卸载vue、cli-init](image/3.3.9.3.2.png)
 
-3、安装vue/cli
+###### 3、安装vue/cli
 
 ```
 npm install -g @vue/cli@4.0.3
@@ -5274,11 +5448,11 @@ npm install -g @vue/cli@4.0.3
 
 <img src="image/3.3.9.3.3.png" alt="安装vue/cli" style="zoom: 50%;" />
 
-4、配置环境变量
+###### 4、配置环境变量
 
 ![image-20220425232327423](image/3.3.9.3.4.png)
 
-5、查看vue是否安装
+###### 5、查看vue是否安装
 
 ```
 vue -V
@@ -5286,7 +5460,7 @@ vue -V
 
 ![image-20220425232413958](image/3.3.9.3.5.png)
 
-6、提示要使用`vue/cli-init`
+###### 6、提示要使用`vue/cli-init`
 
 :rage:就应该按自己的想法来
 
@@ -5295,7 +5469,7 @@ Command vue init requires a global addon to be installed.
 
 ![image-20220425232604227](image/3.3.9.3.6.png)
 
-7、卸载`vue/cli`
+###### 7、卸载`vue/cli`
 
 ```
 npm uninstall -g @vue/cli
@@ -5303,15 +5477,15 @@ npm uninstall -g @vue/cli
 
 ![image-20220425233234014](image/3.3.9.3.7.png)
 
-8、修改环境变量
+###### 8、修改环境变量
 
 ![image-20220425233656209](image/3.3.9.3.8.png)
 
-9、没想到这个也要管理员方式运行cmd执行这个命令
+###### 9、没想到这个也要管理员方式运行cmd执行这个命令
 
 ![image-20220425234128781](image/3.3.9.3.9.png)
 
-10、以管理员方式运行cmd执行命令
+###### 10、以管理员方式运行cmd执行命令
 
 ```
 vue init webpack vue-demo
@@ -5319,7 +5493,7 @@ vue init webpack vue-demo
 
 <img src="image/3.3.9.3.10.png" alt="image-20220425234603564" style="zoom:50%;" />
 
-:pushpin:查看全局已安装
+###### :pushpin:查看全局已安装
 
 ```
 npm ls -g
@@ -5472,7 +5646,7 @@ vscode 添加用户代码片段（快速生成 vue 模板）
 
 ###### 4、导入element-ui 快速开发
 
-1. 安装 element-ui：  
+1. ###### 安装 element-ui：  
 
    以管理员方式运行VS Code，终端执行该命令
 
@@ -5816,15 +5990,29 @@ public class CorsConfig2 {
 
 ![image-20220427155049406](image/4.1.2.8.2.png)
 
+###### 方法一
+
 将`eslintrc.js`里面的`extends: 'standard',`注释掉就不报错了
 
 ![image-20220427160029935](image/4.1.2.8.3.png)
 
-或者删掉`build\webpack.base.conf.js`里面的`createLintingRule()`
+###### 方法二
 
-![image-20220427160549017](image/4.1.2.6.4.4.png)
+删掉`build\webpack.base.conf.js`里面的`createLintingRule()`
 
+![image-20220427160549017](image/4.1.2.8.4.png)
 
+###### 方法三
+
+删掉`build\webpack.base.conf.js`里面`reateLintingRule()`方法里面的代码
+
+![image-20220503140831432](image/4.1.2.8.5.png)
+
+###### 方法四
+
+删掉`config\index.js`里面的`useEslint: true,`
+
+![image-20220503141016797](image/4.1.2.8.6.png)
 
 :pushpin:后来我又使用的是renren-fast-vue，放弃了资料提供的做好的代码
 
@@ -5838,7 +6026,7 @@ find VS including the "Desktop development with C++" workload.
 您需要安装最新版本的Visual Studio查找VS，包括“带有C ++的桌面开发”工作负载。
 ```
 
-![image-20220426234340229](image/4.1.2.8.4.png)
+![image-20220426234340229](image/4.1.2.8.7.png)
 
 修改一下msvs_version版本就行了
 
@@ -5985,6 +6173,24 @@ ps:后面又修改为 `http://localhost:88/api` 了
 ```
 
 ![image-20220427210524719](image/4.1.2.11.1.png)
+
+由于`gulimall-common`模块依赖了配置中心，"renren-fast"模块暂时没配，所以可以先排除掉配置中心
+
+这样的话运行可以不报错(不排除也能运行，不过会报错)
+
+```
+<dependency>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-common</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <exclusions>
+      <exclusion>
+         <groupId>com.alibaba.cloud</groupId>
+         <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+      </exclusion>
+   </exclusions>
+</dependency>
+```
 
 ##### 2、修改配置文件
 
@@ -7557,9 +7763,7 @@ export default {
 
 ### 4.1.7、分类维护增删查改
 
-#### 1、基本添加和修改功能
-
-##### 1、添加修改按钮
+#### 1、添加修改按钮
 
 在`删除`按钮下添加修改按钮
 
@@ -7569,7 +7773,7 @@ export default {
 </el-button>
 ```
 
-##### 2、添加数据
+#### 2、添加数据
 
 添加数据字段，用来标识当前对话框是添加还是删除
 
@@ -7580,7 +7784,7 @@ dialogType: "",
 dialogTitle: "",
 ```
 
-##### 3、添加`catagory`数据字段
+#### 3、添加`catagory`数据字段
 
 添加` catId: null,`字段
 
@@ -7595,7 +7799,7 @@ category: {
 },
 ```
 
-##### 4、编写`edit`方法
+#### 4、编写`edit`方法
 
 ```javascript
 edit(data) {
@@ -7610,7 +7814,7 @@ edit(data) {
 },
 ```
 
-##### 5、修改`append`方法
+#### 5、修改`append`方法
 
 ```javascript
 append(data) {
@@ -7627,7 +7831,7 @@ append(data) {
 },
 ```
 
-##### 6、修改确定按钮绑定的事件方法
+#### 6、修改确定按钮绑定的事件方法
 
 修改确定按钮点击事件调用的方法为`submitData`
 
@@ -7635,7 +7839,7 @@ append(data) {
  <el-button type="primary" @click="submitData">确 定</el-button>
 ```
 
-##### 7、添加`submitData`方法
+#### 7、添加`submitData`方法
 
 ```javascript
 submitData() {
@@ -7647,7 +7851,7 @@ submitData() {
 },
 ```
 
-##### 8、打印修改请求数据
+#### 8、打印修改请求数据
 
 ```javascript
 editCatagory() {
@@ -7657,9 +7861,9 @@ editCatagory() {
 },
 ```
 
-![image-20220430180933340](image/4.1.7.1.8.png)
+![image-20220430180933340](image/4.1.7.8.png)
 
-##### 9、对话框内添加标签
+#### 9、对话框内添加标签
 
 在`el-dialog`标签内添加`el-form-item`标签
 
@@ -7674,7 +7878,7 @@ editCatagory() {
 
 
 
-##### 10、发送修改请求
+#### 10、发送修改请求
 
 这里的代码写的有问题(后面测试发现数据库已经修改数据了，但是前端没有显示，刷新后才能显示)
 
@@ -7721,7 +7925,7 @@ editCatagory() {
 },
 ```
 
-##### 11、修改`edit`方法,动态获取值
+#### 11、修改`edit`方法,动态获取值
 
 ```javascript
 edit(data) {
@@ -7748,7 +7952,7 @@ edit(data) {
 },
 ```
 
-##### 12、修改`append`方法
+#### 12、修改`append`方法
 
 ```javascript
 append(data) {
@@ -7778,7 +7982,7 @@ clearCategory(){
 },
 ```
 
-13、修改`addCatagory`方法
+#### 13、修改`addCatagory`方法
 
 ```javascript
 addCatagory() {
@@ -7804,9 +8008,9 @@ addCatagory() {
 },
 ```
 
-##### 13、优化体验,防止误关对话框
+#### 14、优化体验,防止误关对话框
 
-###### 1、添加`close-on-click-modal`属性
+##### 1、添加`close-on-click-modal`属性
 
 在`el-dialog`标签内添加`close-on-click-modal`属性
 
@@ -7820,27 +8024,27 @@ addCatagory() {
 close-on-click-modal="false"
 ```
 
-###### 2、控制台显示需要`Boolean`类型，而给出的是"String"类型
+##### 2、控制台显示需要`Boolean`类型，而给出的是"String"类型
 
-![image-20220430204554937](image/4.1.7.1.13.2.png)
+![image-20220430204554937](image/4.1.7.14.2.png)
 
-###### 3、使用`v-bind`属性
+##### 3、使用`v-bind`属性
 
 ```
 :close-on-click-modal="false"
 ```
 
-![image-20220430204921080](image/4.1.7.1.13.3.png)
+![image-20220430204921080](image/4.1.7.14.3.png)
 
-###### 4、控制台不报错了
+##### 4、控制台不报错了
 
-![image-20220430205044369](image/4.1.7.1.13.4.png)
+![image-20220430205044369](image/4.1.7.14.4.png)
 
-##### 14、修改后前端不更新数据
+#### 15、修改后前端不更新数据
 
 修改分类名称后，发现数据库已经修改数据了，但是前端没有显示，刷新后才能显示
 
-##### 15、修改`editCatagory`方法
+#### 16、修改`editCatagory`方法
 
 ```javascript
 editCatagory() {
@@ -7865,7 +8069,7 @@ editCatagory() {
 },
 ```
 
-##### 16、完整代码
+#### 17、完整代码
 
 ```javascript
 <template>
@@ -8152,9 +8356,9 @@ export default {
 
 
 
-#### 2、添加拖拽节点功能
+### 4.1.8、添加拖拽节点功能
 
-##### 1、添加拖拽功能
+#### 1、添加拖拽功能
 
 参考文档: [组件 | Element](https://element.eleme.cn/#/zh-CN/component/tree)
 
@@ -8209,63 +8413,63 @@ countNodeLevel(data) {
 
 
 
-##### 2、测试数据1
+#### 2、测试数据1
 
-###### 1、拖拽前
+##### 1、拖拽前
 
-![image-20220430233700326](image/4.1.7.2.1.1.png)
+![image-20220430233700326](image/4.1.8.2.1.1.png)
 
 
 
-![image-20220430233559727](image/4.1.7.2.1.2.png)
+![image-20220430233559727](image/4.1.8.2.1.2.png)
 
-###### 2、拖拽后
+##### 2、拖拽后
 
 (不用管控制台里的next，跟这个没有影响，只是我选的一组数据不是inner而已)
 
-![image-20220430234003283](image/4.1.7.2.2.1.png)
+![image-20220430234003283](image/4.1.8.2.2.1.png)
 
 可以发现catLevel改变了
 
-![image-20220430234200253](image/4.1.7.2.2.2.png)
+![image-20220430234200253](image/4.1.8.2.2.2.png)
 
-##### 3、测试数据2
+#### 3、测试数据2
 
-###### 1、拖动前
+##### 1、拖动前
 
-![image-20220430235635855](image/4.1.7.2.3.1.1png)
+![image-20220430235635855](image/4.1.8.3.1.1.png)
 
-![image-20220430235733676](image/4.1.7.2.3.1.2.png)
+![image-20220430235733676](image/4.1.8.3.1.2.png)
 
-![image-20220430235821830](image/4.1.7.2.3.1.3.png)
+![image-20220430235821830](image/4.1.8.3.1.3.png)
 
 
 
-###### 2、拖动后
+##### 2、拖动后
 
 (不用管控制台里的next，跟这个没有影响，只是我选的一组数据不是inner而已)
 
-![image-20220501000013931](image/4.1.7.2.3.2.1.png)
+![image-20220501000013931](image/4.1.8.3.2.1.png)
 
 
 
-![image-20220501000137695](image/4.1.7.2.3.2.2.png)
+![image-20220501000137695](image/4.1.8.3.2.2.png)
 
-![image-20220501000306998](image/4.1.7.2.3.2.3.png)
+![image-20220501000306998](image/4.1.8.3.2.3.png)
 
-###### 3、menu中的数据
+##### 3、menu中的数据
 
-![image-20220501000725560](image/4.1.7.2.3.3.1.png)
+![image-20220501000725560](image/4.1.8.3.3.1.png)
 
-![image-20220501000839585](image/4.1.7.2.3.3.2.png)
+![image-20220501000839585](image/4.1.8.3.3.2.png)
 
-![image-20220501000923470](image/4.1.7.2.3.3.3.png)
+![image-20220501000923470](image/4.1.8.3.3.3.png)
 
 可见menu中的数据已经改变了
 
 `被拖拽节点`的子节点的`catLevel`都被改为了`被拖拽节点`的`catLevel`
 
-##### 4、修改`countNodeLevel`方法
+#### 4、修改`countNodeLevel`方法
 
 ```javascript
 countNodeLevel(data) {
@@ -8282,33 +8486,33 @@ countNodeLevel(data) {
 },
 ```
 
-###### 1、测试数据1
+##### 1、测试数据1
 
 改动后，节点信息显示正常，并且打印了正确的节点深度
 
-![image-20220501154304218](image/4.1.7.2.4.1.1.png)
+![image-20220501154304218](image/4.1.8.4.1.1.png)
 
-![image-20220501154457199](image/4.1.7.2.4.1.2.png)
+![image-20220501154457199](image/4.1.8.4.1.2.png)
 
-![image-20220501154606221](image/4.1.7.2.4.1.3.png)
+![image-20220501154606221](image/4.1.8.4.1.3.png)
 
-###### **2、测试数据2**
+##### **2、测试数据2**
 
-![image-20220501154951313](image/4.1.7.2.4.2.1.png)
+![image-20220501154951313](image/4.1.8.4.2.1.png)
 
 还是能显示正确的深度
 
-![image-20220501155115738](image/4.1.7.2.4.2.2.png)
+![image-20220501155115738](image/4.1.8.4.2.2.png)
 
-###### 3、测试数据3
+##### 3、测试数据3
 
-![image-20220501155748334](image/4.1.7.2.4.3.1.png)
+![image-20220501155748334](image/4.1.8.4.3.1.png)
 
-![image-20220501160239808](image/4.1.7.2.4.3.2.png)
+![image-20220501160239808](image/4.1.8.4.3.2.png)
 
 经测试可以看到，最长深度的计算没有问题了
 
-##### 5、修改`allowDrop`方法
+#### 5、修改`allowDrop`方法
 
  **这里的整棵树是指：被拖动节点和目标节点 及其子节点 和 其所有父节点 组成的树**
 
@@ -8341,7 +8545,7 @@ allowDrop(draggingNode, dropNode, type) {
 },
 ```
 
-##### 6、完整代码
+#### 6、完整代码
 
 ```vue
 <template>
@@ -8677,17 +8881,17 @@ export default {
 </style>
 ```
 
-#### 3、添加拖拽节点回调函数
+### 4.1.9、添加拖拽节点回调函数
 
 | 事件名称  | 说明                     | 回调参数                                                     |
 | :-------- | :----------------------- | :----------------------------------------------------------- |
 | node-drop | 拖拽成功完成时触发的事件 | 共四个参数，依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event |
 
-##### 1、`el-tree`添加属性
+#### 1、`el-tree`添加属性
 
 `el-tree`添加`@node-drop="handleDrop"`属性
 
-##### 2、添加回调方法
+#### 2、添加回调方法
 
 ```javascript
 handleDrop(draggingNode, dropNode, dropType, ev) {
@@ -8695,13 +8899,13 @@ handleDrop(draggingNode, dropNode, dropType, ev) {
 },
 ```
 
-##### 3、查看回调参数的数据
+#### 3、查看回调参数的数据
 
 数据和拖动节点的数据差不多
 
-![image-20220501233323689](image/4.1.7.3.3.png)
+![image-20220501233323689](image/4.1.9.3.png)
 
-##### 4、编写拖拽成功后触发的事件
+#### 4、编写拖拽成功后触发的事件
 
 ```javascript
 /**
@@ -8777,7 +8981,7 @@ updateChildNodeLevel(node) {
 },
 ```
 
-##### 5、后端添加批量修改功能
+#### 5、后端添加批量修改功能
 
 ```java
 /**
@@ -8791,7 +8995,7 @@ public R updateSort(@RequestBody CategoryEntity[] category){
 }
 ```
 
-##### 6、`handleDrop`方法里添加代码
+#### 6、`handleDrop`方法里添加代码
 
 在第3步那里添加向后端发送请求的代码
 
@@ -8813,15 +9017,15 @@ this.$http({
 });
 ```
 
-##### 7、测试是否成功修改
+#### 7、测试是否成功修改
 
 修改代码结构后，刷新页面，发现树的结构已正确显示
 
-![image-20220502154324423](image/4.1.7.3.7.1.png)
+![image-20220502154324423](image/4.1.9.7.1.png)
 
-![image-20220502154013655](image/4.1.7.3.7.2.png)
+![image-20220502154013655](image/4.1.9.7.2.png)
 
-#### 4、多次拖拽后一次提交
+### 4.1.10、多次拖拽后一次提交
 
 多次拖拽后一次提交有可能出现其他的用户修改后，当前用户没有及时更新，当前用户覆盖了其他用户数据，但当前用户并不知情
 
@@ -8831,13 +9035,15 @@ this.$http({
 | :-------- | :------------------- | :------ | :----- |
 | draggable | 是否开启拖拽节点功能 | boolean | false  |
 
-##### 1、添加按钮
+#### 1、添加开关
+
+参考**element-ui**的**Switch开关**里的**文字描述**：[组件 | Element](https://element.eleme.io/#/zh-CN/component/switch)
 
 ```html
 <el-switch v-model="draggable" active-text="开启拖拽" inactive-text="关闭拖拽">
 ```
 
-##### 2、修改`el-tree`的`draggable`属性
+#### 2、修改`el-tree`的`draggable`属性
 
 动态绑定`draggable`的值来确定是否可以拖拽
 
@@ -8845,7 +9051,7 @@ this.$http({
 :draggable="draggable"
 ```
 
-##### 3、添加数据字段
+#### 3、添加数据字段
 
 默认设置为不可拖拽
 
@@ -8854,13 +9060,13 @@ this.$http({
 draggable: false,
 ```
 
-##### 4、添加批量保存按钮
+#### 4、添加批量保存按钮
 
 ```html
 <el-button v-if="draggable" @click="batchSave">批量保存</el-button>
 ```
 
-##### 5、添加`batchSave`方法
+#### 5、添加`batchSave`方法
 
 删除`handleDrop`方法里向后端发送请求的代码，把向后端发送请求的代码写到`batchSave`里
 
@@ -8891,7 +9097,7 @@ batchSave() {
 },
 ```
 
-##### 6、使用动态更新的层级
+#### 6、使用动态更新的层级
 
 由于加入了**批量提交**功能，当节点拖拽多次后才提交给后端
 
@@ -9017,25 +9223,25 @@ countNodeLevel(node) {
 },
 ```
 
-##### 7、测试
+#### 7、测试
 
 开拖拽后，连续拖拽以下两次，发现允许拖拽，证明代码没问题
 
 初始结构
 
-![image-20220502172234731](image/4.1.7.4.7.1.png)
+![image-20220502172234731](image/4.1.10.7.1.png)
 
 把`2.1`拖拽到一级菜单
 
-![image-20220502182545906](image/4.1.7.4.7.2.png)
+![image-20220502182545906](image/4.1.10.7.2.png)
 
 把`3.1`拖拽到`2.1`下，发现是可以的，如果没有使用动态更新的数据，会显示不可以拖拽
 
-![image-20220502192350288](image/4.1.7.4.7.3.png)
+![image-20220502192350288](image/4.1.10.7.3.png)
 
-##### 8、完整代码
+#### 8、完整代码
 
-###### 1、不使用动态更新的层级之前的错误代码
+##### 1、不使用动态更新的层级之前的错误代码
 
 ```vue
 <template>
@@ -9478,7 +9684,7 @@ export default {
 </style>
 ```
 
-###### 2、使用动态更新的层级之后的正确的代码
+##### 2、使用动态更新的层级之后的正确的代码
 
 ```vue
 <template>
@@ -9921,9 +10127,9 @@ export default {
 </style>
 ```
 
-#### 5、优化体验
+### 4.1.11、优化体验
 
-##### 1、提交后展开多个节点
+#### 1、提交后展开多个节点
 
 拖拽节点并批量保存成功后展开的节点只有一个，即展开的是最后一次拖拽的父节点
 
@@ -9937,7 +10143,7 @@ export default {
 
 (但没拖拽成功但展开的节点在批量保存后不能再次展开)
 
-##### 2、以前展开的节点，提交后依然展开
+#### 2、以前展开的节点，提交后依然展开
 
 | 事件名称      | 说明                   | 回调参数                                                     |
 | :------------ | :--------------------- | :----------------------------------------------------------- |
@@ -9974,7 +10180,7 @@ nodeCollapse(data, node, ele) {
 
 这样重新获取数据后，以前展开的节点都会被展开
 
-###### 1、使用该方法前
+##### 1、使用该方法前
 
 ```vue
 <template>
@@ -10432,7 +10638,7 @@ export default {
 </style>
 ```
 
-###### 2、使用该方法后
+##### 2、使用该方法后
 
 ```vue
 <template>
@@ -10869,17 +11075,17 @@ export default {
 </style>
 ```
 
-###### 3、后端报错
+##### 3、后端报错
 
 当开启拖拽节点后，不拖拽节点，直接批量保存后页面没反应
 
 打开控制台报500的错误，证明是后端的错误
 
-![image-20220502230717102](image/4.1.7.5.2.3.1.png)
+![image-20220502230717102](image/4.1.11.2.3.1.png)
 
 打开后端发现，实体列表不能为空
 
-![image-20220502230934587](image/4.1.7.5.2.3.2.png)
+![image-20220502230934587](image/4.1.11.2.3.2.png)
 
 后端加个判断就行了
 
@@ -10896,13 +11102,13 @@ public R updateSort(@RequestBody CategoryEntity[] category){
 }
 ```
 
-![image-20220502231359263](image/4.1.7.5.2.3.3.png)
+![image-20220502231359263](image/4.1.11.2.3.3.png)
 
 重启项目后，再次不拖拽节点，直接批量保存不报错了
 
-![image-20220502231603498](image/4.1.7.5.2.3.4.png)
+![image-20220502231603498](image/4.1.11.2.3.4.png)
 
-##### 3、开启拖拽功能后，不能添加、修改、删除节点
+#### 3、开启拖拽功能后，不能添加、修改、删除节点
 
 在`append`、`remove`、`edit`方法开头都加上如下类似代码(只需修改一下`message`)
 
@@ -10916,7 +11122,7 @@ if(this.draggable){
 }
 ```
 
-4、批量提交后关闭拖拽功能
+#### 4、批量提交后关闭拖拽功能
 
 在`batchSave`最后添加如下代码
 
@@ -10925,7 +11131,7 @@ if(this.draggable){
  this.draggable = false;
 ```
 
-##### 4、完整代码
+#### 5、完整代码
 
 ```vue
 <template>
@@ -11387,3 +11593,12913 @@ export default {
 </style>
 ```
 
+### 4.1.12、批量删除
+
+#### 1、添加按钮
+
+ 参考**element-ui**的**Button按钮**里的**基本用法**中的**危险按钮**：[组件 | Element](https://element.eleme.io/#/zh-CN/component/button)
+
+在批量保存右边添加批量删除按钮(代码写在批量保存下面，el-tree上面)
+
+```html
+<el-button type="danger" @click="batchDelete">批量删除</el-button>
+```
+
+#### 2、添加`el-tree`属性
+
+在`el-tree`标签里添加`ref="menuTree"`属性，标记这个组件的名字
+
+```
+ref="menuTree"
+```
+
+#### 3、添加批量删除方法
+
+| 方法名          | 说明                                                         | 参数                                                         |
+| :-------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| getCheckedNodes | 若节点可被选择（即 `show-checkbox` 为 `true`），则返回目前被选中的节点所组成的数组 | (leafOnly, includeHalfChecked) 接收两个 boolean 类型的参数，1. 是否只是叶子节点，默认值为 `false` 2. 是否包含半选节点，默认值为 `false` |
+| getCheckedKeys  | 若节点可被选择（即 `show-checkbox` 为 `true`），则返回目前被选中的节点的 key 所组成的数组 | (leafOnly) 接收一个 boolean 类型的参数，若为 `true` 则仅返回被选中的叶子节点的 keys，默认值为 `false` |
+
+`this.$refs`会获取当前vue文件所有组件
+
+`this.$refs.menuTree`获取当前vue文件所有标签中`ref`属性为`menuTree`或`components{}`里面为`menuTree`的组件
+
+然后再调用该组件的方法
+
+```javascript
+//批量删除
+batchDelete() {
+  let catIds = this.$refs.menuTree.getCheckedKeys();
+  console.log("批量删除的id：", JSON.parse(JSON.stringify(catIds)));
+  let names = this.$refs.menuTree
+    .getCheckedNodes()
+    .map((node) => node.name);
+  console.log("批量删除的名字:", JSON.parse(JSON.stringify(names)));
+  this.$confirm(`是否删除【${names}】这些菜单`, "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(() => {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/delete"),
+        method: "post",
+        data: this.$http.adornData(catIds, false),
+      }).then(({ datas }) => {
+        this.$message({
+          type: "success",
+          message: `批量删除成功`,
+        });
+        //重新发送请求,更新数据
+        this.getMenus();
+      });
+    })
+    .catch(() => {
+      this.$message({
+        type: "info",
+        message: "已取消批量删除",
+      });
+    });
+},
+```
+
+3种方式可以获取到选中节点的id
+
+```javascript
+let catIds = this.$refs.menuTree.getCheckedKeys();
+```
+
+```javascript
+let catIds = this.$refs.menuTree.getCheckedNodes().map(node=>node.catId);
+```
+
+```javascript
+let catIds = [];
+this.$refs.menuTree.getCheckedNodes().forEach(node => { catIds.push(node.catId)});
+```
+
+#### 4、体验优化
+
+当没有选中节点的时候，不出现**批量删除**按钮
+
+##### 1、添加数据字段
+
+在`data`里添加字段，用于判断是否显示**批量删除**按钮
+
+```
+ canBatchDeletion: false,
+```
+
+##### 2、添加`v-if`属性
+
+```html
+<el-button v-if="canBatchDeletion" type="danger" @click="batchDelete">批量删除</el-button>
+```
+
+##### 3、添加事件
+
+| 事件名称     | 说明                         | 回调参数                                                     |
+| :----------- | :--------------------------- | :----------------------------------------------------------- |
+| check-change | 节点选中状态发生变化时的回调 | 共三个参数，依次为：传递给 `data` 属性的数组中该节点所对应的对象、节点本身是否被选中、节点的子树中是否有被选中的节点 |
+
+`el-tree`标签内添加属性
+
+```properties
+@check-change="nodeCheckChange"
+```
+
+##### 4、编写方法
+
+```javascript
+nodeCheckChange(data, checked, indeterminate){
+  let catIds = this.$refs.menuTree.getCheckedKeys();
+  console.log(catIds)
+  //如果catIds长度为0就不显示批量删除按钮
+  this.canBatchDeletion = !(catIds.length==0);
+}
+```
+
+##### 5、发现页面有抖动现象
+
+![4.1.7.6.4.5](image/4.1.12.4.5.1.gif)
+
+把这一行加个div设个高度就可以解决
+
+```html
+<div style="height: 50px; line-height: 50px">
+  <el-switch
+    v-model="draggable"
+    active-text="开启拖拽"
+    inactive-text="关闭拖拽"
+  >
+  </el-switch>
+  <!-- draggable为true时，开启了拖拽功能，批量保存才显示 -->
+  <el-button v-if="draggable" @click="batchSave">批量保存</el-button>
+  <el-button v-if="canBatchDeletion" type="danger" @click="batchDelete">批量删除</el-button>
+</div>
+```
+
+![4.1.7.6.4.5.2](image/4.1.12.4.5.2.gif)
+
+##### 6、点击批量删除后，隐藏该按钮
+
+在`batchDelete`方法里面 重新发送请求,更新数据`this.getMenus();`的这行下面添加这行代码
+
+```
+//不显示批量删除按钮
+this.canBatchDeletion = false;
+```
+
+##### 7、完整代码
+
+```vue
+<template>
+  <div>
+    <div style="height: 50px; line-height: 50px">
+      <el-switch
+        v-model="draggable"
+        active-text="开启拖拽"
+        inactive-text="关闭拖拽"
+      >
+      </el-switch>
+      <!-- draggable为true时，开启了拖拽功能，批量保存才显示 -->
+      <el-button v-if="draggable" @click="batchSave">批量保存</el-button>
+      <el-button v-if="canBatchDeletion" type="danger" @click="batchDelete"
+        >批量删除</el-button
+      >
+    </div>
+    <el-tree
+      :data="menu"
+      :props="defaultProps"
+      @node-click="handleNodeClick"
+      @check-change="nodeCheckChange"
+      @node-expand="nodeExpand"
+      @node-collapse="nodeCollapse"
+      node-key="catId"
+      show-checkbox
+      :expand-on-click-node="false"
+      :default-expanded-keys="expandedKey"
+      :draggable="draggable"
+      :allow-drop="allowDrop"
+      @node-drop="handleDrop"
+      ref="menuTree"
+    >
+      <span class="custom-tree-node" slot-scope="{ node, data }">
+        <span>{{ node.label }}</span>
+        <span>
+          <el-button
+            v-if="data.catLevel <= 2"
+            type="text"
+            size="mini"
+            @click="() => append(data)"
+          >
+            添加
+          </el-button>
+          <el-button
+            v-if="data.children.length == 0"
+            type="text"
+            size="mini"
+            @click="() => remove(node, data)"
+          >
+            删除
+          </el-button>
+          <el-button type="text" size="mini" @click="() => edit(data)">
+            修改
+          </el-button>
+        </span>
+      </span>
+    </el-tree>
+
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="category">
+        <el-form-item label="分类名称">
+          <el-input v-model="category.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="图标">
+          <el-input v-model="category.icon" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="计量单位">
+          <el-input
+            v-model="category.productUnit"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitData">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: {},
+  props: {},
+  data() {
+    return {
+      //三级分类的所有数据
+      menu: [],
+      // 添加或修改菜单的对话框是否打开
+      dialogVisible: false,
+      // 添加菜单对话框中的数据
+      category: {
+        name: "",
+        parentCid: 0,
+        catLevel: 0,
+        showStatus: 1,
+        sort: 0,
+        icon: "",
+        productUnit: "",
+        catId: null,
+      },
+      //对话框的类型(添加或删除)
+      dialogType: "",
+      //对话框的标题(添加分类或删除分类)
+      dialogTitle: "",
+      //默认展开的节点的 key 的数组
+      expandedKey: [],
+      defaultProps: {
+        children: "children",
+        label: "name",
+      },
+      //是否可以拖拽
+      draggable: false,
+      //拖拽节点及其子节点在整颗树的最大深度
+      maxLength: 0,
+      //拖拽改变的节点数据
+      updateNodes: [],
+      //是否显示批量删除按钮
+      canBatchDeletion: false,
+    };
+  },
+  methods: {
+    handleNodeClick(data) {
+      console.log("点击节点返回的数据...", data);
+    },
+    getMenus() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log(data.data);
+        this.menu = data.data;
+      });
+    },
+    clearCategory() {
+      this.category = {
+        name: "",
+        parentCid: 0,
+        catLevel: 0,
+        showStatus: 1,
+        sort: 0,
+        icon: "",
+        productUnit: "",
+        catId: null,
+      };
+    },
+    //点击append按钮，弹出添加菜单的对话框
+    append(data) {
+      if (this.draggable) {
+        this.$message({
+          type: "warning",
+          message: "开启拖拽后不可以添加菜单",
+        });
+        return;
+      }
+      console.log("append方法中的data参数：", data);
+      //清空category数据
+      this.clearCategory();
+      this.dialogType = "append";
+      this.dialogTitle = "添加分类";
+      this.dialogVisible = true;
+      //<点击append按钮的节点>为<要添加的节点>的父节点
+      this.category.parentCid = data.catId;
+      //<要添加的节点>的父节点的层级为<点击append按钮的节点>+1
+      //data.catLevel*1 可以将 String类型的 data.catLevel 转为 int 类型
+      this.category.catLevel = data.catLevel * 1 + 1;
+    },
+    //向后端发送删除请求
+    remove(node, data) {
+      if (this.draggable) {
+        this.$message({
+          type: "warning",
+          message: "开启拖拽后不可以删除菜单",
+        });
+        return;
+      }
+      this.$confirm(`是否删除【${data.name}】菜单`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          var ids = [data.catId];
+          this.$http({
+            url: this.$http.adornUrl("/product/category/delete"),
+            method: "post",
+            data: this.$http.adornData(ids, false),
+          }).then(({ datas }) => {
+            this.$message({
+              type: "success",
+              message: `【${data.name}】删除成功`,
+            });
+            //重新发送请求,更新数据
+            this.getMenus();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+
+      console.log("remove方法中的node参数：", node);
+      console.log("remove方法中的data参数：", data);
+    },
+    //点击edit按钮，弹出修改菜单的对话框
+    edit(data) {
+      if (this.draggable) {
+        this.$message({
+          type: "warning",
+          message: "开启拖拽后不可以修改菜单",
+        });
+        return;
+      }
+      console.log("修改按钮...", data);
+      this.clearCategory();
+      this.category.catId = data.catId;
+      this.dialogType = "edit";
+      this.dialogTitle = "修改分类";
+      //打开添加或修改的对话框
+      this.dialogVisible = true;
+      this.$http({
+        url: this.$http.adornUrl(
+          `/product/category/info/${this.category.catId}`
+        ),
+        method: "get",
+      }).then(({ data }) => {
+        console.log("修改按钮调用后端回显的数据:", data);
+        this.category.name = data.data.name;
+        this.category.icon = data.data.icon;
+        this.category.productUnit = data.data.productUnit;
+        //更新父菜单id，发送修改请求后，可以展开父节点
+        this.category.parentCid = data.data.parentCid;
+      });
+    },
+    submitData() {
+      if (this.dialogType == "append") {
+        this.addCatagory();
+      } else if (this.dialogType == "edit") {
+        this.editCatagory();
+      }
+    },
+    //向后端发送添加请求
+    addCatagory() {
+      console.log("添加提交的数据：", this.category);
+
+      var { name, parentCid, catLevel, showStatus, sort, icon, productUnit } =
+        this.category;
+      this.$http({
+        url: this.$http.adornUrl("/product/category/save"),
+        method: "post",
+        data: this.$http.adornData(
+          { name, parentCid, catLevel, showStatus, sort, icon, productUnit },
+          false
+        ),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: `添加成功`,
+        });
+        //关闭对话框
+        this.dialogVisible = false;
+        //重新获取数据
+        this.getMenus();
+      });
+    },
+    //向后端发送修改请求
+    editCatagory() {
+      console.log("修改提交的数据：", this.category);
+      var { catId, name, icon, productUnit } = this.category;
+      this.$http({
+        url: this.$http.adornUrl("/product/category/update"),
+        method: "post",
+        data: this.$http.adornData({ catId, name, icon, productUnit }, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: `添加成功`,
+        });
+        //关闭对话框
+        this.dialogVisible = false;
+        //重新获取数据
+        this.getMenus();
+      });
+    },
+    /**
+     * 判断该节点是否可以拖拽(节点最大深度不能大于3)
+     * @param draggingNode  被拖拽的节点 (draggingNode里的数据不会更新)
+     * @param dropNode      目标节点     (dropNode里面的childNodes,parent等会动态更新(dropNode里面的data为数据库获取到的,不会更新))
+     * @param type  放置在目标节点前：'prev'、插入至目标节点：'inner'、 放置在目标节点后：'next'
+     * @return
+     * 这里的整棵树是指：被拖动节点和目标节点 及其子节点 和 其所有父节点 组成的树
+     */
+    allowDrop(draggingNode, dropNode, type) {
+      //console.log("拖拽节点:", draggingNode, dropNode, type);
+      //最大深度初始化为该该节点的深度,表示没有子节点
+      this.maxLength = draggingNode.level;
+      this.countNodeLevel(draggingNode);
+      //console.log("拖拽节点后的menu:", this.menu);
+      //拖拽节点及其子节点组成的树的最大深度
+      let deep = this.maxLength - draggingNode.level + 1;
+      this.maxLength = 0;
+      //console.log("拖拽的节点的局部树最大深度: " + deep);
+      if (type == "inner") {
+        //类型为 inner(表示在目标节点的内部)
+        //拖拽后整颗树的最大深度=(目标节点的深度 + 拖拽节点及其子节点组成的树的最大深度)
+        return dropNode.level + deep <= 3;
+      } else {
+        //类型为 prev 或 next (表示在目标节点的上面或下面，与目标节点同级)
+        //拖拽后整颗树的最大深度=(目标节点的父节点的深度 + 拖拽节点及其子节点组成的树的最大深度)
+        //dropNode.parent.level为element-ui提供的层级
+        //当拖拽到顶层(一级菜单,level=1)时dropNode.parent.level获取到的是0,dropNode.parent.childNodes为所有一级菜单
+        return dropNode.parent.level + deep <= 3;
+      }
+    },
+    /**
+     * 返回该节点即其子节点树的最大深度
+     * @warning 需要将 catLevel初始化为该节点的深度
+     */
+    countNodeLevel(node) {
+      var children = node.childNodes;
+      if (children != null && children.length > 0) {
+        for (let i = 0; i < children.length; i++) {
+          if (children[i].level > this.maxLength) {
+            this.maxLength = children[i].level;
+          }
+          //递归查找其子树的子树的最大深度
+          this.countNodeLevel(children[i]);
+        }
+      }
+    },
+    /**
+     * 拖拽成功后的回调函数，用来更新节点的信息
+     * @param draggingNode  被拖拽节点对应的 Node (draggingNode里的数据不会更新)
+     * @param dropNode      结束拖拽时最后进入的节点 (dropNode里面的childNodes,parent等会动态更新(dropNode里面的data为数据库获取到的,不会更新))
+     * @param type  被拖拽节点的放置位置（before、after、inner）放置在目标节点前：'prev'、插入至目标节点：'inner'、 放置在目标节点后：'next'
+     * @return
+     */
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+      console.log("拖拽成功的回调参数: ", draggingNode, dropNode, dropType);
+      //当前节点的父节点id
+      let pCid = 0;
+      //拖动节点后，被拖动节点的新的父节点的所有子节点数组
+      let sliblings = null;
+
+      //1、找到父节点id和父节点的子节点
+      if (dropType == "inner") {
+        //类型为 inner(表示在目标节点的内部)
+        //dropNode.data表示的是数据库获取到的data数据
+        pCid = dropNode.data.catId;
+        //dropNode里的数据(除了.data)表示的是element-ui动态更新的数据
+        //这里的dropNode.childNodes是拖动成功后，已经更新的节点的子节点信息
+        //拖拽到内部,则dropNode即为其父节点
+        sliblings = dropNode.childNodes;
+      } else {
+        //类型为 prev 或 next (表示在目标节点的上面或下面，与目标节点同级)
+        //拖拽到上面或下面，则 目标节点的父节点即为拖拽节点的父节点
+        //如果托拖拽到一级菜单(level=1)dropNode.parent.data装的是一级菜单集合(和dropNode.parent.childNodes数据一样),获取到的catId为undefined
+        //如果为undefined赋值为0
+        pCid = dropNode.parent.data.catId || 0;
+        //这里的dropNode.parent为element-ui提供的，是拖拽后的更新过的数据(draggingNode里的数据不会跟新)
+        //拖拽到上面或下面，则 目标节点的父节点子节点即为被拖动节点的新的父节点的所有子节点
+        sliblings = dropNode.parent.childNodes;
+      }
+      //2、将子节点更新的数据放到updateNodes中
+      this.updateNodes = [];
+      for (let i = 0; i < sliblings.length; i++) {
+        //如果是正在托拽的节点，需要更新其父id
+        if (sliblings[i].data.catId == draggingNode.data.catId) {
+          let catLevel = draggingNode.data.catLevel;
+          //当前节点的层级发生变化就更新子节点层级
+          if (sliblings[i].level != draggingNode.data.catLevel) {
+            //其实这个catLevel始终都是等于sliblings[i].level,即更新后的level
+            catLevel = sliblings[i].level;
+            //更新子节点层级
+            this.updateChildNodeLevel(sliblings[i]);
+          }
+          this.updateNodes.push({
+            catId: sliblings[i].data.catId,
+            sort: i,
+            parentCid: pCid,
+            catLevel: catLevel,
+          });
+        } else {
+          this.updateNodes.push({ catId: sliblings[i].data.catId, sort: i });
+        }
+      }
+
+      //3、把数据发送给后端(当点击批量保存后再发送)
+      console.log("拖拽节点成功后，发送给后端的数据:", this.updateNodes);
+    },
+    //拖动节点后，更新其子节点的层级
+    updateChildNodeLevel(node) {
+      if (node.childNodes.length > 0) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          let catId = node.childNodes[i].data.catId;
+          let catLevel = node.childNodes[i].level;
+          this.updateNodes.push({ catId: catId, catLevel: catLevel });
+          //递归更新子节点层级
+          this.updateChildNodeLevel(node.childNodes[i]);
+        }
+      }
+    },
+    //拖拽完成后，批量提交方法
+    batchSave() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/update/sort"),
+        method: "post",
+        data: this.$http.adornData(this.updateNodes, false),
+      }).then(({ data }) => {
+        this.$message({
+          type: "success",
+          message: `菜单结构修改成功`,
+        });
+        //重新获取数据
+        this.getMenus();
+        //需要更新的节点置空
+        this.updateNodes = [];
+        //关闭拖拽功能
+        this.draggable = false;
+      });
+    },
+    //批量删除
+    batchDelete() {
+      let catIds = this.$refs.menuTree.getCheckedKeys();
+      console.log("批量删除的id：", JSON.parse(JSON.stringify(catIds)));
+      let names = this.$refs.menuTree
+        .getCheckedNodes()
+        .map((node) => node.name);
+      console.log("批量删除的名字:", JSON.parse(JSON.stringify(names)));
+      this.$confirm(`是否删除【${names}】这些菜单`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/product/category/delete"),
+            method: "post",
+            data: this.$http.adornData(catIds, false),
+          }).then(({ datas }) => {
+            this.$message({
+              type: "success",
+              message: `批量删除成功`,
+            });
+            //重新发送请求,更新数据
+            this.getMenus();
+            //不显示批量删除按钮
+            this.canBatchDeletion = false;
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消批量删除",
+          });
+        });
+    },
+    //节点被展开时触发的事件
+    //节点被展开就添加默认展开的节点
+    nodeExpand(data, node, ele) {
+      console.log("节点被展开时触发的事件:", data, node, ele);
+      this.expandedKey.push(data.catId);
+    },
+    //节点被关闭时触发的事件
+    //节点被折叠就从默认展开的节点中移除该节点
+    nodeCollapse(data, node, ele) {
+      console.log("节点被关闭时触发的事件", data, node, ele);
+      this.expandedKey.pop(data.catId);
+    },
+    nodeCheckChange(data, checked, indeterminate) {
+      let catIds = this.$refs.menuTree.getCheckedKeys();
+      console.log(catIds);
+      //如果catIds长度为0就不显示批量删除按钮
+      this.canBatchDeletion = !(catIds.length == 0);
+    },
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+
+  //生命周期 - 创建完成（可以访问当前 this 实例）
+  created() {
+    this.getMenus();
+  },
+  //生命周期 - 挂载完成（可以访问 DOM 元素）
+  mounted() {},
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {}, //如果页面有 keep-alive 缓存功能，这个函数会触发
+};
+</script>
+<style scoped>
+</style>
+```
+
+## 4.2、商品服务-API-品牌管理
+
+### 4.2.1、添加品牌管理前端页面
+
+#### 1、复制`brand.vue`文件
+
+复制以前逆向生成的`gulimall-product`项目的`brand.vue`文件(在`\main\resources\src\views\modules\product`文件夹下)
+
+:pushpin:如果已经删除了可以查看`1.10.10`节的笔记，重新逆向生成`gulimall-product`项目
+
+![image-20220503114854616](image/4.2.1.1.png)
+
+#### 2、复制到`product`文件夹下
+
+复制到前端项目的`renren-fast-vue\src\views\modules\product`文件夹下
+
+![image-20220503115203222](image/4.2.1.2.1.png)
+
+##### :pushpin:快速打开`product`文件夹
+
+选中`product`-->右键-->在文件资源管理器中显示 
+
+![image-20220503120339993](image/4.2.1.2.2.png)
+
+#### 3、删除`[0-不显示；1-显示]`
+
+![image-20220503120956488](image/4.2.1.3.png)
+
+#### 4、报了个错
+
+This relative module was not found: 未找到此相关模块
+
+![image-20220503163746900](image/4.2.1.4.1.png)
+
+就是找不到`brand-add-or-update`，把`brand-add-or-update.vue`文件也复制进去就行了
+
+![image-20220503170253394](image/4.2.1.4.2.png)
+
+#### 5、添加品牌管理路由
+
+![image-20220503165715370](image/4.2.1.5.png)
+
+#### 6、已成功显示
+
+![image-20220503170705172](image/4.2.1.6.png)
+
+### 4.2.2、为显示状态所在的列添加按钮
+
+#### 1、添加按钮
+
+参考**element-ui**的**Table表格**里**的自定义列模板**:[组件 | Element](https://element.eleme.io/#/zh-CN/component/table)
+
+> 通过 `Scoped slot` 可以获取到 row, column, $index 和 store（table 内部的状态管理）的数据
+
+```vue
+<template slot-scope="scope">
+	<i class="el-icon-time"></i>
+	<span style="margin-left: 10px">{{ scope.row.date }}</span>
+</template>
+```
+
+参考**element-ui**的**Switch开关**里的**基本用法**：[组件 | Element](https://element.eleme.io/#/zh-CN/component/switch)
+
+```html
+<el-switch
+  v-model="value"
+  active-color="#13ce66"
+  inactive-color="#ff4949">
+</el-switch>
+```
+
+因此在`label`为显示状态的列里面，添加如下模板
+
+`scope.row`获取当前行数据，`scope.row.showStatus`获取当前行数据中键为`showStatus`的值
+
+```vue
+<template slot-scope="scope">
+  <el-switch
+    v-model="scope.row.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+  ></el-switch>
+</template>
+```
+
+![image-20220503173256805](image/4.2.2.1.1.png)
+
+效果就出来了
+
+![image-20220503173852450](image/4.2.2.1.2.png)
+
+#### 2、`新建`和`批量删除`按钮不显示
+
+由于使用了`v-if`当`isAuth('product:brand:save')`为`true`（没有权限）时，就不显示按钮
+
+![image-20220503175051236](image/4.2.2.2.1.png)
+
+把`src\utils\index.js`的`isAuth`方法的这一行删掉
+
+![image-20220503174636295](image/4.2.2.2.2.png)
+
+直接返回`true`就行了
+
+![image-20220503174745909](image/4.2.2.2.3.png)
+
+可以看到按钮已经显示了
+
+![image-20220503174810653](image/4.2.2.2.4.png)
+
+#### 3、修改对话框
+
+点击新建按钮的弹出框写在`brand-add-or-update.vue`文件里，在这里引入的
+
+![image-20220503175515419](image/4.2.2.3.1.png)
+
+删掉这些，还是使用按钮的方式
+
+![image-20220503175845685](image/4.2.2.3.2.png)
+
+`v-model`绑定的数据还是和删除掉的`el-input`标签双向绑定的数据一样，是`dataForm.showStatus`不变
+
+```vue
+<template slot-scope="scope">
+  <el-switch
+    v-model="dataForm.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+  ></el-switch>
+</template>
+```
+
+![image-20220503180026375](image/4.2.2.3.3.png)
+
+点击`新建`后弹出的`显示状态`已经是按钮了
+
+![image-20220503180641548](image/4.2.2.3.4.png)
+
+#### 4、修改表单宽度
+
+表单的宽度有点窄
+
+![image-20220503180824164](image/4.2.2.4.1.png)
+
+这里改为`140px`
+
+![image-20220503180933818](image/4.2.2.4.2.png)
+
+这样就好看多了
+
+![image-20220503181014800](image/4.2.2.4.3.png)
+
+#### 5、绑定监听事件
+
+| 事件名称 | 说明                            | 回调参数   |
+| :------- | :------------------------------ | :--------- |
+| change   | switch 状态发生变化时的回调函数 | 新状态的值 |
+
+##### 1、为按钮添加监听事件
+
+```vue
+<template slot-scope="scope">
+  <el-switch
+    v-model="scope.row.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+    @change="updateBrandStatus"
+  ></el-switch>
+</template>
+```
+
+![image-20220504155713996](image/4.2.2.5.1.png)
+
+##### 2、编写回调方法
+
+```javascript
+//显示状态按钮的回调函数
+updateBrandStatus(status){
+    console.log("显示状态:"+status);
+},
+```
+
+##### 3、只显示`true`或`false`
+
+只显示`true`或`false`，并不能确定是哪个按钮的事件
+
+![image-20220504160833252](image/4.2.2.5.3.png)
+
+##### 4、修改调用方法的参数
+
+```vue
+<template slot-scope="scope">
+  <el-switch
+    v-model="scope.row.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+    @change="updateBrandStatus(scope.row)"
+  ></el-switch>
+</template>
+```
+
+##### 5、修改回调方法
+
+```javascript
+//显示状态按钮的回调函数
+updateBrandStatus(data){
+    console.log("显示状态:",data);
+}
+```
+
+可以看到，已经可以获取显示状态对应按钮那一行的信息和按钮状态了
+
+![image-20220504162444824](image/4.2.2.5.5.png)
+
+##### 6、测试后端接口
+
+点击`BrandController`类`update`方法左侧的小图标，进入IDEA自带的`HTTP Client`调试工具进行测试
+
+```
+###
+POST http://localhost:10000/product/brand/update
+Content-Type: application/json
+
+{"brandId": 1,"logo": "xxx"}
+```
+
+![image-20220504163757244](image/4.2.2.5.6.1.png)
+
+可以看到`logo`列已更新
+
+![image-20220504164033831](image/4.2.2.5.6.2.png)
+
+7、修改`updateBrandStatus`方法
+
+```javascript
+//显示状态按钮的回调函数
+updateBrandStatus(data){
+    console.log("显示状态:",data);
+    let {brandId,showStatus} = data;
+    this.$http({
+    url: this.$http.adornUrl('/product/brand/update'),
+    method: 'post',
+    data: this.$http.adornData({brandId,showStatus}, false)
+    }).then(({ data }) => {
+      this.$message({
+        type: "success",
+        message: "状态更新成功"
+      })
+      });
+}
+```
+
+##### 8、控制台报错
+
+![image-20220504165445351](image/4.2.2.5.8.1.png)
+
+查看请求体的内容
+
+![image-20220504165604410](image/4.2.2.5.8.2.png)
+
+后端也报了警告
+
+```
+2022-05-04 16:55:41.980  WARN 18564 --- [io-10000-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot deserialize instance of `java.lang.Integer` out of VALUE_TRUE token; nested exception is com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot deserialize instance of `java.lang.Integer` out of VALUE_TRUE token
+ at [Source: (PushbackInputStream); line: 1, column: 27] (through reference chain: com.atguigu.gulimall.product.entity.BrandEntity["showStatus"])]
+```
+
+不能把`showStatus`的值转为`java.lang.Integer`类型
+
+![image-20220504165704201](image/4.2.2.5.8.3.png)
+
+数据库是使用`1`或`0`来表示**显示**与**不显示**，而不是`true`或`false`
+
+![image-20220504170055609](image/4.2.2.5.8.4.png)
+
+##### 9、修改`showStatus`值的类型
+
+方法一：
+
+| 参数          | 说明              | 类型                      | 默认值 |
+| :------------ | :---------------- | :------------------------ | :----- |
+| active-value  | switch 打开时的值 | boolean / string / number | true   |
+| nactive-value | switch 关闭时的值 | boolean / string / number | false  |
+
+指定switch 打开或关闭的值
+
+```vue
+<template slot-scope="scope">
+  <el-switch
+    v-model="scope.row.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+    @change="updateBrandStatus(scope.row)"
+    :active-value="1"
+    :inactive-value="0"
+  ></el-switch>
+</template>
+```
+
+~~方法二：~~
+
+三元运算符判断（**这种方法不行**）
+
+```javascript
+//显示状态按钮的回调函数
+updateBrandStatus(data){
+    console.log("显示状态:",data);
+    let {brandId,showStatus} = data;
+    this.$http({
+    url: this.$http.adornUrl('/product/brand/update'),
+    method: 'post',
+    data: this.$http.adornData({brandId,showStatus:showStatus?1:0}, false)
+    }).then(({ data }) => {
+      this.$message({
+        type: "success",
+        message: "状态更新成功"
+      })
+      });
+}
+```
+
+这种方法不可以初始化正确的开关状态(默认使用`true`或`false`来表示开关状态，由于这种方法返回`1`或`0`，所以只能默认显示关闭状态)
+
+###### 1、先让显示状态开关打开
+
+![image-20220504182321591](image/4.2.2.5.9.1.png)
+
+###### 2、当刷新页面后，显示状态还是关闭
+
+![image-20220504182757184](image/4.2.2.5.9.2.png)
+
+###### 3、但数据库其实已更新为1了
+
+![image-20220504183048856](image/4.2.2.5.9.3.png)
+
+##### 10、查看效果
+
+使用方法一刷新页面后，显示状态依然可以正确展示，但方法二不行
+
+![image-20220504171102995](image/4.2.2.5.10.png)
+
+同理修改`brand-add-or-update.vue`文件里`el-switch`标签里的这两个属性
+
+```vue
+<template slot-scope="scope">
+  <el-switch
+    v-model="dataForm.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+    :active-value="1"
+    :inactive-value="0"
+  ></el-switch>
+</template>
+```
+
+### 4.2.3、对象存储OOS
+
+对象存储服务（Object Storage Service，OSS）是一种海量、安全、低成本、高可靠的云存储 服务，适合存放任意类型的文件。容量和处理能力弹性扩展，多种存储类型供选择，全面优化存储成本。
+
+常用的文件存储方式：
+
+![image-20220504231711548](image/4.2.3.0.png)
+
+本项目采用阿里云对象存储服务
+
+#### 1、实名认证
+
+##### 1、登陆后，点击控制台
+
+![image-20220504212358467](image/4.2.3.1.1.png)
+
+##### 2、点击实名认证按钮
+
+鼠标经过小人头像，在弹出的框中点击的实名认证，按步骤操作即可
+
+![image-20220504212450484](image/4.2.3.1.2.png)
+
+#### 2、开启OSS对象存储服务
+
+##### 1、点击左上角的三条横杠
+
+![image-20220504212845267](image/4.2.3.2.1.png)
+
+##### 2、点击对象存储OSS
+
+![image-20220504212952128](image/4.2.3.2.2.png)
+
+##### 3、点击立即开通
+
+![image-20220504213041621](image/4.2.3.2.3.png)
+
+##### 4、勾选协议，然后点击立即开通
+
+![image-20220504213212922](image/4.2.3.2.4.png)
+
+##### 5、点击管理控制台
+
+![image-20220504213312344](image/4.2.3.2.5.png)
+
+##### 6、查看帮助文档
+
+![image-20220504223019548](image/4.2.3.2.6.png)
+
+#### 3、创建Bucket
+
+参考链接：https://help.aliyun.com/document_detail/31947.html
+
+| 中文      | 英文      | 说明                                                         |
+| :-------- | :-------- | :----------------------------------------------------------- |
+| 存储空间  | Bucket    | 存储空间是您用于存储对象（Object）的容器，所有的对象都必须隶属于某个存储空间。 |
+| 对象/文件 | Object    | 对象是 OSS 存储数据的基本单元，也被称为OSS的文件。对象由元信息（Object Meta）、用户数据（Data）和文件名（Key）组成。对象由存储空间内部唯一的Key来标识。 |
+| 地域      | Region    | 地域表示 OSS 的数据中心所在物理位置。您可以根据费用、请求来源等综合选择数据存储的地域。详情请查看[OSS已经开通的Region](https://help.aliyun.com/document_detail/31837.htm#concept-zt4-cvy-5db)。 |
+| 访问域名  | Endpoint  | Endpoint 表示OSS对外服务的访问域名。OSS以HTTP RESTful API的形式对外提供服务，当访问不同地域的时候，需要不同的域名。通过内网和外网访问同一个地域所需要的域名也是不同的。具体的内容请参见[各个Region对应的Endpoint](https://help.aliyun.com/document_detail/31837.htm#concept-zt4-cvy-5db)。 |
+| 访问密钥  | AccessKey | AccessKey，简称 AK，指的是访问身份验证中用到的AccessKeyId 和AccessKeySecret。OSS通过使用AccessKeyId 和AccessKeySecret对称加密的方法来验证某个请求的发送者身份。AccessKeyId用于标识用户，AccessKeySecret是用户用于加密签名字符串和OSS用来验证签名字符串的密钥，其中AccessKeySecret 必须保密。 |
+
+![image-20220504223548831](image/4.2.3.3.1.png)
+
+##### 1、点击创建Bucket
+
+![image-20220504223758657](image/4.2.3.3.1.png)
+
+##### 2、创建Bucket
+
+随便输个Bucket名称
+
+![image-20220504225120652](image/4.2.3.3.2.1.png)
+
+:rocket:读写权限的对话框中要选择"继续修改"
+
+![image-20220504225234319](image/4.2.3.3.2.2.png)
+
+##### 3、点击上传文件
+
+![image-20220504225642860](image/4.2.3.3.3.png)
+
+#### 4、使用Java代码上传
+
+##### 1、上传策略
+
+用户先向应用服务器获取上传策略，应用服务器根据服务器内部存储的阿里云的账号和密码生成一个防伪签名，防伪签名包括**授权令牌**、阿里云哪个**地址**、哪个**位值**等信息，前端带着防伪签名和要上传的文件交给阿里云，阿里云可以验证这些签名是否正确。
+
+![image-20220504230801395](image/4.2.3.4.0.png)
+
+##### 2、查看文档
+
+参考文档：https://help.aliyun.com/document_detail/195870.html
+
+![image-20220504232317468](image/4.2.3.4.2.1.png)
+
+![image-20220504232339802](image/4.2.3.4.2.2.png)
+
+##### 3、操作步骤
+
+参考文档：https://help.aliyun.com/document_detail/32006.html
+
+###### 1、添加依赖
+
+在`gulimall-product`模块内添加阿里云的oss依赖
+
+```
+<dependency>
+    <groupId>com.aliyun.oss</groupId>
+    <artifactId>aliyun-sdk-oss</artifactId>
+    <version>3.5.0</version>
+</dependency>
+```
+
+![image-20220504233153801](image/4.2.3.4.3.1.png)
+
+###### 2、添加测试方法
+
+```java
+/**
+ * 对象存储OSS测试
+ * @throws FileNotFoundException
+ */
+@Test
+public void testUpload() throws FileNotFoundException {
+   // Endpoint以杭州为例，其它Region请按实际情况填写。
+   String endpoint = "oss-cn-beijing.aliyuncs.com";
+   // 云账号AccessKey有所有API访问权限，建议遵循阿里云安全最佳实践，创建并使用RAM子账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建。
+   String accessKeyId = "LTAl4FwfjSycd1APnuG9bjj";
+   String accessKeySecret = "O6xaxyiWfSlitcOkSuK27ju4hXT5HI";
+
+   // 创建OSSClient实例。
+   OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+   // 上传文件流。
+   InputStream inputStream = new FileInputStream("C:\\1.png");
+
+   ossClient.putObject("gulimall-hello", "1.png", inputStream);
+
+   // 关闭OSSClient。
+   ossClient.shutdown();
+   System.out.println("上传成功。。。");
+}
+```
+
+###### 3、修改`endpoint`
+
+点击概览，查看`Endpoint`
+
+![image-20220504235015158](image/4.2.3.4.3.3.png)
+
+###### 4、添加AccessKey
+
+1、点击**AccessKey管理**
+
+![image-20220504235453599](image/4.2.3.4.3.4.1.png)
+
+2、点击**开始使用子用户AccessKey**
+
+![image-20220504235549106](image/4.2.3.4.3.4.2.png)
+
+3、点击**创建用户**
+
+![image-20220504235623910](image/4.2.3.4.3.4.3.png)
+
+4、创建用户
+
+![image-20220505000109142](image/4.2.3.4.3.4.4.png)
+
+5、复制**AccessKey ID** 和 **AccessKey Secret**
+
+**AccessKey ID** 和 **AccessKey Secret**只会出现一次，关掉这个页面就再也看不到了，因此测试成功之前不要关闭该页面
+
+![image-20220505001844577](image/4.2.3.4.3.4.5.0.png)
+
+6、为这个AccessKey添加权限
+
+![image-20220505000806248](image/4.2.3.4.3.4.5.png)
+
+7、选择**管理对象存储服务(OSS)权限**
+
+![image-20220505001118061](image/4.2.3.4.3.4.6.png)
+
+8、点击确定
+
+![image-20220505001200826](image/4.2.3.4.3.4.7.png)
+
+9、粘贴**AccessKey ID** 和 **AccessKey Secret**
+
+把**AccessKey ID** 和 **AccessKey Secret**粘贴到`accessKeyId`和`accessKeySecret`
+
+###### 5、修改**inputStream**里面的文件的位置
+
+点击文件-->右键-->属性-->安全-->复制对象名称
+
+把复制的文件路径粘贴到`FileInputStream`里面
+
+![image-20220505161036130](image/4.2.3.4.3.5.png)
+
+###### 6、修改`putObject`方法的参数
+
+```java
+ossClient.putObject("gulimall-clouds", "1.png", inputStream);
+```
+
+第一个参数为创建Bucket时的名称
+
+第二个为上传的文件起一个文件名，可以通过**阿里云提供的域名+该文件名**访问这个图片
+
+第三个不用改，为刚才图片的IO流
+
+![image-20220505161839620](image/4.2.3.4.3.6.png)
+
+###### 7、测试
+
+可以看到，测试已经通过
+
+![image-20220505162104781](image/4.2.3.4.3.7.1.png)
+
+阿里云上已经看到图片了
+
+复制这个URL即可直接访问
+
+![image-20220505162407468](image/4.2.3.4.3.7.2.png)
+
+#### 5、OSS整合Spring Boot
+
+参考文档：[aliyun-spring-boot/README-zh.md at master · alibaba/aliyun-spring-boot (github.com)](https://github.com/alibaba/aliyun-spring-boot/blob/master/aliyun-spring-boot-samples/aliyun-oss-spring-boot-sample/README-zh.md)
+
+(**先删掉刚才`gulimall-product`模块的`aliyun-sdk-oss`依赖和测试方法**)
+
+##### 1、修改 pom.xml 文件
+
+修改`gulimall-common`模块 pom.xml 文件，引入 aliyun-oss-spring-boot-starter
+
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+</dependency>
+```
+
+![image-20220505165703522](image/4.2.3.5.1.1.png)
+
+最新的参考文档`artifactId`已经改了
+
+使用最新版的会报`Cannot resolve com.alibaba.cloud:aliyun-oss-spring-boot-starter:unknown`这个错误
+
+![image-20220505165730515](image/4.2.3.5.1.2.png)
+
+##### 2、在配置文件中配置OSS
+
+在`gulimall-product`模块中的配置文件中配置OSS
+
+使用自己的`access-key`和`secret-key`，配置自己地域的`endpoint`
+
+```yaml
+spring:
+  cloud:
+    alicloud:
+      access-key: LTAl4FwfjSycd1APnuG9bjj
+      secret-key: O6xaxyiWfSlitcOkSuK27ju4hXT5HI
+      oss:
+        endpoint: oss-cn-beijing.aliyuncs.com
+```
+
+![image-20220505170749948](image/4.2.3.5.2.png)
+
+##### 3、添加测试方法
+
+```java
+@Autowired
+OSSClient ossClient;
+
+@Test
+public void testUpload2() throws FileNotFoundException {
+
+   // 上传文件流。
+   InputStream inputStream = new FileInputStream("C:\\2.png");
+
+   ossClient.putObject("gulimall-anonymous", "2.png", inputStream);
+
+   // 关闭OSSClient。
+   ossClient.shutdown();
+   System.out.println("上传成功。。。");
+}
+```
+
+这里的报错不用管，这个是IDEA没有识别出来
+
+使用`@Resource`注解不报红，`@Resource`注解写在字段上按名称注入,`@Autowired`注解写在字段上按类型注入
+
+`putObject`方法的第一个参数要更改成自己的Bucket名
+
+![image-20220505172414935](image/4.2.3.5.3.png)
+
+##### 4、测试
+
+重启`gulimall-common`模块和`gulimall-product`模块，运行测试方法
+
+![image-20220505171924124](image/4.2.3.5.4.png)
+
+### 4.2.4、新建`gulimall-third-party`模块
+
+(**先删掉刚才`gulimall-common`模块 pom.xml里面的spring-cloud-starter-alicloud-oss依赖、删掉`gulimall-product`模块中在配置文件中配置的OSS、删掉测试方法 **)
+
+#### 1、新建模块
+
+##### 1、新建`gulimall-third-party`模块
+
+```
+com.atguigu.gulimall
+gulimall-third-party
+第三方服务
+com.atguigu.gulimall.thirdparty
+```
+
+![image-20220505173619537](image/4.2.4.1.1.png)
+
+##### 2、选择Web下的Spring Web
+
+![image-20220505173727336](image/4.2.4.1.2.png)
+
+##### 3、选择Spring Cloud Routing里的OpenFeign
+
+右边可以查看选择的依赖
+
+![image-20220505173733736](image/4.2.4.1.3.png)
+
+##### 4、修改pom文件
+
+为了和老师使用的配置一样，我使用了老师的pom文件(这样可以少很多错误)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-parent</artifactId>
+      <version>2.2.1.RELEASE</version>
+      <relativePath/> <!-- lookup parent from repository -->
+   </parent>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-third-party</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <name>gulimall-third-party</name>
+   <description>第三方服务</description>
+
+   <properties>
+      <java.version>1.8</java.version>
+      <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
+   </properties>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.cloud</groupId>
+         <artifactId>spring-cloud-starter-openfeign</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>
+         <scope>test</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>org.junit.vintage</groupId>
+               <artifactId>junit-vintage-engine</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+   </dependencies>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>${spring-cloud.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+         </plugin>
+      </plugins>
+   </build>
+
+   <repositories>
+      <repository>
+         <id>spring-milestones</id>
+         <name>Spring Milestones</name>
+         <url>https://repo.spring.io/milestone</url>
+      </repository>
+   </repositories>
+
+</project>
+```
+
+##### 5、2.2.1.RELEASE没有找到
+
+依赖文件: [Central Repository: org/springframework/boot/spring-boot-parent/2.2.1.RELEASE (maven.org)](https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-parent/2.2.1.RELEASE/)
+
+刷新后报错，说`org.springframework.boot:spring-boot-starter-parent:2.2.1.RELEASE`没有发现
+
+```
+Project 'org.springframework.boot:spring-boot-starter-parent:2.2.1.RELEASE' not found
+Project 'org.springframework.boot:spring-boot-starter-parent:2.2.1.RELEASE' not found
+Dependency 'org.springframework.cloud:spring-cloud-dependencies:Hoxton.RC1' not found
+Plugin 'org.springframework.boot:spring-boot-maven-plugin:' not found
+Plugin 'org.springframework.boot:spring-boot-maven-plugin:' not found
+```
+
+![image-20220505204534787](image/4.2.4.1.5.1.png)
+
+可以看到`2.2.1.RELEASE`和`2.1.8.RELEASE`的目录结构一样，所以应该不是maven的问题，应该是IDEA的问题
+
+![image-20220505212548886](image/4.2.4.1.5.2.png)
+
+可以点击File-->Invalidate Caches / Restar  删除原来的缓存和索引，等待Idea重新构建缓存和索引
+
+现在`2.2.1.RELEASE`已经不报错了
+
+![image-20220505214331561](image/4.2.4.1.5.3.png)
+
+`spring-boot-maven-plugin`这里报错
+
+![image-20220505214448720](image/4.2.4.1.5.4.png)
+
+可以发现其实已经下载了，应该又是IDEA的问题，但我重新Invalidate Caches / Restar 还是报错:disappointed_relieved:
+
+![image-20220505220808846](image/4.2.4.1.5.5.png)
+
+最后我删掉这个`spring-boot-maven-plugin`插件就好了
+
+![image-20220505221657720](image/4.2.4.1.5.6.png)
+
+##### 6、修改测试类
+
+由于不同`spring-boot-starter-parent`版本的测试类不一样，所以修改一下测试类
+
+```java
+package com.atguigu.gulimall.thirdparty;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class GulimallThirdPartyApplicationTests {
+
+   @Test
+   void contextLoads() {
+
+
+   }
+
+}
+```
+
+测试成功
+
+![image-20220505222624423](image/4.2.4.1.6.1.png)
+
+如果测试类ossClent报错，说没定义"**ossClent**"类路径资源
+
+是因为没删`gulimall-common`模块 pom.xml里面的spring-cloud-starter-alicloud-oss依赖，删掉就行了或者先排除掉（后面还是要删的)
+
+```xml
+<dependency>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-common</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <exclusions>
+      <exclusion>
+         <groupId>com.alibaba.cloud</groupId>
+         <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+      </exclusion>
+   </exclusions>
+</dependency>
+```
+
+![image-20220505223841319](image/4.2.4.1.6.2.png)
+
+同理，如果renren-fast报这个错也可以删掉这个依赖(后面还是要删的)
+
+如果还不行可以使用相同的`spring-boot-starter-parent`版本
+
+还是不行的话，可以先备份项目，删掉备份的`.deal`文件,重新导入备份的看看报不报错(这个操作比较微危险，一定要备份)
+
+#### 2、导入依赖
+
+`gulimall-third-party`模块依赖`gulimall-common`模块
+
+需要排除`mybatis-plus`依赖，该模块不操作数据库，用不到
+
+```xml
+<dependency>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-common</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <exclusions>
+      <exclusion>
+         <groupId>com.baomidou</groupId>
+         <artifactId>mybatis-plus-boot-starter</artifactId>
+      </exclusion>
+   </exclusions>
+</dependency>
+```
+
+`dependencyManagement`标签里添加依赖
+
+```xml
+<dependency>
+   <groupId>com.alibaba.cloud</groupId>
+   <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+   <version>2.1.0.RELEASE</version>
+   <type>pom</type>
+   <scope>import</scope>
+</dependency>
+```
+
+`gulimall-third-party`模块用来处理第三方服务，不用放在`gulimall-common`公共模块里
+
+在`gulimall-third-party`模块添加依赖，删掉`gulimall-common`的这个依赖
+
+```xml
+<dependency>
+   <groupId>com.alibaba.cloud</groupId>
+   <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+</dependency>
+```
+
+完整配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-parent</artifactId>
+      <version>2.2.1.RELEASE</version>
+      <relativePath/> <!-- lookup parent from repository -->
+   </parent>
+   <groupId>com.atguigu.gulimall</groupId>
+   <artifactId>gulimall-third-party</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <name>gulimall-third-party</name>
+   <description>第三方服务</description>
+
+   <properties>
+      <java.version>1.8</java.version>
+      <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
+   </properties>
+
+   <dependencies>
+      <dependency>
+         <groupId>com.atguigu.gulimall</groupId>
+         <artifactId>gulimall-common</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+         <exclusions>
+            <exclusion>
+               <groupId>com.baomidou</groupId>
+               <artifactId>mybatis-plus-boot-starter</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.cloud</groupId>
+         <artifactId>spring-cloud-starter-openfeign</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>com.alibaba.cloud</groupId>
+         <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>
+         <scope>test</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>org.junit.vintage</groupId>
+               <artifactId>junit-vintage-engine</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+   </dependencies>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>${spring-cloud.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+            <version>2.1.0.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <!--<build>-->
+   <!--   <plugins>-->
+   <!--      <plugin>-->
+   <!--         <groupId>org.springframework.boot</groupId>-->
+   <!--         <artifactId>spring-boot-maven-plugin</artifactId>-->
+   <!--      </plugin>-->
+   <!--   </plugins>-->
+   <!--</build>-->
+
+   <repositories>
+      <repository>
+         <id>spring-milestones</id>
+         <name>Spring Milestones</name>
+         <url>https://repo.spring.io/milestone</url>
+      </repository>
+   </repositories>
+
+</project>
+```
+
+#### 3、注册到注册中心
+
+##### 1、新建命名空间
+
+![image-20220505225655873](image/4.2.4.3.1.png)
+
+##### 2、添加配置
+
+点击“配置管理”下的"配置列表"，点击"third-party"，然后点击**+**
+
+![image-20220505230915820](image/4.2.4.3.2.1.png)
+
+新建配置
+
+`access-key`和`secret-key`以及`endpoint`和`bucket`输入自己的
+
+`spring.cloud.alicloud.oss.bucket`为自己写的配置，不是官方有的配置
+
+```yaml
+spring:
+  cloud:
+    alicloud:
+      access-key: LTAl4FwfjSycd1APnuG9bjj
+      secret-key: O6xaxyiWfSlitcOkSuK27ju4hXT5HI
+      oss:
+        endpoint: oss-cn-beijing.aliyuncs.com
+        bucket: gulimall-anonymous
+```
+
+![image-20220505231655295](image/4.2.4.3.2.2.png)
+
+##### 3、配置配置文件
+
+###### 1、复制唯一标识
+
+![image-20220505233148868](image/4.2.4.3.3.1.png)
+
+###### 2、配置配置中心
+
+新建"bootstrap.properties"文件，添加配置
+
+namespace填刚刚复制的
+
+```yaml
+spring.application.name=gulimall-third-party
+spring.cloud.nacos.config.server-addr=127.0.0.1:8848
+spring.cloud.nacos.config.namespace=dd540e1b-ffd6-43e2-b9af-065130d391ec
+
+#配置多配置文件
+#数据集id
+spring.cloud.nacos.config.ext-config[0].data-id=oss.yml
+#数据分组
+spring.cloud.nacos.config.ext-config[0].group=DEFAULT_GROUP
+#动态刷新
+spring.cloud.nacos.config.ext-config[0].refresh=true
+```
+
+![image-20220505233837829](image/4.2.4.3.3.2.png)
+
+###### 3、配置注册中心
+
+在"application.yml"中添加配置
+
+```yaml
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: gulimall-third-party
+server:
+  port: 30000
+```
+
+![image-20220505234015676](image/4.2.4.3.3.3.png)
+
+##### 4、添加`@EnableDiscoveryClient`注解
+
+`gulimall-third-party`模块的启动类上添加`@EnableDiscoveryClient`注解
+
+![image-20220505232327742](image/4.2.4.3.4.png)
+
+##### 5、添加测试方法
+
+```yaml
+@Autowired
+OSSClient ossClient;
+
+@Test
+public void testUpload2() throws FileNotFoundException {
+
+   // 上传文件流。
+   InputStream inputStream = new FileInputStream("C:\\2.png");
+
+   ossClient.putObject("gulimall-anonymous", "2222.png", inputStream);
+
+   // 关闭OSSClient。
+   ossClient.shutdown();
+   System.out.println("上传成功。。。");
+}
+```
+
+##### 6、测试是否能上传
+
+可以看到运行成功了
+
+代码报红不用管，那是IDEA没有检测到，其实可以注入进去的
+
+使用`@Resource`注解不报红，`@Resource`注解写在字段上按名称注入,`@Autowired`注解写在字段上按类型注入
+
+![image-20220505235720081](image/4.2.4.3.6.1.png)
+
+已经上传成功了
+
+![image-20220506081810670](image/4.2.4.3.6.2.png)
+
+##### 7、修改配置
+
+`access-key`和`secret-key`以及`endpoint`和`bucket`输入自己的
+
+在开发阶段，可以在"application.yml"中修改配置以方便调试，项目完成后，再上传到配置中心
+
+```yaml
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    alicloud:
+      access-key: LTAl4FwfjSycd1APnuG9bjj
+      secret-key: O6xaxyiWfSlitcOkSuK27ju4hXT5HI
+      oss:
+        endpoint: oss-cn-beijing.aliyuncs.com
+        bucket: gulimall-anonymous
+
+  application:
+    name: gulimall-third-party
+
+server:
+  port: 30000
+```
+
+#### 4、编写方法
+
+##### 1、添加接口
+
+在`com.atguigu.gulimall.thirdparty.controller`目录下新建`OssController`类,编写获取密钥的工具方法
+
+```java
+package com.atguigu.gulimall.thirdparty.controller;
+
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.common.utils.BinaryUtil;
+import com.aliyun.oss.model.MatchMode;
+import com.aliyun.oss.model.PolicyConditions;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/6
+ * @Description:
+ */
+@RestController
+//@RefreshScope 自动刷新配置(使用最新的配置中心配置)
+public class OssController {
+
+
+    @Value("${spring.cloud.alicloud.oss.endpoint}")
+    private String endpoint;
+
+    @Value("${spring.cloud.alicloud.oss.bucket}")
+    private String bucket;
+
+    @Value("${spring.cloud.alicloud.access-key}")
+    private String accessId;
+
+    //@Autowired(required = false)
+    @Resource
+    private OSSClient ossClient;
+
+
+    @RequestMapping("/oss/policy")
+    public Map<String, String> policy() {
+        //https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/1.png
+        String host = "https://" + bucket + "." + this.endpoint; // host的格式为 bucketname.endpoint
+        // callbackUrl为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
+//        String callbackUrl = "http://88.88.88.88:8888";
+        String format = LocalDate.now().toString();
+        String dir = format + "/"; // 用户上传文件时指定的前缀。
+
+        Map<String, String> respMap = null;
+        try {
+            long expireTime = 30;
+            long expireEndTime = System.currentTimeMillis() + expireTime * 1000;
+            Date expiration = new Date(expireEndTime);
+            PolicyConditions policyConds = new PolicyConditions();
+            policyConds.addConditionItem(PolicyConditions.COND_CONTENT_LENGTH_RANGE, 0, 1048576000);
+            policyConds.addConditionItem(MatchMode.StartWith, PolicyConditions.COND_KEY, dir);
+
+            String postPolicy = ossClient.generatePostPolicy(expiration, policyConds);
+            byte[] binaryData = postPolicy.getBytes("utf-8");
+            String encodedPolicy = BinaryUtil.toBase64String(binaryData);
+            String postSignature = ossClient.calculatePostSignature(postPolicy);
+
+            respMap = new LinkedHashMap<String, String>();
+            respMap.put("accessid", accessId);
+            respMap.put("policy", encodedPolicy);
+            respMap.put("signature", postSignature);
+            respMap.put("dir", dir);
+            respMap.put("host", host);
+            respMap.put("expire", String.valueOf(expireEndTime / 1000));
+            // respMap.put("expire", formatISO8601Date(expiration));
+        } catch (Exception e) {
+            // Assert.fail(e.getMessage());
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return respMap;
+    }
+}
+```
+
+![image-20220506102103657](image/4.2.4.4.1.png)
+
+##### 2、浏览器测试接口
+
+浏览器输入 http://localhost:30000/oss/policy
+
+已经正确访问了
+
+![image-20220506102230145](image/4.2.4.4.2.png)
+
+##### 3、添加配置
+
+在`gulimall-gateway`模块添加配置(一定要写在`admin_route`前面)
+
+```
+- id: third_party_route
+  uri: lb://gulimall-third-party
+  predicates:
+    - Path=/api/product/**
+  filters:
+    #http://localhost:88/api/thirdparty/oss/policy 变为 http://localhost:30000/oss/policy
+    - RewritePath=/api/thirdparty/(?<segment>/?.*),/$\{segment}
+```
+
+![image-20220506104808034](image/4.2.4.4.3.png)
+
+##### 4、测试是否可以通过网关访问
+
+###### 1、访问失败了
+
+![image-20220506105012117](image/4.2.4.4.4.1.png)
+
+###### 2、查看日志
+
+没有这个日志的是因为日志级别没有调成`debug`，调整日志级别就行了
+
+```
+logging:
+  level:
+    root: debug
+```
+
+可以发现匹配到`admin_route`
+
+这是因为我`- Path=/api/product/**`这里写错了，应该写成`- Path=/api/thirdparty/**`
+
+因为写错了，所以没匹配的,使用了默认的`admin_route`(所有前面没匹配到的，只要是path是以/api/开头的都会匹配到`admin_route`)
+
+![image-20220506104658815](image/4.2.4.4.4.2.png)
+
+###### 3、修改配置
+
+```
+- id: third_party_route
+  uri: lb://gulimall-third-party
+  predicates:
+    - Path=/api/thirdparty/**
+  filters:
+    #http://localhost:88/api/thirdparty/oss/policy 变为 http://localhost:30000/oss/policy
+    - RewritePath=/api/thirdparty/(?<segment>/?.*),/$\{segment}
+```
+
+![image-20220506110148531](image/4.2.4.4.4.3.png)
+
+###### 4、重新测试
+
+已经访问成功了
+
+![image-20220506110317459](image/4.2.4.4.4.4.png)
+
+### 4.2.5、编写图片上传前端代码
+
+#### 1、复制文件
+
+复制`1.分布式基础（全栈开发篇）\资料源码.zip\docs\代码\前端`目录下`upload`文件
+
+![image-20220506111426347](image/4.2.5.1.png)
+
+#### 2、修改Bucket域名
+
+##### 1、复制Bucket外网访问域名
+
+![image-20220506201245636](image/4.2.5.2.1.png)
+
+##### 2、粘贴到`singleUpload.vue`
+
+粘贴到`src\components\upload\singleUpload.vue`里的`el-upload`标签，`action`属性里面
+
+注意：前面有"**http://**"
+
+![image-20220506201710959](image/4.2.5.2.2.png)
+
+##### 3、粘贴到`multiUpload.vue`
+
+粘贴到`src\components\upload\multiUpload.vue`里的`el-upload`标签，`action`属性里面
+
+注意：前面有"**http://**"
+
+![image-20220506201943305](image/4.2.5.2.3.png)
+
+##### 附录
+
+###### 1、`multiUpload.vue`文件
+
+```vue
+<template>
+  <div>
+    <el-upload
+      action="http://gulimall.oss-cn-shanghai.aliyuncs.com"
+      :data="dataObj"
+      list-type="picture-card"
+      :file-list="fileList"
+      :before-upload="beforeUpload"
+      :on-remove="handleRemove"
+      :on-success="handleUploadSuccess"
+      :on-preview="handlePreview"
+      :limit="maxCount"
+      :on-exceed="handleExceed"
+    >
+      <i class="el-icon-plus"></i>
+    </el-upload>
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="dialogImageUrl" alt />
+    </el-dialog>
+  </div>
+</template>
+<script>
+import { policy } from "./policy";
+import { getUUID } from '@/utils'
+export default {
+  name: "multiUpload",
+  props: {
+    //图片属性数组
+    value: Array,
+    //最大上传图片数量
+    maxCount: {
+      type: Number,
+      default: 30
+    }
+  },
+  data() {
+    return {
+      dataObj: {
+        policy: "",
+        signature: "",
+        key: "",
+        ossaccessKeyId: "",
+        dir: "",
+        host: "",
+        uuid: ""
+      },
+      dialogVisible: false,
+      dialogImageUrl: null
+    };
+  },
+  computed: {
+    fileList() {
+      let fileList = [];
+      for (let i = 0; i < this.value.length; i++) {
+        fileList.push({ url: this.value[i] });
+      }
+
+      return fileList;
+    }
+  },
+  mounted() {},
+  methods: {
+    emitInput(fileList) {
+      let value = [];
+      for (let i = 0; i < fileList.length; i++) {
+        value.push(fileList[i].url);
+      }
+      this.$emit("input", value);
+    },
+    handleRemove(file, fileList) {
+      this.emitInput(fileList);
+    },
+    handlePreview(file) {
+      this.dialogVisible = true;
+      this.dialogImageUrl = file.url;
+    },
+    beforeUpload(file) {
+      let _self = this;
+      return new Promise((resolve, reject) => {
+        policy()
+          .then(response => {
+            console.log("这是什么${filename}");
+            _self.dataObj.policy = response.data.policy;
+            _self.dataObj.signature = response.data.signature;
+            _self.dataObj.ossaccessKeyId = response.data.accessid;
+            _self.dataObj.key = response.data.dir + "/"+getUUID()+"_${filename}";
+            _self.dataObj.dir = response.data.dir;
+            _self.dataObj.host = response.data.host;
+            resolve(true);
+          })
+          .catch(err => {
+            console.log("出错了...",err)
+            reject(false);
+          });
+      });
+    },
+    handleUploadSuccess(res, file) {
+      this.fileList.push({
+        name: file.name,
+        // url: this.dataObj.host + "/" + this.dataObj.dir + "/" + file.name； 替换${filename}为真正的文件名
+        url: this.dataObj.host + "/" + this.dataObj.key.replace("${filename}",file.name)
+      });
+      this.emitInput(this.fileList);
+    },
+    handleExceed(files, fileList) {
+      this.$message({
+        message: "最多只能上传" + this.maxCount + "张图片",
+        type: "warning",
+        duration: 1000
+      });
+    }
+  }
+};
+</script>
+<style>
+</style>
+```
+
+###### 2、`policy.js`文件
+
+```javascript
+import http from '@/utils/httpRequest.js'
+export function policy() {
+   return  new Promise((resolve,reject)=>{
+        http({
+            url: http.adornUrl("/thirdparty/oss/policy"),
+            method: "get",
+            params: http.adornParams({})
+        }).then(({ data }) => {
+            resolve(data);
+        })
+    });
+}
+```
+
+###### 3、`singleUpload.vue`文件
+
+```vue
+<template> 
+  <div>
+    <el-upload
+      action="http://gulimall.oss-cn-shanghai.aliyuncs.com"
+      :data="dataObj"
+      list-type="picture"
+      :multiple="false" :show-file-list="showFileList"
+      :file-list="fileList"
+      :before-upload="beforeUpload"
+      :on-remove="handleRemove"
+      :on-success="handleUploadSuccess"
+      :on-preview="handlePreview">
+      <el-button size="small" type="primary">点击上传</el-button>
+      <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10MB</div>
+    </el-upload>
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="fileList[0].url" alt="">
+    </el-dialog>
+  </div>
+</template>
+<script>
+   import {policy} from './policy'
+   import { getUUID } from '@/utils'
+
+  export default {
+    name: 'singleUpload',
+    props: {
+      value: String
+    },
+    computed: {
+      imageUrl() {
+        return this.value;
+      },
+      imageName() {
+        if (this.value != null && this.value !== '') {
+          return this.value.substr(this.value.lastIndexOf("/") + 1);
+        } else {
+          return null;
+        }
+      },
+      fileList() {
+        return [{
+          name: this.imageName,
+          url: this.imageUrl
+        }]
+      },
+      showFileList: {
+        get: function () {
+          return this.value !== null && this.value !== ''&& this.value!==undefined;
+        },
+        set: function (newValue) {
+        }
+      }
+    },
+    data() {
+      return {
+        dataObj: {
+          policy: '',
+          signature: '',
+          key: '',
+          ossaccessKeyId: '',
+          dir: '',
+          host: '',
+          // callback:'',
+        },
+        dialogVisible: false
+      };
+    },
+    methods: {
+      emitInput(val) {
+        this.$emit('input', val)
+      },
+      handleRemove(file, fileList) {
+        this.emitInput('');
+      },
+      handlePreview(file) {
+        this.dialogVisible = true;
+      },
+      beforeUpload(file) {
+        let _self = this;
+        return new Promise((resolve, reject) => {
+          policy().then(response => {
+            _self.dataObj.policy = response.data.policy;
+            _self.dataObj.signature = response.data.signature;
+            _self.dataObj.ossaccessKeyId = response.data.accessid;
+            _self.dataObj.key = response.data.dir + '/'+getUUID()+'_${filename}';
+            _self.dataObj.dir = response.data.dir;
+            _self.dataObj.host = response.data.host;
+            resolve(true)
+          }).catch(err => {
+            reject(false)
+          })
+        })
+      },
+      handleUploadSuccess(res, file) {
+        console.log("上传成功...")
+        this.showFileList = true;
+        this.fileList.pop();
+        this.fileList.push({name: file.name, url: this.dataObj.host + '/' + this.dataObj.key.replace("${filename}",file.name) });
+        this.emitInput(this.fileList[0].url);
+      }
+    }
+  }
+</script>
+<style>
+
+</style>
+```
+
+#### 3、使用Upload上传组件
+
+`element-ui`中**Upload 上传**组件：[组件 | Element](https://element.eleme.io/#/zh-CN/component/upload)
+
+上传组件已经封装在刚刚复制到upload里面了
+
+#### 4、上传图片报错
+
+##### 1、查看请求
+
+![image-20220506203350269](image/4.2.5.4.1.png)
+
+##### 2、查看匹配到的路由
+
+![image-20220506203432683](image/4.2.5.4.2.png)
+
+##### 3、查看对应路由
+
+发现我`gulimall-third-party`没启动:cold_sweat:
+
+![image-20220506203844785](image/4.2.5.4.3.png)
+
+##### 4、启动`gulimall-third-party`
+
+![image-20220506204230648](image/4.2.5.4.4.png)
+
+##### 5、已经上传成功了
+
+![image-20220506204119458](image/4.2.5.4.5.png)
+
+##### 6、跨域问题
+
+如果还是上传不了，可以看看是不是报**403**或**CROS**
+
+如果是报**403**或**CROS**可以在阿里云OSS里面配置跨域规则
+
+###### 1、点击跨域设置
+
+进入你的Bucket的控制台，点击**"权限管理**"-->"跨域设置"
+
+![image-20220506205320072](image/4.2.5.4.6.1.png)
+
+###### 2、点击**跨域设置**里的**设置**
+
+![image-20220506205451008](image/4.2.5.4.6.2.png)
+
+###### 3、创建规则
+
+点击创建规则，输入规则就可以了
+
+![image-20220506211944153](image/4.2.5.4.6.3.png)
+
+#### 5、修改签名方法
+
+##### 1、获取数据的路径
+
+可以看到路径为响应里的`data`字段
+
+![image-20220506210529130](image/4.2.5.5.1.png)
+
+##### 2、查看请求响应的数据
+
+可以看到响应的数据直接返回了，没有封装在data中
+
+![image-20220506210632683](image/4.2.5.5.2.png)
+
+##### 3、修改返回类型
+
+修改`com.atguigu.gulimall.thirdparty.controller`下的`OssController`类的`policy`方法返回类型
+
+然后重启项目
+
+![image-20220506211124975](image/4.2.5.5.3.png)
+
+##### 4、跨域错误
+
+###### 1、查看控制台
+
+发现有跨域错误
+
+![image-20220506211741596](image/4.2.5.5.4.1.png)
+
+###### 2、点击概要
+
+![image-20220506212310759](image/4.2.5.5.4.2.png)
+
+###### 3、跨域访问
+
+往下滑，找到跨域访问
+
+![image-20220506212332731](image/4.2.5.5.4.3.png)
+
+###### 4、创建规则
+
+![image-20220506212515400](image/4.2.5.5.4.4.png)
+
+###### 5、再次上传
+
+再次上传，图片已经回显出来了
+
+![image-20220506212726224](image/4.2.5.5.4.5.png)
+
+##### 5、修改路径
+
+###### 1、拼路径的时候多了一条杠
+
+![image-20220506213014421](image/4.2.5.5.5.1.png)
+
+###### 2、删除"/"
+
+把这个删掉就行了
+
+![image-20220506213238514](image/4.2.5.5.5.2.png)
+
+###### 3、重新上传
+
+图片已经在日期对应的文件夹下了
+
+![image-20220506213419593](image/4.2.5.5.5.3.png)
+
+### 4.2.6、前端表单校验
+
+#### 1、修改按钮激活值
+
+```html
+<template slot-scope="scope">
+  <el-switch
+    v-model="dataForm.showStatus"
+    active-color="#13ce66"
+    inactive-color="#ff4949"
+    :active-value="1"
+    :inactive-value="0"
+  ></el-switch>
+</template>
+```
+
+![image-20220506214954428](image/4.2.6.1.png)
+
+#### 2、新增商品
+
+![image-20220506215355124](image/4.2.6.2.png)
+
+#### 3、修改品牌logo地址
+
+##### 1、品牌logo地址为文字
+
+![image-20220506215446629](image/4.2.6.3.1.png)
+
+##### 2、自定义列模板
+
+**Table表格**自定义列模板：[组件 | Element](https://element.eleme.io/#/zh-CN/component/table)
+
+通过 `Scoped slot` 可以获取到 row, column, $index 和 store（table 内部的状态管理）的数据
+
+```vue
+<template slot-scope="scope">
+  <i class="el-icon-time"></i>
+  <span style="margin-left: 10px">{{ scope.row.date }}</span>
+</template>
+```
+
+**Image图片**里的基础用法中的contain：[组件 | Element](https://element.eleme.io/#/zh-CN/component/image)
+
+```html
+<el-image
+  style="width: 100px; height: 100px"
+  :src="url"
+  :fit="contain"></el-image>
+```
+
+因此修改`src\views\modules\product\brand.vue`文件里的`品牌logo地址`列为
+
+```html
+<el-table-column
+  prop="logo"
+  header-align="center"
+  align="center"
+  label="品牌logo地址"
+>
+  <template slot-scope="scope">
+    <el-image
+      style="width: 100px; height: 80px"
+      :src="scope.row.logo"
+      :fit="contain"
+    ></el-image>
+  </template>
+</el-table-column>
+```
+
+##### 3、查看页面
+
+###### 1、图片显示不出来
+
+查看报错可以看到，<el-image>组件没有正确注入进来
+
+```
+<el-image> - did you register the component correctly：您是否正确注册了<el-image>组件
+```
+
+![image-20220506223735304](image/4.2.6.3.3.1.png)
+
+###### 2、查看引入的`element-ui`依赖
+
+在`src\main.js`文件中可以看到，`element-ui`引入在`src/element-ui`
+
+`@`符号位自定义的，指向src目录
+
+![image-20220506225556450](image/4.2.6.3.3.2.1.png)
+
+在`src\element-ui\index.js`文件中搜索"**Image**",可以看到没有这个组件
+
+![image-20220506225431970](image/4.2.6.3.3.2.2.png)
+
+###### 3、添加组件
+
+修改`import`和`Vue.use`里面的内容
+
+`element-ui`组件：[组件 | Element](https://element.eleme.io/#/zh-CN/component/quickstart)
+
+```javascript
+import {
+  Pagination,
+  Dialog,
+  Autocomplete,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Menu,
+  Submenu,
+  MenuItem,
+  MenuItemGroup,
+  Input,
+  InputNumber,
+  Radio,
+  RadioGroup,
+  RadioButton,
+  Checkbox,
+  CheckboxButton,
+  CheckboxGroup,
+  Switch,
+  Select,
+  Option,
+  OptionGroup,
+  Button,
+  ButtonGroup,
+  Table,
+  TableColumn,
+  DatePicker,
+  TimeSelect,
+  TimePicker,
+  Popover,
+  Tooltip,
+  Breadcrumb,
+  BreadcrumbItem,
+  Form,
+  FormItem,
+  Tabs,
+  TabPane,
+  Tag,
+  Tree,
+  Alert,
+  Slider,
+  Icon,
+  Row,
+  Col,
+  Upload,
+  Progress,
+  Spinner,
+  Badge,
+  Card,
+  Rate,
+  Steps,
+  Step,
+  Carousel,
+  CarouselItem,
+  Collapse,
+  CollapseItem,
+  Cascader,
+  ColorPicker,
+  Transfer,
+  Container,
+  Header,
+  Aside,
+  Main,
+  Footer,
+  Timeline,
+  TimelineItem,
+  Link,
+  Divider,
+  Image,
+  Calendar,
+  Backtop,
+  PageHeader,
+  CascaderPanel,
+  Loading,
+  MessageBox,
+  Message,
+  Notification
+} from 'element-ui';
+
+Vue.use(Pagination);
+Vue.use(Dialog);
+Vue.use(Autocomplete);
+Vue.use(Dropdown);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
+Vue.use(Menu);
+Vue.use(Submenu);
+Vue.use(MenuItem);
+Vue.use(MenuItemGroup);
+Vue.use(Input);
+Vue.use(InputNumber);
+Vue.use(Radio);
+Vue.use(RadioGroup);
+Vue.use(RadioButton);
+Vue.use(Checkbox);
+Vue.use(CheckboxButton);
+Vue.use(CheckboxGroup);
+Vue.use(Switch);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(OptionGroup);
+Vue.use(Button);
+Vue.use(ButtonGroup);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(DatePicker);
+Vue.use(TimeSelect);
+Vue.use(TimePicker);
+Vue.use(Popover);
+Vue.use(Tooltip);
+Vue.use(Breadcrumb);
+Vue.use(BreadcrumbItem);
+Vue.use(Form);
+Vue.use(FormItem);
+Vue.use(Tabs);
+Vue.use(TabPane);
+Vue.use(Tag);
+Vue.use(Tree);
+Vue.use(Alert);
+Vue.use(Slider);
+Vue.use(Icon);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Upload);
+Vue.use(Progress);
+Vue.use(Spinner);
+Vue.use(Badge);
+Vue.use(Card);
+Vue.use(Rate);
+Vue.use(Steps);
+Vue.use(Step);
+Vue.use(Carousel);
+Vue.use(CarouselItem);
+Vue.use(Collapse);
+Vue.use(CollapseItem);
+Vue.use(Cascader);
+Vue.use(ColorPicker);
+Vue.use(Transfer);
+Vue.use(Container);
+Vue.use(Header);
+Vue.use(Aside);
+Vue.use(Main);
+Vue.use(Footer);
+Vue.use(Timeline);
+Vue.use(TimelineItem);
+Vue.use(Link);
+Vue.use(Divider);
+Vue.use(Image);
+Vue.use(Calendar);
+Vue.use(Backtop);
+Vue.use(PageHeader);
+Vue.use(CascaderPanel);
+```
+
+###### 4、没有发现这些依赖
+
+```
+These dependencies were not found: 未找到这些依赖项
+```
+
+删掉这些依赖就行了
+
+![image-20220506223507564](image/4.2.6.3.3.3.png)
+
+`src\element-ui\index.js`完整代码
+
+```javascript
+/**
+ * UI组件, 统一使用饿了么桌面端组件库(https://github.com/ElemeFE/element）
+ *
+ * 使用:
+ *  1. 项目中需要的组件进行释放(解开注释)
+ *
+ * 注意:
+ *  1. 打包只会包含释放(解开注释)的组件, 减少打包文件大小
+ */
+import Vue from 'vue'
+import {
+  Pagination,
+  Dialog,
+  Autocomplete,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Menu,
+  Submenu,
+  MenuItem,
+  MenuItemGroup,
+  Input,
+  InputNumber,
+  Radio,
+  RadioGroup,
+  RadioButton,
+  Checkbox,
+  CheckboxButton,
+  CheckboxGroup,
+  Switch,
+  Select,
+  Option,
+  OptionGroup,
+  Button,
+  ButtonGroup,
+  Table,
+  TableColumn,
+  DatePicker,
+  TimeSelect,
+  TimePicker,
+  Popover,
+  Tooltip,
+  Breadcrumb,
+  BreadcrumbItem,
+  Form,
+  FormItem,
+  Tabs,
+  TabPane,
+  Tag,
+  Tree,
+  Alert,
+  Slider,
+  Icon,
+  Row,
+  Col,
+  Upload,
+  Progress,
+  Spinner,
+  Badge,
+  Card,
+  Rate,
+  Steps,
+  Step,
+  Carousel,
+  CarouselItem,
+  Collapse,
+  CollapseItem,
+  Cascader,
+  ColorPicker,
+  Transfer,
+  Container,
+  Header,
+  Aside,
+  Main,
+  Footer,
+  Timeline,
+  TimelineItem,
+  Link,
+  Divider,
+  Image,
+  Calendar,
+  Loading,
+  MessageBox,
+  Message,
+  Notification
+} from 'element-ui';
+
+Vue.use(Pagination);
+Vue.use(Dialog);
+Vue.use(Autocomplete);
+Vue.use(Dropdown);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
+Vue.use(Menu);
+Vue.use(Submenu);
+Vue.use(MenuItem);
+Vue.use(MenuItemGroup);
+Vue.use(Input);
+Vue.use(InputNumber);
+Vue.use(Radio);
+Vue.use(RadioGroup);
+Vue.use(RadioButton);
+Vue.use(Checkbox);
+Vue.use(CheckboxButton);
+Vue.use(CheckboxGroup);
+Vue.use(Switch);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(OptionGroup);
+Vue.use(Button);
+Vue.use(ButtonGroup);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(DatePicker);
+Vue.use(TimeSelect);
+Vue.use(TimePicker);
+Vue.use(Popover);
+Vue.use(Tooltip);
+Vue.use(Breadcrumb);
+Vue.use(BreadcrumbItem);
+Vue.use(Form);
+Vue.use(FormItem);
+Vue.use(Tabs);
+Vue.use(TabPane);
+Vue.use(Tag);
+Vue.use(Tree);
+Vue.use(Alert);
+Vue.use(Slider);
+Vue.use(Icon);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Upload);
+Vue.use(Progress);
+Vue.use(Spinner);
+Vue.use(Badge);
+Vue.use(Card);
+Vue.use(Rate);
+Vue.use(Steps);
+Vue.use(Step);
+Vue.use(Carousel);
+Vue.use(CarouselItem);
+Vue.use(Collapse);
+Vue.use(CollapseItem);
+Vue.use(Cascader);
+Vue.use(ColorPicker);
+Vue.use(Transfer);
+Vue.use(Container);
+Vue.use(Header);
+Vue.use(Aside);
+Vue.use(Main);
+Vue.use(Footer);
+Vue.use(Timeline);
+Vue.use(TimelineItem);
+Vue.use(Link);
+Vue.use(Divider);
+Vue.use(Image);
+Vue.use(Calendar);
+
+Vue.use(Loading.directive)
+
+Vue.prototype.$loading = Loading.service
+Vue.prototype.$msgbox = MessageBox
+Vue.prototype.$alert = MessageBox.alert
+Vue.prototype.$confirm = MessageBox.confirm
+Vue.prototype.$prompt = MessageBox.prompt
+Vue.prototype.$notify = Notification
+Vue.prototype.$message = Message
+
+Vue.prototype.$ELEMENT = { size: 'medium' }
+
+```
+
+###### 5、`fit`未定义
+
+```
+ Property or method "fit" is not defined on the instance but referenced during render
+ 属性或方法“fit”未在实例上定义，但在渲染期间引用
+```
+
+![image-20220506230513442](image/4.2.6.3.3.5.1.png)
+
+实例用的"`:`"为动态绑定，由于`data`中没设`content`，所以删掉这个"`:`"就行了，不使用动态绑定
+
+![image-20220506231648179](image/4.2.6.3.3.5.2.png)
+
+###### 6、查看图片
+
+可以看到图片已经出来了，不过是显示的问题
+
+![image-20220506231408833](image/4.2.6.3.3.6.1.png)
+
+查看显示位置
+
+![image-20220506232005751](image/4.2.6.3.3.6.2.png)
+
+最后还是用了原生的img标签
+
+![image-20220506233108057](image/4.2.6.3.3.6.3.png)
+
+图片成功显示
+
+![image-20220506233245174](image/4.2.6.3.3.6.4.png)
+
+#### 4、自定义校验规则
+
+`Form 表单`中的自定义校验规则：[组件 | Element](https://element.eleme.io/#/zh-CN/component/form)
+
+##### 1、修改校验规则
+
+修改`firstLetter`和`sort`的校验规则
+
+```javascript
+firstLetter: [
+  {
+    validator: (rule, value, callback) => {
+      if (value === "" || value ==null) {
+        callback(new Error("首字母必须填写"));
+      } else if (!/^[a-zA-Z]$/.test(value)) {
+        callback(new Error("首字母必须为单个的英文大写或小写"));
+      } else {
+        callback();
+      }
+    },
+    trigger: "blur",
+  },
+],
+sort: [
+  {
+    validator: (rule, value, callback) => {
+      if (value === "" || value==null) {
+        callback(new Error("排序字段必须填写"));
+      } else if ((!Number.isInteger(value) || value<0)) {
+        callback(new Error("排序字段必须为一个大于0的整数"));
+      } else {
+        callback();
+      }
+    },
+    trigger: "blur",
+  },
+],
+```
+
+![image-20220506235834283](image/4.2.6.4.1.png)
+
+##### 2、修改数据字段
+
+修改showStatus字段默认为1(显示)
+
+修改`sort`字段默认为0
+
+![image-20220506235221089](image/4.2.6.4.2.png)
+
+##### 3、`sort`标识为数组
+
+`v-moudel`添加`.number`标识该数据为数字
+
+![image-20220506235509229](image/4.2.6.4.3.png)
+
+### 4.2.7、后端校验
+
+#### 1、添加依赖
+
+新版本需要在""添加依赖(老版本不需要)
+
+引入
+
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+或
+
+```
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+```
+
+#### 2、添加校验规则注解
+
+在实体类里需要校验的字段上添加校验注解
+
+需要导入`javax.validation.constraints`包下的校验规则，在`constraints`上按ctrl键并点击即可查看所有校验注解
+
+![image-20220507091854747](image/4.2.7.2.png)
+
+#### 3、标识需要校验
+
+在controller层需要校验的参数对象的左边添加`@Valid`注解
+
+![image-20220507092700948](image/4.2.7.3.png)
+
+#### 4、测试
+
+重启`gulimall-product`项目后进行测试
+
+url:   http://localhost:10000/product/brand/save
+
+![image-20220507093733971](image/4.2.7.4.1.png)
+
+状态为**400**，消息为**不能为空**，校验失败的对象为`brandEntity`,字段为`name`，失败的原因是`name`的值为空串
+
+![image-20220507094322011](image/4.2.7.4.2.png)
+
+#### 5、自定义显示格式
+
+##### 1、添加错误消息提示
+
+![image-20220507095020241](image/4.2.7.5.1.png)
+
+##### 2、修改返回样式
+
+给校验的bean后紧跟一个`org.springframework.validation`包下的`BindingResult`,就可以获取到校验的结果
+
+```java
+  @RequestMapping("/save")
+      public R save(@Valid @RequestBody BrandEntity brand, BindingResult result){
+      if (result.hasErrors()){
+          Map<String, String> map = new HashMap<>();
+          result.getFieldErrors().forEach((item)->{
+              //错误消息
+              String message = item.getDefaultMessage();
+              //bean的字段名
+              String name = item.getField();
+              map.put(name,message);
+          });
+          return R.error(400,"提交的数据不合法").put("data",map);
+      }
+	  brandService.save(brand);
+
+      return R.ok();
+  }
+```
+
+![image-20220507100430365](image/4.2.7.5.2.png)
+
+#### 6、重新测试
+
+重启`gulimall-product`项目后重新进行测试
+
+可以看到已经按照想要的格式显示了
+
+![image-20220507102736630](image/4.2.7.6.png)
+
+#### 7、添加其他校验规则
+
+```java
+package com.atguigu.gulimall.product.entity;
+
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serializable;
+import lombok.Data;
+import org.hibernate.validator.constraints.URL;
+
+import javax.validation.constraints.*;
+
+/**
+ * 品牌
+ *
+ * @author 无名氏
+ * @email 2185180175@qq.com
+ * @date 2022-04-17 18:19:58
+ */
+@Data
+@TableName("pms_brand")
+public class BrandEntity implements Serializable {
+   private static final long serialVersionUID = 1L;
+
+   /**
+    * 品牌id
+    */
+   @TableId
+   private Long brandId;
+   /**
+    * 品牌名
+    * @NotBlank: 不能为空，必须包含一个非空白字符
+    */
+   @NotBlank(message = "品牌名不能为空")
+   private String name;
+   /**
+    * 品牌logo地址
+    * @NotEmpty ：The annotated element must not be {@code null} nor empty
+    *              可以接收 CharSequence、Collection、Map、Array 类型
+    * @URL ：必须为一个合法的url地址
+    */
+   @NotEmpty
+   @URL(message = "Logo必须为一个合法的url地址")
+   private String logo;
+   /**
+    * 介绍
+    */
+   private String descript;
+   /**
+    * 显示状态[0-不显示；1-显示]
+    */
+   private Integer showStatus;
+   /**
+    * 检索首字母
+    */
+   @NotEmpty
+   @Pattern(regexp = "^[a-zA-Z]$",message = "首字母必须为单个的大写或小写英文字母")
+   private String firstLetter;
+   /**
+    * 排序
+    * @NotNull : The annotated element must not be {@code null}.
+    *        * Accepts any type.
+    */
+   @NotNull
+   @Min(value = 0,message = "排序字段必须为一个大于0的整数")
+   private Integer sort;
+
+}
+```
+
+#### 8、再次测试
+
+重启`gulimall-product`项目后重新进行测试
+
+##### 1、提交错误请求
+
+###### 1、为空判断
+
+![image-20220507103142585](image/4.2.7.8.1.1.png)
+
+###### 2、错误值判断
+
+name值为一个空格可以判断，但sort为浮点型判断不出来
+
+```json
+{"name": "1","logo":"http://www.example.org/1.jpg","firstLetter":"q","sort":1.1}
+```
+
+![image-20220507104541200](image/4.2.7.8.1.2.png)
+
+###### 3、测试sort为浮点型
+
+当其他值合法，只有sort不为int类型时，尽然校验通过了
+
+![image-20220507105030110](image/4.2.7.8.1.3.1.png)
+
+`sort`直接被转成int了:cold_sweat:
+
+![image-20220507105222663](image/4.2.7.8.1.3.2.png)
+
+###### 4、读取请求体信息
+
+sort确实为1.1
+
+```java
+@RequestMapping("/save")
+public R save(HttpServletRequest request) throws IOException {
+    System.out.println(request.getParameter("sort"));
+    request.getParameterMap().forEach((k, v) -> System.out.println(k + " : " + v));
+
+    StringBuffer stringBuffer = new StringBuffer();
+    BufferedReader reader = request.getReader();
+    String temp;
+    while ((temp = reader.readLine()) != null) {
+        stringBuffer.append(temp);
+    }
+    System.out.println(stringBuffer);
+
+    brandService.save(brand);
+
+    return R.ok();
+}
+```
+
+![image-20220507120100556](image/4.2.7.8.1.4.1.png)
+
+不要加上`@RequestBody BrandEntity brand`，如果加上这些参数spring会读取request输入流
+
+而request的输入流只允许被读取一次
+
+```java
+@RequestMapping("/save")
+public R save(HttpServletRequest request, @Valid @RequestBody BrandEntity brand, BindingResult result) throws IOException {
+    request.getParameterMap().forEach((k, v) -> System.out.println("111" + k + " : " + v));
+
+    StringBuffer stringBuffer = new StringBuffer();
+    BufferedReader reader = request.getReader();
+    String temp;
+    while ((temp = reader.readLine()) != null) {
+        stringBuffer.append(temp);
+    }
+    System.out.println(stringBuffer);
+
+    if (result.hasErrors()) {
+        Map<String, String> map = new HashMap<>();
+        result.getFieldErrors().forEach((item) -> {
+            //错误消息
+            String message = item.getDefaultMessage();
+            //bean的字段名
+            String name = item.getField();
+            map.put(name, message);
+        });
+        return R.error(400, "提交的数据不合法").put("data", map);
+    }
+    
+    brandService.save(brand);
+
+    return R.ok();
+}
+```
+
+![image-20220507122011532](image/4.2.7.8.1.4.2.png)
+
+###### 5、不允许强转
+
+设置json反序列化不允许`float`强转成`int`
+
+```yaml
+spring:
+  jackson:
+    deserialization:
+      ACCEPT_FLOAT_AS_INT: false
+```
+
+![image-20220507144358777](image/4.2.7.8.1.5.1.png)
+
+可以看到已经不允许强转了
+
+Cannot coerce a floating-point value ('1.1') into Integer：无法将浮点值 ('1.1') 强制转换为整数
+
+![image-20220507144324665](image/4.2.7.8.1.5.2.png)
+
+##### 2、提交正确请求
+
+```json
+{"name": "1","logo":"http://www.example.org/1.jpg","firstLetter":"q","sort":0}
+```
+
+![image-20220507103754722](image/4.2.7.8.2.1.png)
+
+已经显示出来了
+
+![image-20220507103937140](image/4.2.7.8.2.2.png)
+
+#### 9、批量捕获异常
+
+##### 1、编写异常捕获类
+
+在`com.atguigu.gulimall.product`下新建`exception`文件夹
+
+在`com.atguigu.gulimall.product.exception`下新建` GulimallExceptionControllerAdvice`类自定义捕获异常
+
+```java
+package com.atguigu.gulimall.product.exception;
+
+import com.atguigu.common.utils.R;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/7
+ * @Description: 自定义异常捕获类
+ *
+ * @RestControllerAdvice =  @ControllerAdvice + @ResponseBody
+ */
+
+@Slf4j  //lombok日志
+@RestControllerAdvice(basePackages = "com.atguigu.gulimall.product.controller")
+public class GulimallExceptionControllerAdvice {
+
+    /**
+     * 捕获异常
+     * @ExceptionHandler: 捕获异常的类型
+     * @param e 该异常类
+     * @return  返回前端的结果
+     */
+    @ExceptionHandler(value = Exception.class)
+    public R handleValidException(Exception e){
+        log.error("数据校验出现问题:{},异常类型:{}",e.getMessage(),e.getClass());
+        return R.error();
+    }
+}
+```
+
+![image-20220507153231608](image/4.2.7.9.1.png)
+
+##### 2、测试`upload`方法
+
+重启`gulimall-product`项目后测试
+
+```
+http://localhost:10000/product/brand/update
+
+{"id":1,"name": " ","logo":"www.example.org/1.jpg","firstLetter":"qq","sort":-1}
+```
+
+###### 1、未知错误
+
+可以看到显示的是未知错误
+
+![image-20220507151321841](image/4.2.7.9.2.1.png)
+
+###### 2、控制台查看异常类
+
+异常类为：`org.springframework.web.bind.MethodArgumentNotValidException`
+
+![image-20220507153339775](image/4.2.7.9.2.2.png)
+
+##### 3、修改捕获异常类型
+
+修改` GulimallExceptionControllerAdvice`类的`handleValidException`方法
+
+```java
+@ExceptionHandler(value = MethodArgumentNotValidException.class)
+public R handleValidException(MethodArgumentNotValidException e){
+    log.error("数据校验出现问题:{},异常类型:{}",e.getMessage(),e.getClass());
+    Map<String, String> errMap = new HashMap<>();
+    e.getBindingResult().getFieldErrors().forEach((item)->{
+        //实体类的字段名和对应的错误消息
+        errMap.put(item.getField(),item.getDefaultMessage());
+    });
+
+    return R.error(400,"数据校验失败").put("data",errMap);
+}
+```
+
+![image-20220507152807842](image/4.2.7.9.3.png)
+
+4、测试`upload`方法
+
+测试`upload`方法，可以看到按想要的格式显示出来了
+
+![image-20220507152532267](image/4.2.7.9.4.png)
+
+#### 10、捕获所有类型异常
+
+在` GulimallExceptionControllerAdvice`类中添加方法
+
+所有前面没有被匹配的异常都会执行这个方法
+
+```java
+@ExceptionHandler(value = Throwable.class)
+public R handleException(Throwable throwable){
+    return R.error();
+}
+```
+
+![image-20220507154355873](image/4.2.7.10.png)
+
+#### 11、错误类型枚举
+
+##### 1、新建枚举类
+
+在`gulimall-common`模块的`com.atguigu.common.exception`文件夹下新建`BizCodeException`枚举类
+
+定义可能的错误信息
+
+```java
+package com.atguigu.common.exception;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/7
+ * @Description:
+ * 错误码和错误信息定义类
+ * 1. 错误码定义规则为 5 为数字
+ * 2. 前两位表示业务场景，最后三位表示错误码。例如：100001。10:通用 001:系统未知异常
+ * 3. 维护错误码后需要维护错误描述，将他们定义为枚举形式
+ * 错误码列表：
+ * 10: 通用
+ * 001：参数格式校验
+ * 11: 商品
+ * 12: 订单
+ * 13: 购物车
+ * 14: 物流
+ */
+public enum BizCodeException {
+    /**
+     * 系统未知异常
+     */
+    UNKNOW_EXCEPTION(10000,"系统未知异常"),
+    /**
+     * 参数格式校验失败
+     */
+    VALID_EXCEPTION(10001,"参数格式校验失败");
+
+    private int code;
+    private String msg;
+
+    BizCodeException(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+}
+```
+
+![image-20220507155929408](image/4.2.7.11.1.png)
+
+##### 2、`R`类添加方法
+
+在`gulimall-common`模块的`com.atguigu.common.utils`文件夹下的`R`类里添加方法
+
+```java
+public static R error(BizCodeException bizCodeException){
+   return error(bizCodeException.getCode(),bizCodeException.getMsg());
+}
+```
+
+![image-20220507161305656](image/4.2.7.11.2.png)
+
+##### 3、修改返回参数
+
+修改`gulimall-product`模块`com.atguigu.gulimall.product.exception`包下的
+
+` GulimallExceptionControllerAdvice`类的方法返回参数
+
+![image-20220507161815782](image/4.2.7.11.3.png)
+
+#### 12、分组校验
+
+> 默认没有指定分组的校验注解@NotBlank，在分组校验情况@Validated({AddGroup.class})下不生效，只会在@Validated生效；
+>
+> 默认指定分组的校验注解@NotBlank(groups = AddGroup.class)，在@Validated下不生效，只会在分组校验@Validated({AddGroup.class})下生效
+
+可以看到groups的参数为接口数组
+
+![image-20220507175045352](image/4.2.7.12.0.png)
+
+##### 1、新建接口
+
+在`gulimall-common`模块的`com.atguigu.common`包下新建`valid`文件夹
+
+在`gulimall-common`模块的`com.atguigu.common.valid`包下创建`AddGroup`和`UpdateGroup`接口
+
+这些接口只做标识，不用书写任何方法和字段
+
+![image-20220507175647905](image/4.2.7.12.1.1.png)
+
+![image-20220507175702832](image/4.2.7.12.1.2.png)
+
+##### 2、添加分组
+
+id添加校验注解，使用`groups`属性进行分组,传入的类只做一个标识
+
+```java
+@Null(message = "添加不能指定品牌id",groups = {AddGroup.class})
+@NotNull(message = "修改必须指定品牌id",groups = {UpdateGroup.class})
+```
+
+![image-20220507182831588](image/4.2.7.12.2.png)
+
+##### 3、按组校验
+
+使用`org.springframework.validation.annotation`包下的`Validated`注解，指定分组的类
+
+![image-20220507183447890](image/4.2.7.12.3.png)
+
+##### 4、测试
+
+重启`gulimall-product`模块
+
+```json
+{"brandId":1,"name": " ","logo":"www.example.org/1.jpg","firstLetter":"qq","sort":-1}
+```
+
+可以看到`brandId`字段已经分组校验了，其他没有分组的字段在使用`Validated`注解进行分组校验的情况下不生效
+
+![image-20220507193841877](image/4.2.7.12.4.1.png)
+
+![image-20220507193934405](image/4.2.7.12.4.2.png)
+
+##### 5、其他字段添加分组校验
+
+修改`gulimall-product`模块下的`com.atguigu.gulimall.product.entity.BrandEntity`类
+
+```java
+package com.atguigu.gulimall.product.entity;
+
+import com.atguigu.common.valid.AddGroup;
+import com.atguigu.common.valid.UpdateGroup;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serializable;
+import lombok.Data;
+import org.hibernate.validator.constraints.URL;
+
+import javax.validation.constraints.*;
+
+/**
+ * 品牌
+ *
+ * @author 无名氏
+ * @email 2185180175@qq.com
+ * @date 2022-04-17 18:19:58
+ */
+@Data
+@TableName("pms_brand")
+public class BrandEntity implements Serializable {
+   private static final long serialVersionUID = 1L;
+
+   /**
+    * 品牌id
+    * UpdateGroup不能指定品牌
+    * AddGroup必须指定品牌id
+    */
+   @Null(message = "添加不能指定品牌id",groups = {AddGroup.class})
+   @NotNull(message = "修改必须指定品牌id",groups = {UpdateGroup.class})
+   @TableId
+   private Long brandId;
+   /**
+    * 品牌名
+    * @NotBlank: 不能为空，必须包含一个非空白字符
+    */
+   @NotBlank(message = "品牌名不能为空",groups = AddGroup.class)
+   private String name;
+   /**
+    * 品牌logo地址
+    * @NotEmpty ：The annotated element must not be {@code null} nor empty
+    *              可以接收 CharSequence、Collection、Map、Array 类型
+    * @URL ：必须为一个合法的url地址
+    *
+    * 添加品牌时logo不能为空，并且需要是一个URL
+    * 修改可以为空，但如果不为空则必须为一个URL
+    */
+   @NotEmpty(groups = AddGroup.class)
+   @URL(message = "Logo必须为一个合法的url地址",groups = {AddGroup.class,UpdateGroup.class})
+   private String logo;
+   /**
+    * 介绍
+    */
+   private String descript;
+   /**
+    * 显示状态[0-不显示；1-显示]
+    */
+   private Integer showStatus;
+   /**
+    * 检索首字母
+    */
+   @NotEmpty(groups = AddGroup.class)
+   @Pattern(regexp = "^[a-zA-Z]$",message = "首字母必须为单个的大写或小写英文字母",groups = {AddGroup.class,UpdateGroup.class})
+   private String firstLetter;
+   /**
+    * 排序
+    * @NotNull : The annotated element must not be {@code null}.
+    *        * Accepts any type.
+    */
+   @NotNull(groups = AddGroup.class)
+   @Min(value = 0,message = "排序字段必须为一个大于0的整数",groups = {AddGroup.class,UpdateGroup.class})
+   private Integer sort;
+
+
+
+}
+```
+
+#### 13、自定义校验注解
+
+需求：`showStatus`只能为0或1
+
+Integer和Long类型不能使用正则
+
+```
+/**
+ * 显示状态[0-不显示；1-显示]
+ * @Pattern不能用在Integer和Long上
+ * No validator could be found for constraint 'javax.validation.constraints.Pattern' validating type 'java.lang.Integer'
+ * 因为java中的正则是针对字符串的,只有String才有Patter相关的方法
+ */
+//@Pattern(regexp = "^[01]$",message = "显示状态异常",groups = AddGroup.class) 不能使用该注解来校验
+private Integer showStatus;
+```
+
+不过可以使用以下三个注解来完成功能
+
+```
+@NotNull(groups = AddGroup.class)
+@Max(value = 1,groups = {AddGroup.class,UpdateGroup.class})
+@Min(value = 0,groups = {AddGroup.class,UpdateGroup.class})
+private Integer showStatus;
+```
+
+如果有更复杂的需求,比方说只能为[1,4,7]中的一个，这些注解就不能实现这个需求了
+
+因此可以自定义注解
+
+##### 1、编写自定义注解
+
+在`gulimall-common`模块的`com.atguigu.common.valid`包下创建`ListValue`注解
+
+在`jsr303`规范中，校验注解必须添加这三个属性
+
+```java
+package com.atguigu.common.valid;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.TYPE_USE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/7
+ * @Description: 只能为列表内的值
+ */
+//生成文档
+@Documented
+//使用哪个校验器进行校验(如果不指定，需要在初始化的时候指定)
+@Constraint(validatedBy = { })
+//注解可以标注在哪个位置
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+//校验时机，在运行时获取
+@Retention(RUNTIME)
+public @interface ListValue {
+    /**
+     * 校验出错以后，错误信息去哪取
+     * 默认使用com.atguigu.common.valid.ListValue.message属性去
+     * org/hibernate/validator/ValidationMessages.properties配置文件中去取
+     *
+     * 一般为 (注解全类名 + .message)
+     * @return
+     */
+    String message() default "{com.atguigu.common.valid.ListValue.message}";
+    /**
+     * 支持分组校验
+     * @return
+     */
+    Class<?>[] groups() default { };
+    /**
+     * 自定义负载信息
+     * @return
+     */
+    Class<? extends Payload>[] payload() default { };
+    /**
+     * 可以为哪些值
+     * @return
+     */
+    int[] vals() default { };
+}
+```
+
+![image-20220507212345254](image/4.2.7.13.1.png)
+
+##### 2、添加坐标
+
+在`gulimall-common`模块的`pom.xml`文件中添加validation坐标，点击刷新，然后在`ListValue`注解类中导包就不报错
+
+```xml
+<dependency>
+    <groupId>javax.validation</groupId>
+    <artifactId>validation-api</artifactId>
+    <version>2.0.1.Final</version>
+</dependency>
+```
+
+![image-20220507215105090](image/4.2.7.13.2.png)
+
+##### 3、创建配置文件
+
+在`jsr303`规范中，在`ValidationMessages.properties`文件中获取`message`中键对应的值作为消息
+
+###### 1、搜索`ValidationMessages.properties`
+
+双击**shift**键,在弹出的框中搜索`ValidationMessages.properties`即可看到
+
+![image-20220507212629762](image/4.2.7.13.3.1.png)
+
+###### 2、新建配置文件
+
+在`gulimall-common`模块的`resources`目录下新建`ValidationMessages.properties`配置文件
+
+```properties
+com.atguigu.common.valid.ListValue.message = "必须提交指定的值"
+```
+
+这里写错了，测试的时候发现它把两个双引号也显示出来了(别人写的也没有双引号),其实为
+
+```properties
+com.atguigu.common.valid.ListValue.message = 必须提交指定的值
+```
+
+注意编码为"**UTF-8**"
+
+![image-20220507213536293](image/4.2.7.13.3.2.png)
+
+###### 3、设置字符编码
+
+如果编码不为"**UTF-8**"可以**设置字符编码**
+
+![image-20220507214152772](image/4.2.7.13.3.3.png)
+
+##### 4、自定义校验规则
+
+校验类必须实现`ConstraintValidator`接口
+
+![image-20220507215413611](image/4.2.7.13.4.1.png)
+
+`ConstraintValidator`接口有两个泛型,第一个泛型用来**指定注解**，第二个泛型用来指定**需要校验的数据类型**
+
+![image-20220507215539055](image/4.2.7.13.4.2.png)
+
+在`com.atguigu.common.valid`包下新建`ListValueConstraintValidator`类，实现`ConstraintValidator`接口
+
+```java
+package com.atguigu.common.valid;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/7
+ * @Description:
+ */
+public class ListValueConstraintValidator implements ConstraintValidator<ListValue, Integer> {
+
+    private Set<Integer> set = new HashSet<>();
+
+    /**
+     * 初始化信息
+     * 可以获取注解的详细信息
+     * @param constraintAnnotation
+     */
+    @Override
+    public void initialize(ListValue constraintAnnotation) {
+        //@ListValue注解中 vals 属性的值
+        //值必须为这几个中的一个
+        int[] vals = constraintAnnotation.vals();
+        for (int val : vals) {
+            set.add(val);
+        }
+    }
+
+    /**
+     * 判断是否校验成功
+     * @param value
+     * @param context
+     * @return
+     */
+    @Override
+    public boolean isValid(Integer value, ConstraintValidatorContext context) {
+
+        return set.contains(value);
+    }
+}
+```
+
+![image-20220507222417417](image/4.2.7.13.4.3.png)
+
+##### 5、指定校验器
+
+可以指定多个校验器，能够根据泛型自动匹配正确的校验器
+
+![image-20220507222719730](image/4.2.7.13.5.png)
+
+##### 6、使用该注解
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.BrandEntity`类的`showStatus`字段上使用自定义注解
+
+```java
+@NotNull(groups = AddGroup.class)
+@ListValue(vals = {0,1},groups = {AddGroup.class,UpdateGroup.class})
+```
+
+![image-20220507225522195](image/4.2.7.13.6.png)
+
+##### 7、测试
+
+重启`gulimall-product`模块
+
+###### 1、多了两个双引号
+
+![image-20220507223836326](image/4.2.7.13.7.1.png)
+
+###### 2、去掉双引号
+
+去掉双引号后重启`gulimall-product`模块
+
+![image-20220507223924267](image/4.2.7.13.7.2.png)
+
+###### 3、重新测试
+
+![image-20220507224020853](image/4.2.7.13.7.3.png)
+
+## 4.3、商品服务-API-属性分组
+
+### 4.3.1、前端组件导入
+
+#### 1、导入数据
+
+##### 1、执行sql语句
+
+打开`1.分布式基础（全栈开发篇）\资料源码.zip\docs\代码\sql`文件夹下的`sys_menus.sql`，全选复制
+
+点击`gulimall_admin`然后右键选择`命令行界面` ，粘贴到里面，回车执行sql语句
+
+(不要点击`运行SQL文件`,这样会有中文乱码问题)
+
+![image-20220508090404565](image/4.3.1.1.1.png)
+
+##### 2、查看结果
+
+url: http://localhost:8001/#/product-brand
+
+刷新前端项目，可以看到这些系统已经显示出来了
+
+![image-20220508091348831](image/4.3.1.1.2.png)
+
+#### 2、新建文件
+
+##### 1、新建`category.vue`文件
+
+在`src\views\modules`文件夹里新建`common`文件夹，用来存储公共组件
+
+在`src\views\modules`文件夹下的`common`文件夹里新建`category.vue`文件,输入vue生成模板
+
+![image-20220508092805251](image/4.3.1.2.1.png)
+
+##### 2、新建`attrgroup.vue`文件
+
+###### 1、查看位置
+
+![image-20220508092955297](image/4.3.1.2.2.1.png)
+
+###### 2、新建`attrgroup.vue`文件
+
+在`src\views\modules`文件夹下的`product`文件夹里新建`attrgroup.vue`文件,输入vue生成模板
+
+![image-20220508095359481](image/4.3.1.2.2.2.png)
+
+#### 3、添加代码
+
+##### 1、添加`category.vue`代码
+
+修改`src\views\modules\common\category.vue`文件为如下内容
+
+```vue
+<template>
+  <div>
+    <el-tree
+      :data="menu"
+      :props="defaultProps"
+      node-key="catId"
+      ref="menuTree"
+    ></el-tree>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: {},
+  props: {},
+  data() {
+    //这里存放数据
+    return {
+      //三级分类的所有数据
+      menu: [],
+      //默认展开的节点的 key 的数组
+      expandedKey: [],
+      defaultProps: {
+        children: "children",
+        label: "name",
+      },
+      //是否可以拖拽
+      draggable: false,
+      //拖拽节点及其子节点在整颗树的最大深度
+      maxLength: 0,
+      //拖拽改变的节点数据
+      updateNodes: [],
+      //是否显示批量删除按钮
+      canBatchDeletion: false,
+    };
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  //方法集合
+  methods: {
+    getMenus() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log(data.data);
+        this.menu = data.data;
+      });
+    },
+  },
+  //生命周期 - 创建完成（可以访问当前 this 实例）
+  created() {
+      this.getMenus();
+  },
+  //生命周期 - 挂载完成（可以访问 DOM 元素）
+  mounted() {},
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {}, //如果页面有 keep-alive 缓存功能，这个函数会触发
+};
+</script>
+<style scoped>
+</style>
+```
+
+##### 2、添加`attrgroup.vue`代码
+
+`element-ui`里面的**Layout 布局**下的**分栏间隔**:  [组件 | Element](https://element.eleme.io/#/zh-CN/component/layout)
+
+引入组件步骤：
+
+1. import Category from "../common/category.vue"; 把组件导进来
+2. components: { Category:Category }, 指明需要的组件
+3. <category></category> 使用该标签
+
+修改`src\views\modules\product\attrgroup.vue`文件为如下内容
+
+```vue
+<template>
+  <div>
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <category></category>
+      </el-col>
+      <el-col :span="18"> 表格 </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+/*
+    引入组件步骤：
+    1、import Category from "../common/category.vue"; 把组件导进来
+    2、components: { Category:Category }, 指明需要的组件
+    3、<category></category> 使用该标签
+*/
+import Category from "../common/category.vue";
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: { Category },
+  props: {},
+  data() {
+    //这里存放数据
+    return {};
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  //方法集合
+  methods: {},
+  //生命周期 - 创建完成（可以访问当前 this 实例）
+  created() {},
+  //生命周期 - 挂载完成（可以访问 DOM 元素）
+  mounted() {},
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {}, //如果页面有 keep-alive 缓存功能，这个函数会触发
+};
+</script>
+<style scoped>
+</style>
+```
+
+##### 3、结构已经出来了
+
+![image-20220508100902403](image/4.3.1.3.3.png)
+
+##### 4、添加表格
+
+将<div>标签里面的内容替换掉"表格"
+
+然后把其他除<template>标签里的内容与`attrgroup.vue`里面的内容合并
+
+![image-20220508101443870](image/4.3.1.3.4.png)
+
+```vue
+<template>
+  <div>
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <category></category>
+      </el-col>
+      <el-col :span="18">
+        <div class="mod-config">
+          <el-form
+            :inline="true"
+            :model="dataForm"
+            @keyup.enter.native="getDataList()"
+          >
+            <el-form-item>
+              <el-input
+                v-model="dataForm.key"
+                placeholder="参数名"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="getDataList()">查询</el-button>
+              <el-button
+                v-if="isAuth('product:attrgroup:save')"
+                type="primary"
+                @click="addOrUpdateHandle()"
+                >新增</el-button
+              >
+              <el-button
+                v-if="isAuth('product:attrgroup:delete')"
+                type="danger"
+                @click="deleteHandle()"
+                :disabled="dataListSelections.length <= 0"
+                >批量删除</el-button
+              >
+            </el-form-item>
+          </el-form>
+          <el-table
+            :data="dataList"
+            border
+            v-loading="dataListLoading"
+            @selection-change="selectionChangeHandle"
+            style="width: 100%"
+          >
+            <el-table-column
+              type="selection"
+              header-align="center"
+              align="center"
+              width="50"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="attrGroupId"
+              header-align="center"
+              align="center"
+              label="分组id"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="attrGroupName"
+              header-align="center"
+              align="center"
+              label="组名"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="sort"
+              header-align="center"
+              align="center"
+              label="排序"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="descript"
+              header-align="center"
+              align="center"
+              label="描述"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="icon"
+              header-align="center"
+              align="center"
+              label="组图标"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="catelogId"
+              header-align="center"
+              align="center"
+              label="所属分类id"
+            >
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="addOrUpdateHandle(scope.row.attrGroupId)"
+                  >修改</el-button
+                >
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="deleteHandle(scope.row.attrGroupId)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="sizeChangeHandle"
+            @current-change="currentChangeHandle"
+            :current-page="pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="pageSize"
+            :total="totalPage"
+            layout="total, sizes, prev, pager, next, jumper"
+          >
+          </el-pagination>
+          <!-- 弹窗, 新增 / 修改 -->
+          <add-or-update
+            v-if="addOrUpdateVisible"
+            ref="addOrUpdate"
+            @refreshDataList="getDataList"
+          ></add-or-update>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+/*
+    引入组件步骤：
+    1、import Category from "../common/category.vue"; 把组件导进来
+    2、components: { Category:Category }, 指明需要的组件
+    3、<category></category> 使用该标签
+*/
+import Category from "../common/category.vue";
+import AddOrUpdate from "./attrgroup-add-or-update";
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: { Category, AddOrUpdate },
+  props: {},
+  data() {
+    return {
+      dataForm: {
+        key: "",
+      },
+      dataList: [],
+      pageIndex: 1,
+      pageSize: 10,
+      totalPage: 0,
+      dataListLoading: false,
+      dataListSelections: [],
+      addOrUpdateVisible: false,
+    };
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  activated() {
+    this.getDataList();
+  },
+  //方法集合
+  methods: {
+    // 获取数据列表
+    getDataList() {
+      this.dataListLoading = true;
+      this.$http({
+        url: this.$http.adornUrl("/product/attrgroup/list"),
+        method: "get",
+        params: this.$http.adornParams({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          key: this.dataForm.key,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataList = data.page.list;
+          this.totalPage = data.page.totalCount;
+        } else {
+          this.dataList = [];
+          this.totalPage = 0;
+        }
+        this.dataListLoading = false;
+      });
+    },
+    // 每页数
+    sizeChangeHandle(val) {
+      this.pageSize = val;
+      this.pageIndex = 1;
+      this.getDataList();
+    },
+    // 当前页
+    currentChangeHandle(val) {
+      this.pageIndex = val;
+      this.getDataList();
+    },
+    // 多选
+    selectionChangeHandle(val) {
+      this.dataListSelections = val;
+    },
+    // 新增 / 修改
+    addOrUpdateHandle(id) {
+      this.addOrUpdateVisible = true;
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init(id);
+      });
+    },
+    // 删除
+    deleteHandle(id) {
+      var ids = id
+        ? [id]
+        : this.dataListSelections.map((item) => {
+            return item.attrGroupId;
+          });
+      this.$confirm(
+        `确定对[id=${ids.join(",")}]进行[${id ? "删除" : "批量删除"}]操作?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(() => {
+        this.$http({
+          url: this.$http.adornUrl("/product/attrgroup/delete"),
+          method: "post",
+          data: this.$http.adornData(ids, false),
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "操作成功",
+              type: "success",
+              duration: 1500,
+              onClose: () => {
+                this.getDataList();
+              },
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        });
+      });
+    },
+  },
+};
+</script>
+<style scoped>
+</style>
+```
+
+##### 5、引入`attrgroup-add-or-update.vue`文件
+
+![image-20220508103547839](image/4.3.1.3.5.png)
+
+##### 6、效果
+
+![image-20220508104040518](image/4.3.1.3.6.png)
+
+#### 4、完整代码
+
+##### 1、`category.vue`
+
+```vue
+<template>
+  <div>
+    <el-tree
+      :data="menu"
+      :props="defaultProps"
+      node-key="catId"
+      ref="menuTree"
+      @node-click="nodeClick"
+    ></el-tree>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: {},
+  props: {},
+  data() {
+    //这里存放数据
+    return {
+      //三级分类的所有数据
+      menu: [],
+      //默认展开的节点的 key 的数组
+      expandedKey: [],
+      defaultProps: {
+        children: "children",
+        label: "name",
+      },
+      //是否可以拖拽
+      draggable: false,
+      //拖拽节点及其子节点在整颗树的最大深度
+      maxLength: 0,
+      //拖拽改变的节点数据
+      updateNodes: [],
+      //是否显示批量删除按钮
+      canBatchDeletion: false,
+    };
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  //方法集合
+  methods: {
+    getMenus() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log(data.data);
+        this.menu = data.data;
+      });
+    },
+    nodeClick(data,node,component){
+      console.log("子组件的category里的节点被点击：",data,node,component);
+      //向父组件发送事件
+      //第一个参数为事件的名称,后面的都为发送的数据
+      this.$emit("tree-node-click",data,node,component);
+    },
+  },
+  //生命周期 - 创建完成（可以访问当前 this 实例）
+  created() {
+      this.getMenus();
+  },
+  //生命周期 - 挂载完成（可以访问 DOM 元素）
+  mounted() {},
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {}, //如果页面有 keep-alive 缓存功能，这个函数会触发
+};
+</script>
+<style scoped>
+</style>
+```
+
+##### 2、`attrgroup.vue`
+
+```vue
+<template>
+  <div>
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <category @tree-node-click="treeNodeClick"></category>
+      </el-col>
+      <el-col :span="18">
+        <div class="mod-config">
+          <el-form
+            :inline="true"
+            :model="dataForm"
+            @keyup.enter.native="getDataList()"
+          >
+            <el-form-item>
+              <el-input
+                v-model="dataForm.key"
+                placeholder="参数名"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="getDataList()">查询</el-button>
+              <el-button
+                v-if="isAuth('product:attrgroup:save')"
+                type="primary"
+                @click="addOrUpdateHandle()"
+                >新增</el-button
+              >
+              <el-button
+                v-if="isAuth('product:attrgroup:delete')"
+                type="danger"
+                @click="deleteHandle()"
+                :disabled="dataListSelections.length <= 0"
+                >批量删除</el-button
+              >
+            </el-form-item>
+          </el-form>
+          <el-table
+            :data="dataList"
+            border
+            v-loading="dataListLoading"
+            @selection-change="selectionChangeHandle"
+            style="width: 100%"
+          >
+            <el-table-column
+              type="selection"
+              header-align="center"
+              align="center"
+              width="50"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="attrGroupId"
+              header-align="center"
+              align="center"
+              label="分组id"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="attrGroupName"
+              header-align="center"
+              align="center"
+              label="组名"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="sort"
+              header-align="center"
+              align="center"
+              label="排序"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="descript"
+              header-align="center"
+              align="center"
+              label="描述"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="icon"
+              header-align="center"
+              align="center"
+              label="组图标"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="catelogId"
+              header-align="center"
+              align="center"
+              label="所属分类id"
+            >
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="addOrUpdateHandle(scope.row.attrGroupId)"
+                  >修改</el-button
+                >
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="deleteHandle(scope.row.attrGroupId)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="sizeChangeHandle"
+            @current-change="currentChangeHandle"
+            :current-page="pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="pageSize"
+            :total="totalPage"
+            layout="total, sizes, prev, pager, next, jumper"
+          >
+          </el-pagination>
+          <!-- 弹窗, 新增 / 修改 -->
+          <add-or-update
+            v-if="addOrUpdateVisible"
+            ref="addOrUpdate"
+            @refreshDataList="getDataList"
+          ></add-or-update>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+/*
+    引入组件步骤：
+    1、import Category from "../common/category.vue"; 把组件导进来
+    2、components: { Category:Category }, 指明需要的组件
+    3、<category></category> 使用该标签
+*/
+import Category from "../common/category.vue";
+import AddOrUpdate from "./attrgroup-add-or-update";
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: { Category, AddOrUpdate },
+  props: {},
+  data() {
+    return {
+      dataForm: {
+        key: "",
+      },
+      dataList: [],
+      pageIndex: 1,
+      pageSize: 10,
+      totalPage: 0,
+      dataListLoading: false,
+      dataListSelections: [],
+      addOrUpdateVisible: false,
+    };
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  activated() {
+    this.getDataList();
+  },
+  //方法集合
+  methods: {
+    // 获取数据列表
+    getDataList() {
+      this.dataListLoading = true;
+      this.$http({
+        url: this.$http.adornUrl("/product/attrgroup/list"),
+        method: "get",
+        params: this.$http.adornParams({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          key: this.dataForm.key,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataList = data.page.list;
+          this.totalPage = data.page.totalCount;
+        } else {
+          this.dataList = [];
+          this.totalPage = 0;
+        }
+        this.dataListLoading = false;
+      });
+    },
+    // 每页数
+    sizeChangeHandle(val) {
+      this.pageSize = val;
+      this.pageIndex = 1;
+      this.getDataList();
+    },
+    // 当前页
+    currentChangeHandle(val) {
+      this.pageIndex = val;
+      this.getDataList();
+    },
+    // 多选
+    selectionChangeHandle(val) {
+      this.dataListSelections = val;
+    },
+    // 新增 / 修改
+    addOrUpdateHandle(id) {
+      this.addOrUpdateVisible = true;
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init(id);
+      });
+    },
+    // 删除
+    deleteHandle(id) {
+      var ids = id
+        ? [id]
+        : this.dataListSelections.map((item) => {
+            return item.attrGroupId;
+          });
+      this.$confirm(
+        `确定对[id=${ids.join(",")}]进行[${id ? "删除" : "批量删除"}]操作?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(() => {
+        this.$http({
+          url: this.$http.adornUrl("/product/attrgroup/delete"),
+          method: "post",
+          data: this.$http.adornData(ids, false),
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "操作成功",
+              type: "success",
+              duration: 1500,
+              onClose: () => {
+                this.getDataList();
+              },
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        });
+      });
+    },
+    //参数为子组件传递的参数
+    treeNodeClick(data,node,component){
+      console.log("父组件attrgroup感知到子组件category的节点被点击：",data,node,component);
+      console.log("被点击的节点名：",data.name)
+    },
+  },
+};
+</script>
+<style scoped>
+</style>
+```
+
+### 4.3.2、父子组件交互
+
+#### 1、发送消息
+
+##### 1、绑定事件
+
+**Tree树形控件**中的**Events**:  [组件 | Element](https://element.eleme.io/#/zh-CN/component/tree)
+
+| 事件名称   | 说明               | 回调参数                                                     |
+| :--------- | :----------------- | :----------------------------------------------------------- |
+| node-click | 节点被点击时的回调 | 共三个参数，依次为：传递给 `data` 属性的数组中该节点所对应的对象、节点对应的 Node、节点组件本身。 |
+
+在`src\views\modules\common\category.vue`文件的`el-tree`标签内添加属性
+
+```html
+@node-click="nodeClick"
+```
+
+##### 2、添加方法
+
+在`src\views\modules\common\category.vue`文件的`methods`里面添加方法
+
+```javascript
+nodeClick(data,node,component){
+  console.log("子组件的category里的节点被点击：",data,node,component);
+  //向父组件发送事件
+  //第一个参数为事件的名称,后面的都为发送的数据
+  this.$emit("tree-node-click",data,node,component);
+},
+```
+
+#### 2、接收事件
+
+##### 1、添加事件
+
+在`src\views\modules\product\attrgroup.vue`文件中的`category`标签里添加属性
+
+格式： @事件名称=”父组件方法“
+
+```
+@tree-node-click="treeNodeClick"
+```
+
+![image-20220508111126728](image/4.3.2.2.1.png)
+
+##### 2、添加方法
+
+在`src\views\modules\product\attrgroup.vue`文件中的`methods`里面添加方法
+
+```javascript
+//参数为子组件传递的参数
+treeNodeClick(data,node,component){
+  console.log("父组件attrgroup感知到子组件category的节点被点击：",data,node,component);
+  console.log("被点击的节点名：",data.name)
+},
+```
+
+#### 3、查看效果
+
+点击"数码相机",可以看到父组件attrgroup已经感知到子组件category的节点被点击了
+
+![image-20220508112504211](image/4.3.2.3.png)
+
+### 4.3.3、获取分类属性分组
+
+#### 1、后端
+
+##### 1、更改`list`方法
+
+修改`gulimall-product`模块下`com.atguigu.gulimall.product.service.impl.AttrGroupServiceImpl`类的`list`方法
+
+```java
+@RequestMapping("/list/{catelogId}")
+    public R list(@RequestParam Map<String, Object> params,@PathVariable("catelogId") Long catelogId){
+    //PageUtils page = attrGroupService.queryPage(params);
+    PageUtils page = attrGroupService.queryPage(params,catelogId);
+    return R.ok().put("page", page);
+}
+```
+
+`alt+enter`在提示里面选第二个`Create method`
+
+![image-20220508165717823](image/4.3.3.1.1.png)
+
+##### 2、添加抽象方法
+
+`com.atguigu.gulimall.product.service`包下的`AttrGroupService`接口添加抽象方法
+
+```java
+PageUtils queryPage(Map<String, Object> params, Long catelogId);
+```
+
+##### 3、添加实现类
+
+`com.atguigu.gulimall.product.service.impl`包下的`AttrGroupServiceImpl`类添加实现方法
+
+```java
+@Override
+public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+    if (catelogId == 0){
+        return this.queryPage(params);
+    }else {
+        String key = (String) params.get("key");
+        //select * from attr_group where catelogId = ? and ( attr_group_id = key or attr_group_name like %key%)
+        LambdaQueryWrapper<AttrGroupEntity> queryWrapper = new LambdaQueryWrapper<AttrGroupEntity>()
+                .eq(AttrGroupEntity::getCatelogId,catelogId);
+        if (key != null && key.length() > 0){
+            queryWrapper.and((obj)->{
+                obj.eq(AttrGroupEntity::getAttrGroupId,key).or().like(AttrGroupEntity::getAttrGroupName,key);
+            });
+        }
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params),queryWrapper);
+        return new PageUtils(page);
+    }
+}
+```
+
+##### 4、测试
+
+使用Postman测试
+
+url: http://localhost:88/api/product/attrgroup/list/1?page=1&key=aa
+
+选择**get**方法
+
+![image-20220508165944731](image/4.3.3.1.4.1.png)
+
+可以看到已正确打印sql语句
+
+![image-20220508165149621](image/4.3.3.1.4.2.png)
+
+#### 2、前端
+
+##### 1、修改`treeNodeClick`方法
+
+修改`src\views\modules\product\attrgroup.vue`的`treeNodeClic`方法，为第三级时查询该catelogId的信息
+
+```javascript
+//参数为子组件传递的参数
+treeNodeClick(data,node,component){
+  console.log("父组件attrgroup感知到子组件category的节点被点击：",data,node,component);
+  console.log("被点击的节点名：",data.name)
+  //为第三级时查询该catelogId的信息
+  if(node.level==3){
+    this.catelogId = data.catId;
+    this.getDataList();
+  }
+},
+```
+
+##### 2、添加`catelogId`字段
+
+在`data`里的`return`里添加`catelogId`数据字段
+
+```
+catelogId : 0,
+```
+
+##### 3、修改url
+
+修改`getDataList`方法里面传递的url
+
+```
+url: this.$http.adornUrl(`/product/attrgroup/list/${this.catelogId}`),
+```
+
+#### 3、测试
+
+##### 1、查询全部
+
+点击 手机-->手机通讯-->手机 ,所有数据都查询出来了
+
+![image-20220508173023284](image/4.3.3.3.1.png)
+
+##### 2、根据id查
+
+输入`1`点击查询
+
+![image-20220508173218019](image/4.3.3.3.2.png)
+
+##### 3、根据组名查
+
+输入`基本`点击查询
+
+![image-20220508173329517](image/4.3.3.3.3.png)
+
+### 4.3.4、属性分组新增功能
+
+#### 1、添加级联选择器
+
+切换到`src\views\modules\product\attrgroup-add-or-update.vue`文件
+
+在`label="所属分类id"`的`el-form-item `标签内，删除`el-input`标签
+
+```html
+<el-input v-model="dataForm.catelogId" placeholder="所属分类id"></el-input>
+```
+
+添加`Cascader级联选择器`
+
+```html
+<el-cascader
+  v-model="dataForm.catelogId"
+  :options="categorys"
+  :props="props"
+></el-cascader>
+```
+
+#### 2、添加属性
+
+在`data`里面的`return`里添加属性
+
+```javascript
+props: {
+  value: 'catId',
+  label: 'name',
+  children: 'children'
+},
+categorys: [],
+```
+
+#### 3、添加方法
+
+添加`getCategorys`方法，获取分类数据
+
+```javascript
+getCategorys() {
+  this.$http({
+    url: this.$http.adornUrl("/product/category/list/tree"),
+    method: "get",
+  }).then(({ data }) => {
+    console.log(data.data);
+    this.categorys = data.data;
+  });
+},
+```
+
+#### 4、调用方法
+
+在创建完成（可以访问当前 this 实例）的时候调用`getCategorys`方法，获取分类数据
+
+`created`方法写在与“**data**"和”**methods**“同级的位置
+
+```javascript
+created() {
+  this.getCategorys();
+},
+```
+
+![image-20220508200114324](image/4.3.4.4.png)
+
+#### 5、测试
+
+##### 1、控制台报错
+
+```
+Invalid prop: type check failed for prop "value". Expected Array, got String
+无效的属性：属性“value”的类型检查失败。 预期数组，得到字符串。
+```
+
+![image-20220508201217559](image/4.3.4.5.1.1.png)
+
+把`src\views\modules\product`下的`attrgroup-add-or-update.vue`里的
+
+```
+catelogId: "",
+```
+
+改成
+
+```
+catelogId: [],
+```
+
+就行了，现在已经不报错了
+
+![image-20220509210341350](image/4.3.4.5.1.2.png)
+
+##### 2、查看数据，但多出一级
+
+数据已经显示出来了，但是在点击第三级分类时，又出来了一级
+
+![image-20220508200249772](image/4.3.4.5.2.1.png)
+
+![image-20220508202500776](image/4.3.4.5.2.2.png)
+
+![image-20220508202714332](image/4.3.4.5.2.3.png)
+
+##### 3、后端添加注解
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.CategoryEntity`文件里的`children`字段上添加注解
+
+```java
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+```
+
+![image-20220508203003106](image/4.3.4.5.3.png)
+
+##### 4、重新测试
+
+显示已经成功了，
+
+![image-20220509211116839](image/4.3.4.5.4.1.png)
+
+也没有`children`为空的字段了
+
+![image-20220509211356536](image/4.3.4.5.4.2.png)
+
+![image-20220509211717999](image/4.3.4.5.4.3.png)
+
+##### 5、提交的`catelogId`为数组
+
+提交的`catelogId`为数组，而想要的`catelogId`只是最后一级(不一定是第三级)分类的id
+
+![image-20220508204402893](image/4.3.4.5.4.png)
+
+##### 6、修改提交的数据
+
+把`src\views\modules\product`下的`attrgroup-add-or-update.vue`里的
+
+```
+catelogId: [],
+```
+
+改为
+
+```
+catelogIds: [],
+```
+
+并添加`catelogId`字段，此时的`catelogId`为要提交的最后一级(不一定是第三级)分类的id
+
+```
+catelogId: 0,
+```
+
+------
+
+把`el-cascader`标签内的属性
+
+```
+v-model="dataForm.catelogId"
+```
+
+改为
+
+```
+v-model="dataForm.catelogIds"
+```
+
+使其继续绑定以前的`catelogId`
+
+------
+
+把`dataFormSubmit`方法里`data`字段里的
+
+```
+catelogId: this.dataForm.catelogId,
+```
+
+改成
+
+```
+catelogId: this.dataForm.catelogIds[this.dataForm.catelogIds.length-1],
+```
+
+使其绑定最后一级(不一定是第三级)分类的id
+
+##### 7、继续测试
+
+![image-20220509213100721](image/4.3.4.5.7.1.png)
+
+提交后，页面自动刷新，获取最新数据
+
+![image-20220509213118005](image/4.3.4.5.7.2.png)
+
+:pushpin:这个刷新的功能就是通过刚才父子组件交换实现的
+
+![image-20220509213451960](image/4.3.4.5.7.3.png)
+
+![image-20220509213506714](image/4.3.4.5.7.4.png)
+
+![image-20220509213521855](image/4.3.4.5.7.5.png)
+
+##### 8、`所属分类id`不在一行显示
+
+`src\views\modules\product\attrgroup-add-or-update.vue`文件里的`el-form`标签里修改属性
+
+```css
+label-width="100px"
+```
+
+![image-20220509214406434](image/4.3.4.5.8.1.png)
+
+这样所属分类id就显示在一行了
+
+![image-20220509214549516](image/4.3.4.5.8.2.png)
+
+#### 6、完整代码
+
+##### 1、`common`下的`category.vue`文件
+
+`src\views\modules\common\category.vue`文件
+
+```vue
+<template>
+  <div>
+    <el-tree
+      :data="menu"
+      :props="defaultProps"
+      node-key="catId"
+      ref="menuTree"
+      @node-click="nodeClick"
+    ></el-tree>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: {},
+  props: {},
+  data() {
+    //这里存放数据
+    return {
+      //三级分类的所有数据
+      menu: [],
+      //默认展开的节点的 key 的数组
+      expandedKey: [],
+      defaultProps: {
+        children: "children",
+        label: "name",
+      },
+      //是否可以拖拽
+      draggable: false,
+      //拖拽节点及其子节点在整颗树的最大深度
+      maxLength: 0,
+      //拖拽改变的节点数据
+      updateNodes: [],
+      //是否显示批量删除按钮
+      canBatchDeletion: false,
+    };
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  //方法集合
+  methods: {
+    getMenus() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log(data.data);
+        this.menu = data.data;
+      });
+    },
+    nodeClick(data,node,component){
+      console.log("子组件的category里的节点被点击：",data,node,component);
+      //向父组件发送事件
+      //第一个参数为事件的名称,后面的都为发送的数据
+      this.$emit("tree-node-click",data,node,component);
+    },
+  },
+  //生命周期 - 创建完成（可以访问当前 this 实例）
+  created() {
+      this.getMenus();
+  },
+  //生命周期 - 挂载完成（可以访问 DOM 元素）
+  mounted() {},
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {}, //如果页面有 keep-alive 缓存功能，这个函数会触发
+};
+</script>
+<style scoped>
+</style>
+```
+
+##### 2、`attrgroup.vue`文件
+
+`src\views\modules\product\attrgroup.vue`文件
+
+```vue
+<template>
+  <div>
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <category @tree-node-click="treeNodeClick"></category>
+      </el-col>
+      <el-col :span="18">
+        <div class="mod-config">
+          <el-form
+            :inline="true"
+            :model="dataForm"
+            @keyup.enter.native="getDataList()"
+          >
+            <el-form-item>
+              <el-input
+                v-model="dataForm.key"
+                placeholder="参数名"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button @click="getDataList()">查询</el-button>
+              <el-button
+                v-if="isAuth('product:attrgroup:save')"
+                type="primary"
+                @click="addOrUpdateHandle()"
+                >新增</el-button
+              >
+              <el-button
+                v-if="isAuth('product:attrgroup:delete')"
+                type="danger"
+                @click="deleteHandle()"
+                :disabled="dataListSelections.length <= 0"
+                >批量删除</el-button
+              >
+            </el-form-item>
+          </el-form>
+          <el-table
+            :data="dataList"
+            border
+            v-loading="dataListLoading"
+            @selection-change="selectionChangeHandle"
+            style="width: 100%"
+          >
+            <el-table-column
+              type="selection"
+              header-align="center"
+              align="center"
+              width="50"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="attrGroupId"
+              header-align="center"
+              align="center"
+              label="分组id"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="attrGroupName"
+              header-align="center"
+              align="center"
+              label="组名"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="sort"
+              header-align="center"
+              align="center"
+              label="排序"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="descript"
+              header-align="center"
+              align="center"
+              label="描述"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="icon"
+              header-align="center"
+              align="center"
+              label="组图标"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="catelogId"
+              header-align="center"
+              align="center"
+              label="所属分类id"
+            >
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              header-align="center"
+              align="center"
+              width="150"
+              label="操作"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="addOrUpdateHandle(scope.row.attrGroupId)"
+                  >修改</el-button
+                >
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="deleteHandle(scope.row.attrGroupId)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="sizeChangeHandle"
+            @current-change="currentChangeHandle"
+            :current-page="pageIndex"
+            :page-sizes="[10, 20, 50, 100]"
+            :page-size="pageSize"
+            :total="totalPage"
+            layout="total, sizes, prev, pager, next, jumper"
+          >
+          </el-pagination>
+          <!-- 弹窗, 新增 / 修改 -->
+          <add-or-update
+            v-if="addOrUpdateVisible"
+            ref="addOrUpdate"
+            @refreshDataList="getDataList"
+          ></add-or-update>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具 js，第三方插件 js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+/*
+    引入组件步骤：
+    1、import Category from "../common/category.vue"; 把组件导进来
+    2、components: { Category:Category }, 指明需要的组件
+    3、<category></category> 使用该标签
+*/
+import Category from "../common/category.vue";
+import AddOrUpdate from "./attrgroup-add-or-update";
+export default {
+  //import 引入的组件需要注入到对象中才能使用
+  components: { Category, AddOrUpdate },
+  props: {},
+  data() {
+    return {
+      catelogId : 0,
+      dataForm: {
+        key: "",
+      },
+      dataList: [],
+      pageIndex: 1,
+      pageSize: 10,
+      totalPage: 0,
+      dataListLoading: false,
+      dataListSelections: [],
+      addOrUpdateVisible: false,
+    };
+  },
+  //计算属性 类似于 data 概念
+  computed: {},
+  //监控 data 中的数据变化
+  watch: {},
+  activated() {
+    this.getDataList();
+  },
+  //方法集合
+  methods: {
+    // 获取数据列表
+    getDataList() {
+      this.dataListLoading = true;
+      this.$http({
+        url: this.$http.adornUrl(`/product/attrgroup/list/${this.catelogId}`),
+        method: "get",
+        params: this.$http.adornParams({
+          page: this.pageIndex,
+          limit: this.pageSize,
+          key: this.dataForm.key,
+        }),
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.dataList = data.page.list;
+          this.totalPage = data.page.totalCount;
+        } else {
+          this.dataList = [];
+          this.totalPage = 0;
+        }
+        this.dataListLoading = false;
+      });
+    },
+    // 每页数
+    sizeChangeHandle(val) {
+      this.pageSize = val;
+      this.pageIndex = 1;
+      this.getDataList();
+    },
+    // 当前页
+    currentChangeHandle(val) {
+      this.pageIndex = val;
+      this.getDataList();
+    },
+    // 多选
+    selectionChangeHandle(val) {
+      this.dataListSelections = val;
+    },
+    // 新增 / 修改
+    addOrUpdateHandle(id) {
+      this.addOrUpdateVisible = true;
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init(id);
+      });
+    },
+    // 删除
+    deleteHandle(id) {
+      var ids = id
+        ? [id]
+        : this.dataListSelections.map((item) => {
+            return item.attrGroupId;
+          });
+      this.$confirm(
+        `确定对[id=${ids.join(",")}]进行[${id ? "删除" : "批量删除"}]操作?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(() => {
+        this.$http({
+          url: this.$http.adornUrl("/product/attrgroup/delete"),
+          method: "post",
+          data: this.$http.adornData(ids, false),
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "操作成功",
+              type: "success",
+              duration: 1500,
+              onClose: () => {
+                this.getDataList();
+              },
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        });
+      });
+    },
+    //参数为子组件传递的参数
+    treeNodeClick(data,node,component){
+      console.log("父组件attrgroup感知到子组件category的节点被点击：",data,node,component);
+      console.log("被点击的节点名：",data.name)
+      //为第三级时查询该catelogId的信息
+      if(node.level==3){
+        this.catelogId = data.catId;
+        this.getDataList();
+      }
+    },
+  },
+};
+</script>
+<style scoped>
+</style>
+```
+
+##### 3、`attrgroup-add-or-update.vue`文件
+
+`src\views\modules\product\attrgroup-add-or-update.vue`文件
+
+```vue
+<template>
+  <el-dialog
+    :title="!dataForm.attrGroupId ? '新增' : '修改'"
+    :close-on-click-modal="false"
+    :visible.sync="visible"
+  >
+    <el-form
+      :model="dataForm"
+      :rules="dataRule"
+      ref="dataForm"
+      @keyup.enter.native="dataFormSubmit()"
+      label-width="100px"
+    >
+      <el-form-item label="组名" prop="attrGroupName">
+        <el-input
+          v-model="dataForm.attrGroupName"
+          placeholder="组名"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="排序" prop="sort">
+        <el-input v-model="dataForm.sort" placeholder="排序"></el-input>
+      </el-form-item>
+      <el-form-item label="描述" prop="descript">
+        <el-input v-model="dataForm.descript" placeholder="描述"></el-input>
+      </el-form-item>
+      <el-form-item label="组图标" prop="icon">
+        <el-input v-model="dataForm.icon" placeholder="组图标"></el-input>
+      </el-form-item>
+      <el-form-item label="所属分类id" prop="catelogId">
+        <!-- <el-input v-model="dataForm.catelogId" placeholder="所属分类id"></el-input> -->
+      <el-cascader
+        v-model="dataForm.catelogIds"
+        :options="categorys"
+        :props="props"
+      ></el-cascader>
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    </span>
+  </el-dialog>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      props: {
+        value: 'catId',
+        label: 'name',
+        children: 'children'
+      },
+      categorys: [],
+      visible: false,
+      dataForm: {
+        attrGroupId: 0,
+        attrGroupName: "",
+        sort: "",
+        descript: "",
+        icon: "",
+        catelogIds: [],
+        catelogId: 0,
+      },
+      dataRule: {
+        attrGroupName: [
+          { required: true, message: "组名不能为空", trigger: "blur" },
+        ],
+        sort: [{ required: true, message: "排序不能为空", trigger: "blur" }],
+        descript: [
+          { required: true, message: "描述不能为空", trigger: "blur" },
+        ],
+        icon: [{ required: true, message: "组图标不能为空", trigger: "blur" }],
+        catelogId: [
+          { required: true, message: "所属分类id不能为空", trigger: "blur" },
+        ],
+      },
+    };
+  },
+  methods: {
+    getCategorys() {
+      this.$http({
+        url: this.$http.adornUrl("/product/category/list/tree"),
+        method: "get",
+      }).then(({ data }) => {
+        console.log(data.data);
+        this.categorys = data.data;
+      });
+    },
+    init(id) {
+      this.dataForm.attrGroupId = id || 0;
+      this.visible = true;
+      this.$nextTick(() => {
+        this.$refs["dataForm"].resetFields();
+        if (this.dataForm.attrGroupId) {
+          this.$http({
+            url: this.$http.adornUrl(
+              `/product/attrgroup/info/${this.dataForm.attrGroupId}`
+            ),
+            method: "get",
+            params: this.$http.adornParams(),
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.dataForm.attrGroupName = data.attrGroup.attrGroupName;
+              this.dataForm.sort = data.attrGroup.sort;
+              this.dataForm.descript = data.attrGroup.descript;
+              this.dataForm.icon = data.attrGroup.icon;
+              this.dataForm.catelogId = data.attrGroup.catelogId;
+            }
+          });
+        }
+      });
+    },
+    // 表单提交
+    dataFormSubmit() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          this.$http({
+            url: this.$http.adornUrl(
+              `/product/attrgroup/${
+                !this.dataForm.attrGroupId ? "save" : "update"
+              }`
+            ),
+            method: "post",
+            data: this.$http.adornData({
+              attrGroupId: this.dataForm.attrGroupId || undefined,
+              attrGroupName: this.dataForm.attrGroupName,
+              sort: this.dataForm.sort,
+              descript: this.dataForm.descript,
+              icon: this.dataForm.icon,
+              catelogId: this.dataForm.catelogIds[this.dataForm.catelogIds.length-1],
+            }),
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false;
+                  this.$emit("refreshDataList");
+                },
+              });
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        }
+      });
+    },
+  },
+  created() {
+    this.getCategorys();
+  },
+};
+</script>
+```
+
+### 4.3.5、回显`所属分类id`
+
+当点击修改按钮后
+
+![image-20220509222434388](image/4.3.5.0.1.png)
+
+`所属分类id`没有回显
+
+![image-20220509222509610](image/4.3.5.0.2.png)
+
+#### 1、查看点击修改按钮调用的方法
+
+查看`src\views\modules\product\attrgroup.vue`文件的`addOrUpdateHandle`方法，分析点击修改按钮后`所属分类id`没有回显的原因
+
+------
+
+` this.$nextTick()`：当要显示的组件(上面这个对话框)完全渲染后，再调用里面的lambda表达式
+
+`this.$refs`会获取当前vue文件所有组件
+
+`this.$refs.addOrUpdate`获取当前vue文件所有标签中`ref`属性为`addOrUpdate`或`components{}`里面为`addOrUpdate`的组件
+
+然后再调用该组件的方法
+
+```
+    // 新增 / 修改
+    addOrUpdateHandle(id) {
+      //打开对话框
+      this.addOrUpdateVisible = true;
+      //当要显示的组件(上面这个对话框)完全渲染后，再调用一个方法
+      this.$nextTick(() => {
+        this.$refs.addOrUpdate.init(id);
+      });
+    },
+```
+
+可以看到调用了`addOrUpdate`组件的`init`方法
+
+当前vue文件引了同文件夹下的`attrgroup-add-or-update.vue`文件
+
+并把它命名为`addOrUpdate`，并使用这个名字添加到该vue文件的组件里
+
+因此其调用了`attrgroup-add-or-update.vue`文件的`init`方法，并传入了`attrGroup`的`Id`
+
+![image-20220509223330783](image/4.3.5.1.png)
+
+#### 2、查看`init`方法
+
+`src\views\modules\product\attrgroup-add-or-update.vue`文件`init`方法得到的`catelogId`只是一个值(最后一级分类的id)
+
+![image-20220509224447118](image/4.3.5.2.png)
+
+而`所属分类id`需要的参数是**完整分类id**(最后一级分类的所有父分类id+最后一级分类的id)
+
+因此可以添加返回的数据
+
+#### 3、修改前端代码
+
+在`src\views\modules\product\attrgroup-add-or-update.vue`的`init`方法里添加这一行
+
+```javascript
+//最后一级分类的所有父分类id+最后一级分类id
+this.dataForm.catelogPath = data.attrGroup.catelogPath;
+```
+
+按"ctrl+H"快捷键调出替换,把"catelogIds"替换成"catelogPath",点击替换所有
+
+![image-20220509225211670](image/4.3.5.3.png)
+
+#### 4、修改后端代码
+
+##### 1、修改`AttrGroupController`的`info`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrGroupController`类的`info`方法
+
+注入`categoryService`
+
+```java
+@Autowired
+private CategoryService categoryService;
+```
+
+调用其`getCatelogPath`方法,根据**最后一级分类的id**查出**完整分类id**(最后一级分类的所有父分类id+最后一级分类id)
+
+并将查处的结果赋给`AttrGroupEntity`的`catelogPath`字段
+
+```java
+@RequestMapping("/info/{attrGroupId}")
+public R info(@PathVariable("attrGroupId") Long attrGroupId) {
+    AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
+
+    Long catelogId = attrGroup.getCatelogId();
+    //根据最后一级分类的id查出完整分类id(最后一级分类的所有父分类id+最后一级分类id)
+    Long[] catelogPath = categoryService.findCatelogPath(catelogId);
+    //赋给AttrGroupEntity的catelogPath字段
+    attrGroup.setCatelogPath(catelogPath);
+
+    return R.ok().put("attrGroup", attrGroup);
+}
+```
+
+![image-20220509233808743](image/4.3.5.4.1.png)
+
+##### 2、`AttrGroupEntity`类添加`catelogPath`字段
+
+```java
+/**
+ * 此字段在数据库中不存在
+ */
+@TableField(exist = false)
+private Long[] catelogPath;
+```
+
+![image-20220509231524255](image/4.3.5.4.2.png)
+
+##### 3、添加`getCatelogPath`抽象方法
+
+由于使用了`lombok`插件，添加了`lombok`依赖，并添加了`@Data`注解，所以会在编译时给字段自动添加`get`和`set`方法，
+
+因此`attrGroup.setCatelogPath(catelogPath);`不报错了
+
+鼠标悬停在`getCatelogPath`上(或者使用`alt+enter`快捷键)，点击`Create method`，创建方法
+
+![image-20220509233935848](image/4.3.5.4.3.1.png)
+
+添加抽象方法
+
+```java
+/**
+ * 根据最后一级分类的id查出完整分类id(最后一级分类的所有父分类id+最后一级分类id)
+ * @return
+ */
+Long[] findCatelogPath(Long catelogId);
+```
+
+然后点击`1 related problem`或接口类左边的`I和向下箭头`的那个按钮或使用`ctrl+alt+B`快捷键转到其实现类
+
+![image-20220509234029398](image/4.3.5.4.3.2.png)
+
+使用`alt+enter`快捷键，点击"**Implement methods**",实现未实现的方法
+
+![image-20220509234117877](image/4.3.5.4.3.3.png)
+
+##### 4、实现`getCatelogPath`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里添加方法
+
+```java
+@Override
+public Long[] findCatelogPath(Long catelogId) {
+    List<Long> paths = new ArrayList<>();
+
+    List<Long> parentPath = findParentPath(catelogId,paths);
+    //先加入节点id后再递归求解其父分类，所有求出的完整路径是反的，需要转置一下
+    Collections.reverse(parentPath);
+    return (Long[]) parentPath.toArray();
+}
+
+/**
+ * 例如：[413,50,5]
+ * 根据最后一级分类的id递归求解完整分类id(最后一级分类的所有父分类id+最后一级分类id)
+ * @param catelogId 当前分类id
+ * @param paths 分类id数组
+ * @return  完整分类id
+ */
+private List<Long> findParentPath(Long catelogId, List<Long> paths) {
+    paths.add(catelogId);
+    CategoryEntity categoryEntity = this.getById(catelogId);
+    Long parentCid = categoryEntity.getParentCid();
+    if (parentCid!=0){
+        findParentPath(parentCid,paths);
+    }
+    return paths;
+}
+```
+
+##### 5、单元测试
+
+在`test\java`的`com.atguigu.gulimall.product.GulimallProductApplicationTests`类里添加方法，点击方法左侧的运行按钮
+
+:pushpin:如果报空指针，说明你`gulimall_pms`数据库的`pms_category`表里面不存在`cat_id`为你写的那个id
+
+```java
+@Autowired
+CategoryService categoryService;
+
+@Test
+public void test(){
+   Long[] catelogPath = categoryService.findCatelogPath(413L);
+   System.out.println(Arrays.toString(catelogPath));
+}
+```
+
+```
+[Ljava.lang.Object; cannot be cast to [Ljava.lang.Long;
+Object[]类型不能强转成Long[]类型
+```
+
+![image-20220510113030426](image/4.3.5.4.5.1.png)
+
+![image-20220510114911801](image/4.3.5.4.5.2.png)
+
+##### 6、修改`findCatelogPath`方法
+
+修改`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类的`findCatelogPath`方法
+
+把
+
+```java
+return (Long[]) parentPath.toArray();
+```
+
+改成
+
+```java
+return parentPath.toArray(new Long[parentPath.size()]);
+```
+
+测试成功，但又提示`Call to 'toArray()' with pre-sized array argument 'new Long[parentPath.size()]' `
+
+![image-20220510115355135](image/4.3.5.4.6.1.png)
+
+可以改成
+
+```
+return parentPath.toArray(new Long[0]);
+```
+
+这样写测试也没有问题
+
+![image-20220510115533565](image/4.3.5.4.6.2.png)
+
+📌其实`findParentPath`方法的返回值有点多余
+
+📌`findCatelogPath`方法也可以直接返回`List<Long>`类型，返回到前端的内容`Long[]`和`List<Long>`都是一样的
+
+#### 5、测试
+
+重启`gulimall-product`项目后测试
+
+##### 1、点击`修改`按钮
+
+点击`测试数据`的`修改`按钮，可以看到`所属分类id`已正确回显
+
+![image-20220510123323627](image/4.3.5.5.1.png)
+
+##### 2、点击`新增`按钮
+
+点击`新增`按钮，发现`所属分类id`没有删除
+
+![image-20220510123145766](image/4.3.5.5.2.png)
+
+##### 3、添加`closed`回调
+
+`element-ui`中`Dialog对话框`中的事件：[组件 | Element](https://element.eleme.io/#/zh-CN/component/dialog)
+
+| 事件名称 | 说明                        |
+| :------- | :-------------------------- |
+| closed   | Dialog 关闭动画结束时的回调 |
+
+`src\views\modules\product\attrgroup-add-or-update.vue`中`el-dialog`标签添加属性
+
+```properties
+ @closed="dialogClose"
+```
+
+并再`method`里面添加方法，清空`catelogPath`
+
+```javascript
+dialogClose(){
+  this.dataForm.catelogPath = [];
+},
+```
+
+##### 4、查看是否清除
+
+刷新页面，先点击`修改`，再点击`新增`可以看到已经没有上次`修改`回显执行后留下的`所属分类id`的信息了
+
+![image-20220510125315522](image/4.3.5.5.4.png)
+
+##### 5、可搜索级联选择器
+
+修改`src\views\modules\product\attrgroup-add-or-update.vue`里的`el-cascader`标签
+
+ `elememt-ui`的`Cascader 级联选择器`里面的`可搜索`：[组件 | Element](https://element.eleme.io/#/zh-CN/component/cascader)
+
+添加`filterable`就变成可搜索的了，添加`placeholder`属性可以给予提示
+
+```html
+<el-cascader
+  v-model="dataForm.catelogPath"
+  :options="categorys"
+  :props="props"
+  placeholder="试试搜索：手机"
+  filterable
+></el-cascader>
+```
+
+输入手机后，下面可以提供选择
+
+![image-20220510130049823](image/4.3.5.5.5.png)
+
+## 4.4、商品服务-API-品牌管理
+
+### 4.4.1、完善品牌管理
+
+#### 1、重新执行sql
+
+重新打开`1.分布式基础（全栈开发篇）\资料源码.zip\docs\代码\sql`下的`pms_catelog.sql`文件，复制内容
+
+点击`gulimall_pms`数据库，右键选择`命令行界面`，粘贴刚刚复制的内容，点击回车，执行sql语句
+
+(不要点击`运行SQL文件`,这样会有中文乱码问题)
+
+![image-20220510145629313](image/4.4.1.1.png)
+
+#### 2、添加分页插件
+
+##### 1、总条数错误
+
+url：http://localhost:8001/#/product-brand
+
+![image-20220510150440811](image/4.4.1.2.1.png)
+
+##### 2、添加分页插件
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product`文件夹下新建`config`文件夹
+
+在`config`文件夹下新建`MyBatisConfig`类
+
+```java
+package com.atguigu.gulimall.product.config;
+
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/10
+ * @Description:
+ * @EnableTransactionManagement ：开启事务功能
+ */
+@Configuration
+@EnableTransactionManagement
+@MapperScan("com.atguigu.gulimall.product.dao")
+public class MyBatisConfig {
+
+    /**
+     * 引入分页插件
+     * @return
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor(){
+        PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+        //设置请求的页面大于最大页后操作，true调回到首页，false 继续请求 默认false
+        paginationInterceptor.setOverflow(false);
+        //设置最大单页限制数量，默认500条，-1 不受限制
+        paginationInterceptor.setLimit(1000);
+
+        return paginationInterceptor;
+    }
+}
+```
+
+![image-20220510151731315](image/4.4.1.2.2.png)
+
+##### 3、查看条数
+
+重启`gulimall-product`模块，刷新前端页面，可以看到总条数显示正确
+
+![image-20220510151901745](image/4.4.1.2.3.png)
+
+#### 3、修改查询逻辑
+
+##### 1、模糊查询失败
+
+根据`品牌id`查询
+
+![image-20220510154018496](image/4.4.1.3.1.1.png)
+
+根据`品牌名`模糊查询
+
+![image-20220510154130509](image/4.4.1.3.1.2.png)
+
+##### 2、根据`品牌id`和`品牌名`查询
+
+修改`gulimall-product`模块里`com.atguigu.gulimall.product.service.impl.BrandServiceImpl`类下的`queryPage`方法
+
+```java
+@Override
+public PageUtils queryPage(Map<String, Object> params) {
+    String key = (String) params.get("key");
+    LambdaQueryWrapper<BrandEntity> lambdaQueryWrapper = new LambdaQueryWrapper<BrandEntity>();
+    if (key!=null && key.length()>0){
+        lambdaQueryWrapper.eq(BrandEntity::getBrandId,key)
+                .or().like(BrandEntity::getName,key);
+    }
+    IPage<BrandEntity> page = this.page(
+            new Query<BrandEntity>().getPage(params),
+           lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220510154241194](image/4.4.1.3.2.png)
+
+##### 3、测试
+
+重新运行`gulimall-product`模块，进行测试
+
+根据`品牌id`查询
+
+![image-20220510153551322](image/4.4.1.3.3.1.png)
+
+根据`品牌名`模糊查询
+
+![image-20220510153617854](image/4.4.1.3.3.2.png)
+
+都没有什么问题
+
+#### 4、添加数据
+
+##### 1、删除`品牌管理`数据
+
+![image-20220510201428448](image/4.4.1.4.1.1.png)
+
+可以在数据库执行以下命令，清空`gulimall_pms.pms_brand`表数据，并让主键重新从1开始
+
+```sql
+truncate gulimall_pms.pms_brand;
+```
+
+也可以选中表-->右键-->截断表
+
+![image-20220511151930445](image/4.4.1.4.1.2.png)
+
+##### 2、添加有用数据
+
+图片在`1.分布式基础（全栈开发篇）\资料源码.zip\docs\pics`文件夹里面
+
+![image-20220510223618376](image/4.4.1.4.2.1.png)
+
+添加华为品牌
+
+![image-20220510223418633](image/4.4.1.4.2.2.png)
+
+添加小米品牌
+
+![image-20220510223456458](image/4.4.1.4.2.3.png)
+
+添加oppo品牌
+
+![image-20220510223906193](image/4.4.1.4.2.4.png)
+
+添加Apple品牌
+
+![image-20220510224046126](image/4.4.1.4.2.5.png)
+
+所有品牌
+
+![image-20220510224352810](image/4.4.1.4.2.6.png)
+
+##### 3、复制文件
+
+:pushpin:最好先**提交到远程仓库**并**复制前端项目**再操作,最少也要复制`renren-fast-vue\src\views\modules`下的`common`和`product`文件夹
+
+1.  复制`1.分布式基础（全栈开发篇）\资料源码.zip\docs\代码\前端\modules`里的`common`和`product`文件夹
+2. 点击`src`下的"views"，然后右键
+3. 选择`在文件资源管理器中显示`
+4. 进入到`view`下的`modules`里面
+5. 右键，选择粘贴  
+6. 选择`替换目标中的文件`
+
+![image-20220510201443183](image/4.4.1.4.3.png)
+
+### 4.4.2、根据`品牌id`查询`品牌和三级分类的关联关系`
+
+#### 1、添加`catelogList`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.CategoryBrandRelationController`类里添加方法
+
+```java
+/**
+ * 列表
+ * @GetMapping = @RequestMapping(method = RequestMethod.GET)
+ */
+@GetMapping("/catelog/list")
+public R catelogList(@RequestParam(value = "brandId") Long brandId){
+    List<CategoryBrandRelationEntity> data = categoryBrandRelationService.listByBrandId(brandId);
+
+    return R.ok().put("data", data);
+}
+```
+
+![image-20220510213324100](image/4.4.2.1.png)
+
+#### 2、添加`listByBrandId`抽象方法
+
+在`com.atguigu.gulimall.product.service.CategoryBrandRelationService`接口里添加`listByBrandId`抽象方法
+
+```java
+List<CategoryBrandRelationEntity> listByBrandId(Long brandId);
+```
+
+![image-20220510213901065](image/4.4.2.2.png)
+
+#### 3、实现`listByBrandId`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.CategoryBrandRelationServiceImpl`类里
+
+实现`CategoryBrandRelationService`接口未实现的`listByBrandId`方法
+
+```java
+@Override
+public List<CategoryBrandRelationEntity> listByBrandId(Long brandId) {
+    LambdaQueryWrapper<CategoryBrandRelationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    return this.list(lambdaQueryWrapper.eq(CategoryBrandRelationEntity::getBrandId, brandId));
+}
+```
+
+![image-20220510214006492](image/4.4.2.3.png)
+
+### 4.4.3、保存品牌和分类完整信息
+
+#### 1、修改`save`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.CategoryBrandRelationController`类里
+
+修改`save`方法，保存其`brand_id、catelog_id、brand_name、catelog_name`
+
+传来的数据只有`brand_id、catelog_id`，调用`categoryBrandRelationService`的`saveDetail`查出`brand_name`和`catelog_name`
+
+并将完整的`brand_id、catelog_id、brand_name、catelog_name`保存到数据库
+
+```java
+@RequestMapping("/save")
+    public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
+    // 保存 brand_id、catelog_id、brand_name、catelog_name
+    categoryBrandRelationService.saveDetail(categoryBrandRelation);
+
+    return R.ok();
+}
+```
+
+![image-20220510215925645](image/4.4.3.1.png)
+
+#### 2、添加`saveDetail`抽象方法
+
+在`com.atguigu.gulimall.product.service.CategoryBrandRelationService`接口里添加`saveDetail`抽象方法
+
+```java
+void saveDetail(CategoryBrandRelationEntity categoryBrandRelation);
+```
+
+![image-20220510215959515](image/4.4.3.2.png)
+
+#### 3、实现`saveDetail`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.CategoryBrandRelationServiceImpl`类里
+
+实现`CategoryBrandRelationService`接口未实现的`saveDetail`方法
+
+```java
+@Autowired
+BrandDao brandDao;
+@Autowired
+CategoryDao categoryDao;
+    
+/**
+ *原本的save方法只能保存 brand_id 和 catelog_id 的关联关系,不能保存 brand_name 和 catelog_name
+ * 保存 brand_id、catelog_id、brand_name、catelog_name
+ * @param categoryBrandRelation
+ */
+@Override
+public void saveDetail(CategoryBrandRelationEntity categoryBrandRelation) {
+    Long brandId = categoryBrandRelation.getBrandId();
+    Long catelogId = categoryBrandRelation.getCatelogId();
+
+    //根据brandId 查询 brandName
+    BrandEntity brandEntity = brandDao.selectById(brandId);
+    //根据 categoryId 查询 categoryName
+    CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+
+    categoryBrandRelation.setBrandName(brandEntity.getName());
+    categoryBrandRelation.setCatelogName(categoryEntity.getName());
+
+    this.save(categoryBrandRelation);
+}
+```
+
+这里报红不用管,使用MyBatis时dao接口没有实现类，接口是没有办法创建实例的，因此也就无法注入到ioc容器
+
+IDEA检测到没有注入到ioc容器，所有就报红了
+
+![image-20220510220108353](image/4.4.3.3.png)
+
+#### 4、解决IDEA报红
+
+按住`ctrl`键，点击`BrandDao`进入`BrandDao`类
+
+![image-20220510222434101](image/4.4.3.4.1.png)
+
+添加`@Repository`注解，显式的把`BrandDao`添加到ioc容器
+
+![image-20220510222612590](image/4.4.3.4.2.png)
+
+添加`@Repository`注解，显式的把`CategoryDao`添加到ioc容器
+
+![image-20220510222727987](image/4.4.3.4.3.png)
+
+已经不报红了(其实不修改也行)
+
+![image-20220510223032990](image/4.4.3.4.4.png)
+
+#### 5、测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+##### 1、添加关联分类
+
+![3](image/4.4.3.5.1.gif)
+
+##### 2、查看回显数据
+
+URL: http://localhost:88/api/product/categorybrandrelation/catelog/list?t=1652197270780&brandId=1
+
+回显正常，证明`catelogList`方法和`save`方法正确
+
+![image-20220510234520024](image/4.4.3.5.2.png)
+
+##### 3、查看数据库
+
+可以看到已经`brand_id、catelog_id、brand_name、catelog_name`全部添加到数据库了，所有`save`方法正确
+
+![image-20220510233840276](image/4.4.3.5.3.png)
+
+### 4.4.4、保证数据一致性
+
+当修改`brand_name`或`catelog_name`时,不仅要更新`pms_category`或`pms_brand`表
+
+同时也要更新`pms_category_brand_relation`表，用来保证冗余字段的一致性
+
+#### 1、修改`update`方法
+
+修改`gulimall-product`模块下的`com.atguigu.gulimall.product.controller.BrandController`类的`update`方法
+
+```java
+@RequestMapping("/update")
+public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
+    brandService.updateDetail(brand);
+
+    return R.ok();
+}
+```
+
+![image-20220510235115019](image/4.4.4.1.png)
+
+#### 2、添加`updateDetail`抽象方法
+
+在`com.atguigu.gulimall.product.service.BrandService`接口里添加`updateDetail`方法
+
+```java
+void updateDetail(BrandEntity brand);
+```
+
+![image-20220510235219096](image/4.4.4.2.png)
+
+#### 3、实现`updateDetail`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.BrandServiceImpl`类里实现`updateDetail`抽象方法
+
+```java
+@Autowired
+CategoryBrandRelationService categoryBrandRelationService;
+
+@Override
+public void updateDetail(BrandEntity brand) {
+    //保证冗余字段的数据一致
+    this.updateById(brand);
+    if (StringUtils.hasLength(brand.getName())){
+        //同步更新其他关联表中的数据
+        categoryBrandRelationService.updateBrand(brand);
+        
+        //TODO 更新其他关联
+    }
+}
+```
+
+![image-20220511000527982](image/4.4.4.3.png)
+
+#### 4、添加`updateBrand`抽象方法
+
+在`com.atguigu.gulimall.product.service.CategoryBrandRelationService`接口里添加`updateBrand`抽象方法
+
+```java
+void updateBrand(BrandEntity brand);
+```
+
+![image-20220511000607317](image/4.4.4.4.png)
+
+#### 5、实现`updateBrand`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.CategoryBrandRelationServiceImpl`类里实现`updateBrand`抽象方法
+
+```java
+@Override
+public void updateBrand(BrandEntity brand) {
+    CategoryBrandRelationEntity categoryBrandRelationEntity = new CategoryBrandRelationEntity();
+    categoryBrandRelationEntity.setBrandId(brand.getBrandId());
+    categoryBrandRelationEntity.setBrandName(brand.getName());
+
+    LambdaUpdateWrapper<CategoryBrandRelationEntity> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+    lambdaUpdateWrapper.eq(CategoryBrandRelationEntity::getBrandId,brand.getBrandId());
+    this.update(categoryBrandRelationEntity,lambdaUpdateWrapper);
+}
+```
+
+![image-20220511001114986](image/4.4.4.5.png)
+
+#### 6、测试
+
+##### 1、重启项目前
+
+可以看到当修改品牌名后，关联关系表并没有更新，因此没有正确回显
+
+![GIF 2022-5-11 0-14-16](image/4.4.4.6.1.1.gif)
+
+![image-20220511001742563](image/4.4.4.6.1.2.png)
+
+![image-20220511001759165](image/4.4.4.6.1.3.png)
+
+##### 2、重启项目后
+
+将`华为1`改为`华为`,重启`gulimall-product`项目后，再次测试
+
+可以看到当修改品牌名后，关联关系表已经更新，并且正确回显
+
+（成功后要恢复为原始数据）
+
+![GIF 2022-5-11 0-20-17](image/4.4.4.6.2.1.gif)
+
+![image-20220511002213445](image/4.4.4.6.2.2.png)
+
+![image-20220511002226070](image/4.4.4.6.2.3.png)
+
+### 4.4.5、保证`Category`数据一致性
+
+#### 1、修改`Category`的`update`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.CategoryController`类里修改`update`方法
+
+```java
+@RequestMapping("/update")
+    public R update(@RequestBody CategoryEntity category){
+    //级联更新
+    categoryService.updateCascade(category);
+
+    return R.ok();
+}
+```
+
+![image-20220511002457753](image/4.4.5.1.png)
+
+#### 2、添加`updateCascade`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.CategoryService`类里添加`updateCascade`抽象方法
+
+```java
+void updateCascade(CategoryEntity category);
+```
+
+![image-20220511002632061](image/4.4.5.2.png)
+
+#### 3、实现`updateCascade`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里实现`updateCascade`抽象方法
+
+```java
+@Autowired
+CategoryBrandRelationService categoryBrandRelationService;
+
+/**
+ * 级联更新所有的数据
+ * @param category
+ */
+@Override
+public void updateCascade(CategoryEntity category) {
+    this.updateById(category);
+    categoryBrandRelationService.updateCategory(category);
+}
+```
+
+![image-20220511003343110](image/4.4.5.3.png)
+
+#### 4、添加`updateCategory`抽象方法
+
+在`com.atguigu.gulimall.product.service.CategoryBrandRelationService`接口里添加`updateCategory`抽象方法
+
+```java
+void updateCategory(CategoryEntity category);
+```
+
+![image-20220511003421670](image/4.4.5.4.png)
+
+#### 5、实现`updateCategory`抽象方法
+
+在`com.atguigu.gulimall.product.service.impl.CategoryBrandRelationServiceImpl`类里实现`updateCategory`抽象方法
+
+```java
+@Override
+public void updateCategory(CategoryEntity category) {
+   this.baseMapper.updateCategory(category);
+}
+```
+
+![image-20220511113803364](image/4.4.5.5..png)
+
+#### 6、添加`updateCategory`抽象方法
+
+在`com.atguigu.gulimall.product.dao.CategoryBrandRelationDao`类添加`updateCategory`抽象方法
+
+```java
+void updateCategory(CategoryEntity category);
+```
+
+鼠标悬浮在`updateCategory`上或使用`alt+enter`快捷键点击`Generater statement`，如果没有这个选项说明没有安装**MyBatis插件**
+
+没有小鸟图标也可以证明没有安装**MyBatis插件**
+
+![image-20220511123714784](image/4.4.5.6.1.png)
+
+##### :rocket:Mybatis传递多个参数的4种方式
+
+###### 方法1：顺序传参法
+
+```bash
+public User selectUser(String name, int deptId);
+
+<select id="selectUser" resultMap="UserResultMap">
+    select * from user
+    where user_name = #{0} and dept_id = #{1}
+</select>
+123456
+```
+
+\#{}里面的数字代表你传入参数的顺序。
+
+这种方法不建议使用，sql层表达不直观，且一旦顺序调整容易出错。
+
+###### 方法2：@Param注解传参法
+
+```bash
+public User selectUser(@Param("userName") String name, int @Param("deptId") deptId);
+
+<select id="selectUser" resultMap="UserResultMap">
+    select * from user
+    where user_name = #{userName} and dept_id = #{deptId}
+</select>
+123456
+```
+
+\#{}里面的名称对应的是注解 @Param括号里面修饰的名称。
+这种方法在参数不多的情况还是比较直观的，推荐使用。
+
+###### 方法3：Map传参法
+
+```bash
+public User selectUser(Map<String, Object> params);
+
+<select id="selectUser" parameterType="java.util.Map" resultMap="UserResultMap">
+    select * from user
+    where user_name = #{userName} and dept_id = #{deptId}
+</select>
+123456
+```
+
+\#{}里面的名称对应的是 Map里面的key名称。
+
+这种方法适合传递多个参数，且参数易变能灵活传递的情况。
+
+###### 方法4：Java Bean传参法
+
+```bash
+public User selectUser(User params);
+
+<select id="selectUser" parameterType="com.test.User" resultMap="UserResultMap">
+    select * from user
+    where user_name = #{userName} and dept_id = #{deptId}
+</select>
+```
+
+\#{}里面的名称对应的是 User类里面的成员属性。
+
+这种方法很直观，但需要建一个实体类，扩展不容易，需要加属性，看情况使用。
+
+[Mybatis传递多个参数的4种方式]: https://blog.csdn.net/zhaofen_7/article/details/108315918
+
+##### :rocket:添加MyBatis插件
+
+点击`File`-->`Settings...`-->`Plugins`-->搜索`MyBatisX`-->点击`install`
+
+![image-20220511145711068](image/4.4.5.6.2.png)
+
+#### 7、添加`updateCategory`的sql语句
+
+在`src/main/resources/mapper/product/CategoryBrandRelationDao.xml`中添加`updateCategory`的sql语句
+
+```bash
+<update id="updateCategory" parameterType="categoryEntity">
+    update gulimall_pms.pms_category_brand_relation
+    set catelog_name=#{name}
+    where catelog_id=#{catId}
+</update>
+```
+
+![image-20220511124930457](image/4.4.5.7.png)
+
+#### 8、为实体类起别名
+
+在`src/main/resources/application.yml`里添加配置，为`com.atguigu.gulimall.product.entity`包下的实体类起别名
+
+```yaml
+mybatis-plus:
+  #起别名
+  type-aliases-package: com.atguigu.gulimall.product.entity
+```
+
+![image-20220511125048450](image/4.4.5.8.png)
+
+#### 9、单元测试
+
+在`src/test/java/com/atguigu/gulimall/product/GulimallProductApplicationTests.java`里添加测试方法
+
+使用MyBatis时dao接口没有实现类，接口是没有办法创建实例的，因此也就无法注入到ioc容器
+
+IDEA检测到没有注入到ioc容器，所有就报红了
+
+可以按`ctrl`键并点击`CategoryBrandRelationDao`,在该类上添加`@Repository`注解，显式的把`BrandDao`添加到ioc容器，就不报红了
+
+```java
+@Autowired
+CategoryBrandRelationDao categoryBrandRelationDao;
+@Test
+public void testCategoryBrandRelationDao(){
+   CategoryEntity categoryEntity = new CategoryEntity();
+   categoryEntity.setCatId(225L);
+   categoryEntity.setName("手机2");
+   categoryBrandRelationDao.updateCategory(categoryEntity);
+}
+```
+
+![image-20220511151116797](image/4.4.5.9.1.png)
+
+数据库已经更新
+
+![image-20220511125255539](image/4.4.5.9.2.png)
+
+#### 10、前端测试
+
+把数据在改回来(把`brand_name`为`华为1`的修改为`华为`、把`catelog_name`为`手机2`的修改为`手机`)
+
+然后重启`gulimall-product`项目，刷新前端页面进行测试，可以看到冗余字段已经更新了
+
+（成功后要恢复为原始数据）
+
+![GIF 2022-5-11 15-30-12](image/4.4.5.10.gif)
+
+### 4.4.6、开启事务功能
+
+#### 1、开启事务功能
+
+在`com.atguigu.gulimall.product.config.MyBatisConfig`配置类里开启事务功能(已经开启过了)
+
+```java
+@EnableTransactionManagement
+```
+
+![image-20220511004119519](image/4.4.6.1.png)
+
+#### 2、`updateCascade`方法上添加事务注解
+
+在`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类的`updateCascade`方法上添加`@Transactional`注解
+
+![image-20220511004035837](image/4.4.6.2.png)
+
+#### 3、`updateDetail`方法上添加事务注解
+
+在`com.atguigu.gulimall.product.service.impl.BrandServiceImpl`类的`updateDetail`方法上添加`@Transactional`注解
+
+![image-20220511004000692](image/4.4.6.3.png)
+
+## 4.5、商品服务-API-平台属性
+
+### 4.5.1、规格参数新增与VO
+
+#### 1、修改`queryPage`方法
+
+##### 1、查询全部时有查询条件
+
+url: http://localhost:88/api/product/attrgroup/list/0?t=1652341878270&page=1&limit=10&key=%E4%B8%BB
+
+以前写的只有`catelogId != 0`时才带查询条件,因此输入查询条件，然后点击`查询全部`，并没有根据条件查询全部
+
+![image-20220512160738015](image/4.5.1.1.1.png)
+
+##### 2、以前写的只有`catelogId != 0`时才带查询条件
+
+```java
+@Override
+public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+    if (catelogId == 0){
+        return this.queryPage(params);
+    }else {
+        String key = (String) params.get("key");
+        //select * from attr_group where catelogId = ? and ( attr_group_id = key or attr_group_name like %key%)
+        LambdaQueryWrapper<AttrGroupEntity> queryWrapper = new LambdaQueryWrapper<AttrGroupEntity>()
+                .eq(AttrGroupEntity::getCatelogId,catelogId);
+        if (key != null && key.length() > 0){
+            queryWrapper.and((obj)->{
+                obj.eq(AttrGroupEntity::getAttrGroupId,key).or().like(AttrGroupEntity::getAttrGroupName,key);
+            });
+        }
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params),queryWrapper);
+        return new PageUtils(page);
+    }
+}
+```
+
+![image-20220512155755111](image/4.5.1.1.2.png)
+
+##### 3、修改`queryPage`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrGroupServiceImpl`里的`queryPage`方法，
+
+使得不管`catelogId`是否等于0，都带上查询条件
+
+```java
+@Override
+public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+    String key = (String) params.get("key");
+
+    LambdaQueryWrapper<AttrGroupEntity> queryWrapper = new LambdaQueryWrapper<AttrGroupEntity>();
+
+    if (key != null && key.length() > 0) {
+        queryWrapper.and(obj -> {
+            obj.eq(AttrGroupEntity::getAttrGroupId, key).or().like(AttrGroupEntity::getAttrGroupName, key);
+        });
+    }
+
+
+    if (catelogId == 0) {
+        //select * from attr_group where ( attr_group_id = key or attr_group_name like %key%)
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), queryWrapper);
+        return new PageUtils(page);
+    } else {
+        //select * from attr_group where ( attr_group_id = key or attr_group_name like %key%) and catelogId = ?
+        queryWrapper.eq(AttrGroupEntity::getCatelogId, catelogId);
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), queryWrapper);
+        return new PageUtils(page);
+    }
+}
+```
+
+```mysql
+SELECT attr_group_id,icon,catelog_id,sort,descript,attr_group_name FROM pms_attr_group 
+WHERE (( (attr_group_id = ? OR attr_group_name LIKE ?) ) AND catelog_id = ?) LIMIT ?,? 
+```
+
+![image-20220512000235143](image/4.5.1.1.3.png)
+
+##### 4、错误写法
+
+```java
+@Override
+public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+    String key = (String) params.get("key");
+
+    LambdaQueryWrapper<AttrGroupEntity> queryWrapper = new LambdaQueryWrapper<AttrGroupEntity>();
+
+    if (key != null && key.length() > 0) {
+        queryWrapper.eq(AttrGroupEntity::getAttrGroupId, key).or().like(AttrGroupEntity::getAttrGroupName, key);
+    }
+
+
+    if (catelogId == 0) {
+        //select * from attr_group where ( attr_group_id = key or attr_group_name like %key%)
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), queryWrapper);
+        return new PageUtils(page);
+    } else {
+        //select * from attr_group where ( attr_group_id = key or attr_group_name like %key%) and catelogId = ?
+        queryWrapper.and(obj->obj.eq(AttrGroupEntity::getCatelogId, catelogId));
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), queryWrapper);
+        return new PageUtils(page);
+    }
+}
+```
+
+这样写的`queryWrapper.and(obj->obj.eq(AttrGroupEntity::getCatelogId, catelogId));`使用`and`就没意义了
+
+```mysql
+SELECT attr_group_id,icon,catelog_id,sort,descript,attr_group_name FROM pms_attr_group WHERE (attr_group_id = ? OR attr_group_name LIKE ? AND ( (catelog_id = ?) )) LIMIT ?,? 
+```
+
+![image-20220512000844124](image/4.5.1.1.4.png)
+
+##### 5、测试
+
+重启`gulimall-product`模块，然后刷新前端页面
+
+重新输入查询条件，然后点击`查询全部`，已经根据条件查询全部了
+
+![image-20220512161159756](image/4.5.1.1.5.png)
+
+#### 2、测试新增属性
+
+##### 1、基础属性
+
+当点击`商品系统`下的`平台属性`下的`规格参数`时，会获取`基础属性`(规格参数，如机身颜色等)的列表
+
+![image-20220512161328451](image/4.5.1.2.1.png)
+
+##### 2、新建属性(规格参数)
+
+![image-20220512162502623](image/4.5.1.2.2.png)
+
+##### 3、保存成功了
+
+![image-20220512162518487](image/4.5.1.2.3.png)
+
+##### 4、但是只是基本保存
+
+只是基本保存，只是保存了是哪个分类的，并没有保存是哪个分组
+
+![image-20220512162814832](image/4.5.1.2.4.1.png)
+
+分类属性保存进来了
+
+![image-20220512163039683](image/4.5.1.2.4.2.png)
+
+但是关联关系没保存
+
+![image-20220512163053494](image/4.5.1.2.4.3.png)
+
+#### 3、修改方法
+
+##### 1、添加`AttrVo`类
+
+由于在实体类里添加字段，然后再标注`@TableField(exist = false)`注解，告诉`MyBatis`该字段不存在是很不规范的，
+
+所以可以使用Vo对象，Vo是用来封装请求和响应数据的，不建议继承实体类，因遵循多实现，少继承的原则
+
+`AttrVo`类里面跟数据库相关的注解就不需要了
+
+在``gulimall-product`模块的`com.atguigu.gulimall.product`包下新建`vo`文件夹
+
+在`com.atguigu.gulimall.product.vo`包下新建`AttrVo`类
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Data;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/12
+ * @Description:
+ */
+@Data
+public class AttrVo {
+    /**
+     * 属性id
+     */
+    private Long attrId;
+    /**
+     * 属性名
+     */
+    private String attrName;
+    /**
+     * 是否需要检索[0-不需要，1-需要]
+     */
+    private Integer searchType;
+    /**
+     * 属性图标
+     */
+    private String icon;
+    /**
+     * 可选值列表[用逗号分隔]
+     */
+    private String valueSelect;
+    /**
+     * 属性类型[0-销售属性，1-基本属性，2-既是销售属性又是基本属性]
+     */
+    private Integer attrType;
+    /**
+     * 启用状态[0 - 禁用，1 - 启用]
+     */
+    private Long enable;
+    /**
+     * 所属分类
+     */
+    private Long catelogId;
+    /**
+     * 快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整
+     */
+    private Integer showDesc;
+
+    private Long attrGroupId;
+}
+```
+
+![image-20220512164302169](image/4.5.1.3.1.png)
+
+**扩展：**
+
+**Object 划分**
+
+###### 1.PO(persistant object) 持久对象
+
+PO 就是对应数据库中某个表中的一条记录，多个记录可以用 PO 的集合。 PO 中应该不包含任何对数据库的操作。
+
+###### 2.DO（Domain Object）领域对象
+
+就是从现实世界中抽象出来的有形或无形的业务实体。
+
+###### 3.TO(Transfer Object) ，数据传输对象
+
+不同的应用程序之间传输的对象
+
+###### 4.DTO（Data Transfer Object）数据传输对象
+
+这个概念来源于 J2EE 的设计模式，原来的目的是为了 EJB 的分布式应用提供粗粒度的数据实体，以减少分布式调用的次数，
+
+从而提高分布式调用的性能和降低网络负载，但在这里，泛指用于展示层与服务层之间的数据传输对象。
+
+###### 5.VO(value object) 值对象
+
+通常用于业务层之间的数据传递，和 PO 一样也是仅仅包含数据而已。但应是抽象出的业务对象 , 可以和表对应 , 也可以不 , 
+
+这根据业务的需要 。用 new 关键字创建，由GC 回收的。
+View object：视图对象；
+接受页面传递来的数据，封装对象
+将业务处理完成的对象，封装成页面要用的数据
+
+###### 6.BO(business object) 业务对象
+
+从业务模型的角度看 , 见 UML 元件领域模型中的领域对象。封装业务逻辑的 java 对象 , 通过调用 DAO 方法 , 
+
+结合 PO,VO 进行业务操作。business object: 业务对象 主要作用是把业务逻辑封装为一个对象。
+
+这个对象可以包括一个或多个其它的对象。 比如一个简历，有教育经历、工作经历、社会关系等等。 
+
+我们可以把教育经历对应一个 PO ，工作经历对应一个 PO ，社会关系对应一个 PO 。
+
+ 建立一个对应简历的 BO 对象处理简历，每个 BO 包含这些 PO 。 这样处理业务逻辑时，我们就可以针对 BO 去处理。
+
+###### 7.POJO(plain ordinary java object) 简单无规则 java 对象
+
+传统意义的 java 对象。就是说在一些 Object/Relation Mapping 工具中，能够做到维护数据库表记录的 persisent object 完全是一个符合 Java Bean 规范的纯 Java 对象，没有增加别的属性和方法。我的理解就是最基本的 java Bean ，只有属性字段及 setter 和 getter方法！
+POJO 是 DO/DTO/BO/VO 的统称。
+
+###### 8.DAO(data access object) 数据访问对象
+
+是一个 sun 的一个标准 j2ee 设计模式， 这个模式中有个接口就是 DAO ，它负持久层的操作。为业务层提供接口。
+
+此对象用于访问数据库。通常和 PO 结合使用， DAO 中包含了各种数据库的操作方法。通过它的方法 , 
+
+结合 PO 对数据库进行相关的操作。夹在业务逻辑与数据库资源中间。配合 VO, 提供数据库的 CRUD 操作
+
+##### 2、修改`save`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrController`类的`save`方法
+
+```java
+@RequestMapping("/save")
+public R save(@RequestBody AttrVo attr) {
+    attrService.saveAttr(attr);
+
+    return R.ok();
+}
+```
+
+![image-20220512165118105](image/4.5.1.3.2.png)
+
+##### 3、添加`saveAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrService`接口里添加`saveAttr`抽象方法
+
+```java
+void saveAttr(AttrVo attr);
+```
+
+![image-20220512165526385](image/4.5.1.3.3.png)
+
+##### 4、实现`saveAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里实现`saveAttr`抽象方法
+
+```java
+@Override
+public void saveAttr(AttrVo attr) {
+    AttrEntity attrEntity = new AttrEntity();
+    //将attr中的数据复制到attrEntity对应的字段里
+    BeanUtils.copyProperties(attr,attrEntity);
+    //1、保存基本数据
+    this.save(attrEntity);
+    //2、保存关联关系
+    AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+    attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+    //调用this.save(attrEntity);方法后，会将数据库生成的attrId封装到AttrEntity里面
+    attrAttrgroupRelationEntity.setAttrId(attrEntity.getAttrId());
+    attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+}
+```
+
+![image-20220512171158059](image/4.5.1.3.4.png)
+
+##### 5、测试
+
+重启`gulimall-product`模块，重新添加规格参数
+
+![image-20220512171458466](image/4.5.1.3.5.1.png)
+
+关联关系已经成功保存了
+
+![image-20220512171744173](image/4.5.1.3.5.2.png)
+
+### 4.5.2、规格参数列表显示
+
+#### 1、添加查询规格参数列表功能
+
+##### 1、查看请求
+
+当点击`规格参数`里的`手机\手机通讯\手机`后，会发送这个请求
+
+ http://localhost:88/api/product/attr/base/list/225?t=1652347219117&page=1&limit=10&key=
+
+![image-20220512172045858](image/4.5.2.1.1.1.png)
+
+接口文档：[05、获取分类规格参数 - 谷粒商城 - 易文档 (easydoc.net)](https://easydoc.net/s/78237135/ZUqEdvA4/Ld1Vfkcd)
+
+![image-20220518194247523](image/4.5.2.1.1.2.png)
+
+##### 2、添加`baseAttrList`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrController`类里添加`baseAttrList`方法
+
+这里的代码有问题，应该为`@GetMapping("/base/list/{categoryId}")`，多写了个`$`
+
+```java
+@GetMapping("/base/list/${categoryId}")
+public R baseAttrList(@RequestParam Map<String, Object> params,@PathVariable("categoryId") Long categoryId){
+    PageUtils page = attrService.queryBaseAttrPage(params,categoryId);
+    return R.ok().put("page", page);
+}
+```
+
+![image-20220512173043820](image/4.5.2.1.2.png)
+
+##### 3、添加`queryBaseAttrPage`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrService`接口里添加`queryBaseAttrPage`抽象方法
+
+```java
+PageUtils queryBaseAttrPage(Map<String, Object> params, Long categoryId);
+```
+
+![image-20220512173145318](image/4.5.2.1.3.png)
+
+##### 4、实现`queryBaseAttrPage`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里实现`queryBaseAttrPage`抽象方法
+
+```java
+@Override
+public PageUtils queryBaseAttrPage(Map<String, Object> params, Long categoryId) {
+    LambdaQueryWrapper<AttrEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    if (categoryId != 0) {
+        lambdaQueryWrapper.eq(AttrEntity::getCatelogId, categoryId);
+    }
+
+    String key = (String) params.get("key");
+    if (StringUtils.hasLength(key)){
+        lambdaQueryWrapper.and((obj)->{
+           obj.eq(AttrEntity::getAttrId,key).or().like(AttrEntity::getAttrName,key);
+        });
+    }
+    IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), lambdaQueryWrapper);
+    return new PageUtils(page);
+}
+```
+
+![image-20220512174710768](image/4.5.2.1.4.png)
+
+##### 5、测试
+
+重启`gulimall-product`模块，刷新前端界面
+
+报错了
+
+```
+Could not resolve placeholder 'categoryId' in value "/base/list/${categoryId}"
+```
+
+![image-20220512175657245](image/4.5.2.1.5.1.png)
+
+修改代码，删掉`@GetMapping("/base/list/{categoryId}")`里面多写的`$`
+
+```java
+@GetMapping("/base/list/{categoryId}")
+public R baseAttrList(@RequestParam Map<String, Object> params,@PathVariable("categoryId") Long categoryId){
+    PageUtils page = attrService.queryBaseAttrPage(params,categoryId);
+    return R.ok().put("page", page);
+}
+```
+
+![image-20220512231037337](image/4.5.2.1.5.2.png)
+
+重新启动`gulimall-product`模块，刷新前端界面
+
+已经显示出来了，但是**所属分类**和**所属分组**没有显示
+
+![image-20220512231242187](image/4.5.2.1.5.3.png)
+
+#### 2、显示所属分类和所属分组
+
+##### 1、新建`AttrRespVo`类
+
+在`gulimall-product`模块下的`com.atguigu.gulimall.product.vo`包内新建`AttrRespVo`类，继承`AttrVo`类
+
+**这里的`categoryName`是错的，应该为`catelogName`**
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/12
+ * @Description:
+ */
+@Data
+public class AttrRespVo extends AttrVo{
+
+    /**
+     * 所属分类名   /手机/数码/手机
+     */
+
+    private String categoryName;
+    /**
+     * 所属分组名  主机
+     */
+    private String groupName;
+}
+```
+
+![image-20220513000203162](image/4.5.2.2.1.png)
+
+##### 2、修改`queryBaseAttrPage`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里修改`queryBaseAttrPage`方法
+
+在大型项目中，连表查询很危险，做**笛卡儿积**会使数据量非常大，因此也不推荐使用**外键**，使用`service`来处理表之间的关系
+
+```java
+@Autowired
+CategoryDao categoryDao;
+@Autowired
+AttrGroupDao attrGroupDao;
+
+@Override
+public PageUtils queryBaseAttrPage(Map<String, Object> params, Long categoryId) {
+    LambdaQueryWrapper<AttrEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    if (categoryId != 0) {
+        //如果有categoryId，则查该categoryId的数据
+        lambdaQueryWrapper.eq(AttrEntity::getCatelogId, categoryId);
+    }
+
+    String key = (String) params.get("key");
+    if (StringUtils.hasLength(key)) {
+        lambdaQueryWrapper.and((obj) -> {
+            //如果有查询条件，则判断该条件是否 与attrId相等 或 名字包含该条件
+            obj.eq(AttrEntity::getAttrId, key).or().like(AttrEntity::getAttrName, key);
+        });
+    }
+    IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), lambdaQueryWrapper);
+
+    //查询categoryName字段和groupName字段
+    List<AttrEntity> list = page.getRecords();
+    List<AttrRespVo> respVos = list.stream().map(attrEntity -> {
+        AttrRespVo attrRespVo = new AttrRespVo();
+        BeanUtils.copyProperties(attrEntity, attrRespVo);
+        //根据attrId到attr和attrgroup的中间表查询 attrgroupId
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
+        attrAttrgroupRelationQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId());
+        //根据attrgroupId查询中间表的该行数据，并封装到对象
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(attrAttrgroupRelationQueryWrapper);
+        if (attrAttrgroupRelationEntity != null) {
+            //如果查到attrgroupId，则根据attrgroupId查询attrgroupName，并添加到attrRespVo中
+            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+            attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+        }
+
+        LambdaQueryWrapper<CategoryEntity> categoryQueryWrapper = new LambdaQueryWrapper<>();
+        categoryQueryWrapper.eq(CategoryEntity::getCatId, attrEntity.getCatelogId());
+        //根据catelogId查询该行数据，并封装到对象
+        CategoryEntity categoryEntity = categoryDao.selectOne(categoryQueryWrapper);
+        if (categoryEntity != null) {
+            attrRespVo.setCategoryName(categoryEntity.getName());
+        }
+        return attrRespVo;
+    }).collect(Collectors.toList());
+
+    PageUtils pageUtils = new PageUtils(page);
+    //重新给数据
+    pageUtils.setList(respVos);
+    return pageUtils;
+}
+```
+
+##### 3、测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+###### 1、所属分类没有数据，所属分组有数据
+
+![image-20220513102104224](image/4.5.2.2.3.1.png)
+
+###### 2、查看所属分类绑定的名字
+
+可以看到绑定的名字为`catelogName`，而后端传过来的为`categoryName`
+
+![image-20220513102522427](image/4.5.2.2.3.2.1.png)
+
+为什么是这个文件呢? 
+
+可以查看就是这个方法发送的请求
+
+![image-20220513102715896](image/4.5.2.2.3.2.2.png)
+
+###### 3、修改字段名称
+
+修改`gulimall-product`模块`com.atguigu.gulimall.product.vo.AttrRespVo`类的字段
+
+将`categoryName`改为`catelogName`
+
+![image-20220513102854084](image/4.5.2.2.3.3.1.png)
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`queryBaseAttrPage`方法
+
+将
+
+```java
+attrRespVo.setCategoryName(categoryEntity.getName());
+```
+
+改为
+
+```java
+attrRespVo.setCatelogName(categoryEntity.getName());
+```
+
+![image-20220513102940156](image/4.5.2.2.3.3.2.png)
+
+##### 4、重新测试
+
+重启`gulimall-product`模块，刷新前端页面，已成功显示所属分类
+
+![image-20220513103829286](image/4.5.2.2.4.png)
+
+### 4.5.3、规格参数修改回显
+
+#### 1、查看需要回显的数据
+
+点击`修改`按钮，可以看到还需要会先拿`属性分类`和`所属分组`,而且我点的是`修改`，这个表单却显示的是修改
+
+![image-20220513104507146](image/4.5.3.1.png)
+
+#### 2、填加`catelogPath`字段
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.vo.AttrRespVo`类里添加`catelogPath`字段
+
+```java
+private Long[] catelogPath;
+```
+
+![image-20220513104838259](image/4.5.3.2.png)
+
+#### 3、修改`info`方法
+
+在`gulimall-product`模块里，修改`com.atguigu.gulimall.product.controller.AttrController`类的`info`方法
+
+```java
+@RequestMapping("/info/{attrId}")
+public R info(@PathVariable("attrId") Long attrId) {
+    //AttrEntity attr = attrService.getById(attrId);
+    AttrRespVo respVo = attrService.getAttrInfo(attrId);
+    return R.ok().put("attr", respVo
+    );
+}
+```
+
+![image-20220513105158303](image/4.5.3.3.png)
+
+#### 4、添加`getAttrInfo`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrService`接口里添加`getAttrInfo`抽象方法
+
+```java
+AttrRespVo getAttrInfo(Long attrId);
+```
+
+![image-20220513105520512](image/4.5.3.4.png)
+
+#### 5、实现`getAttrInfo`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里实现`getAttrInfo`抽象方法
+
+```java
+@Override
+public AttrRespVo getAttrInfo(Long attrId) {
+    AttrRespVo attrRespVo = new AttrRespVo();
+    //根据attrId到attr表中查该行数据
+    AttrEntity attrEntity = this.getById(attrId);
+    BeanUtils.copyProperties(attrEntity, attrRespVo);
+
+    LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
+    attrAttrgroupRelationQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attrId);
+    //根据attrId到attrAttrgroupRelation关联关系表里查attrGroupId
+    AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(attrAttrgroupRelationQueryWrapper);
+    if (attrAttrgroupRelationEntity != null) {
+        attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+        //根据attrGroupId到attrGroup表里查groupName
+        AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+        if (attrGroupEntity != null) {
+            attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+        }
+    }
+
+    //根据最后一级分类id到categoryService中查询完整三级分类id
+    Long catelogId = attrEntity.getCatelogId();
+    Long[] catelogPath = categoryService.findCatelogPath(catelogId);
+    if (catelogPath!=null){
+        attrRespVo.setCatelogPath(catelogPath);
+    }
+    return attrRespVo;
+}
+```
+
+![image-20220513111825693](image/4.5.3.5.png)
+
+#### 6、测试
+
+重启`gulimall-product`模块，刷新前端页面，已成功显示`属性分类`和`所属分组`
+
+![image-20220513112029811](image/4.5.3.6.1.png)
+
+![image-20220513112042807](image/4.5.3.6.2.png)
+
+### 4.5.4、规格参数修改发送请求
+
+#### 1、前端提交时规则校验失败
+
+##### 1、值类型不能为空
+
+![image-20220513114101205](image/4.5.4.1.1.png)
+
+##### 2、查看数据
+
+![image-20220513114127890](image/4.5.4.1.2.png)
+
+##### 3、寻找原因
+
+###### 1、绑定`valueType`
+
+![image-20220513114746867](image/4.5.4.1.3.1.png)
+
+###### 2、`valueType`数据字段
+
+![image-20220513115002459](image/4.5.4.1.3.2.png)
+
+###### 3、`valueType`校验字段
+
+![image-20220513115126361](image/4.5.4.1.3.3.png)
+
+###### 4、初始化方法重新给`valueType`赋值
+
+初始化的时候重新给"valueType"赋值了
+很有可能是在这个时候没有获取到"valueType"
+
+![image-20220513115444277](image/4.5.4.1.3.4.png)
+
+###### 5、表单提交后重新给`valueType`赋值
+
+表单提交的时候也重新赋值了
+但现在表单还没提交，应该不是这里
+
+![image-20220513115757511](image/4.5.4.1.3.5.png)
+
+###### 6、查看初始化请求返回的数据
+
+可以看到没有`valueType`字段
+
+![image-20220513120136532](image/4.5.4.1.3.6.png)
+
+###### 7、返回对象没有`valueType`字段
+
+![image-20220513120635878](image/4.5.4.1.3.7.png)
+
+###### 8、数据库也没有`valueType`字段
+
+![image-20220513120831498](image/4.5.4.1.3.8.png)
+
+##### 4、数据库添加`valueType`字段
+
+![image-20220513121750821](image/4.5.4.1.4.png)
+
+##### 5、`pojo`对象添加字段
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.AttrEntity`类里添加字段
+
+```java
+/**
+ * 值类型【0-只能单个值，1-允许多个值】
+ */
+private Integer valueType;
+```
+
+![image-20220513122050410](image/4.5.4.1.5.1.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.vo.AttrVo`类里添加字段
+
+![image-20220513122208202](image/4.5.4.1.5.2.png)
+
+由于`attrRespVo`继承了`attrVo`,所以也有`valueType`字段
+
+![image-20220513122301927](image/4.5.4.1.5.3.png)
+
+由于使用的是MyBatisPuls，所以**增删查改**会自动将`entity`类的所有需要的字段都带上，因此不需要修改业务代码
+
+##### 6、重新测试
+
+现在提交已经校验成功了
+
+![image-20220513122505664](image/4.5.4.1.6.png)
+
+#### 2、查看请求的URL
+
+请求的URL为：http://localhost:88/api/product/attr/update
+
+![image-20220513222311216](image/4.5.4.2.png)
+
+#### 3、修改
+
+在`gulimall-product`模块里修改`com.atguigu.gulimall.product.controller.AttrController`类的`update`方法
+
+```java
+@RequestMapping("/update")
+public R update(@RequestBody AttrVo attr) {
+    attrService.updateAttr(attr);
+
+    return R.ok();
+}
+```
+
+![image-20220513222402532](image/4.5.4.3.png)
+
+#### 4、添加`updateAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrService`接口里添加`updateAttr`抽象方法
+
+```java
+void updateAttr(AttrVo attr);
+```
+
+![image-20220513222606908](image/4.5.4.4.png)
+
+#### 5、实现`updateAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里实现`updateAttr`抽象方法
+
+![image-20220513224031536](image/4.5.4.5.png)
+
+#### 6、测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+可以看到当没有设置所属分组时，修改失败了，原因就是没有查到`attrId`为该值的数据，因此当查不到数据时应该增加该数据
+
+![GIF 2022-5-13 22-45-38](image/4.5.4.6.1.gif)
+
+当设置了所属分组后，修改正常
+
+![GIF 2022-5-13 22-53-56](image/4.5.4.6.2.gif)
+
+#### 7、修改`updateAttr`方法
+
+在`gulimall-product`模块里修改`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`updateAttr`方法
+
+```java
+@Transactional
+@Override
+public void updateAttr(AttrVo attr) {
+    AttrEntity attrEntity = new AttrEntity();
+    BeanUtils.copyProperties(attr,attrEntity);
+    this.updateById(attrEntity);
+
+
+    AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+    attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+
+    LambdaQueryWrapper<AttrAttrgroupRelationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId,attr.getAttrId());
+    Integer count = attrAttrgroupRelationDao.selectCount(lambdaQueryWrapper);
+    //如果有attr和attrgroup的关联关系就修改该，没有就新增
+    if (count>0) {
+        //根据attr_id修改 pms_attr_attrgroup_relation 里的attr_group_id 字段
+        attrAttrgroupRelationDao.update(attrAttrgroupRelationEntity, lambdaQueryWrapper);
+    }else {
+        //添加attr和attrgroup的关联关系
+        attrAttrgroupRelationEntity.setAttrId(attr.getAttrId());
+        attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+    }
+}
+```
+
+![image-20220513230716943](image/4.5.4.7.png)
+
+#### 8、重新测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+![GIF 2022-5-13 23-02-23](image/4.5.4.8.gif)
+
+### 4.5.5、销售属性维护
+
+#### 1、查看`url`
+
+点击`商品系统`下的`平台属性`下的`销售属性`，会发送一个请求，查看销售属性列表
+
+url：http://localhost:88/api/product/attr/sale/list/0?t=1652454755415&page=1&limit=10&key=
+
+![image-20220513231338361](image/4.5.5.1.1.png)
+
+当`pms_attr`表的`attr_type`字段为`0`,则表示的是销售属性
+
+![image-20220513232155146](image/4.5.5.1.2.png)
+
+接口文档: [09、获取分类销售属性 - 谷粒商城 - 易文档 (easydoc.net)](https://easydoc.net/s/78237135/ZUqEdvA4/FTx6LRbR)
+
+![image-20220518194022173](image/4.5.5.1.3.png)
+
+#### 2、修改`baseAttrList`方法
+
+在`gulimall-product`模块里修改`com.atguigu.gulimall.product.controller.AttrController`类的`baseAttrList`方法
+
+![image-20220513233818883](image/4.5.5.2.1.png)
+
+![image-20220513233835501](image/4.5.5.2.2.png)
+
+#### 3、转到接口方法
+
+按住`ctrl`键，然后点击`queryBaseAttrPage`，跳转到`com.atguigu.gulimall.product.service.AttrService`类的`queryBaseAttrPage`方法
+
+![image-20220513233933096](image/4.5.5.3.1.png)
+
+![image-20220513233956714](image/4.5.5.3.2.png)
+
+#### 4、修改`queryBaseAttrPage`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`queryBaseAttrPage`方法里添加比较条件
+
+```java
+lambdaQueryWrapper.eq(AttrEntity::getAttrType,"base".equalsIgnoreCase(attrType)?1:0);
+```
+
+![image-20220513234038547](image/4.5.5.4.png)
+
+完整代码
+
+```java
+@Override
+public PageUtils queryBaseAttrPage(Map<String, Object> params, Long categoryId, String attrType) {
+    LambdaQueryWrapper<AttrEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(AttrEntity::getAttrType,"base".equalsIgnoreCase(attrType)?1:0);
+    if (categoryId != 0) {
+        //如果有categoryId，则查该categoryId的数据
+        lambdaQueryWrapper.eq(AttrEntity::getCatelogId, categoryId);
+    }
+
+    String key = (String) params.get("key");
+    if (StringUtils.hasLength(key)) {
+        lambdaQueryWrapper.and((obj) -> {
+            //如果有查询条件，则判断该条件是否 与attrId相等 或 名字包含该条件
+            obj.eq(AttrEntity::getAttrId, key).or().like(AttrEntity::getAttrName, key);
+        });
+    }
+    IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), lambdaQueryWrapper);
+
+    //查询categoryName字段和groupName字段
+    List<AttrEntity> list = page.getRecords();
+    List<AttrRespVo> respVos = list.stream().map(attrEntity -> {
+        AttrRespVo attrRespVo = new AttrRespVo();
+        BeanUtils.copyProperties(attrEntity, attrRespVo);
+        //根据attrId到attr和attrgroup的中间表查询 attrgroupId
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
+        attrAttrgroupRelationQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId());
+        //根据attrgroupId查询中间表的该行数据，并封装到对象
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(attrAttrgroupRelationQueryWrapper);
+        if (attrAttrgroupRelationEntity != null) {
+            //如果查到attrgroupId，则根据attrgroupId查询attrgroupName，并添加到attrRespVo中
+            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+            attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+        }
+
+        LambdaQueryWrapper<CategoryEntity> categoryQueryWrapper = new LambdaQueryWrapper<>();
+        categoryQueryWrapper.eq(CategoryEntity::getCatId, attrEntity.getCatelogId());
+        //根据catelogId查询该行数据，并封装到对象
+        CategoryEntity categoryEntity = categoryDao.selectOne(categoryQueryWrapper);
+        if (categoryEntity != null) {
+            attrRespVo.setCatelogName(categoryEntity.getName());
+        }
+        return attrRespVo;
+    }).collect(Collectors.toList());
+
+    PageUtils pageUtils = new PageUtils(page);
+    //重新给数据
+    pageUtils.setList(respVos);
+    return pageUtils;
+}
+```
+
+#### 5、测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+##### 1、新增`销售属性`
+
+![image-20220513234339081](image/4.5.5.5.1.png)
+
+##### 2、点击`查询全部`
+
+点击查询全部，可以看到请求的url
+
+url: http://localhost:88/api/product/attr/sale/list/0?t=1652456634834&page=1&limit=10&key=
+
+![image-20220513234412544](image/4.5.5.5.2.png)
+
+##### 3、报空指针
+
+`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`queryBaseAttrPage`方法里的这一行报空指针
+
+![image-20220513234555986](image/4.5.5.5.3.png)
+
+##### 4、加个判断
+
+在`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`queryBaseAttrPage`方法里这个位置加个判断
+
+![image-20220513234720363](image/4.5.5.5.4.png)
+
+##### 5、重新测试
+
+重启`gulimall-product`项目，已经正常显示了
+
+![image-20220513234805564](image/4.5.5.5.5.png)
+
+#### 6、修改`销售属性`报错
+
+##### 1、修改`销售属性`
+
+可选值里添加`蓝色`,然后点击确定，成功了
+
+![image-20220516230532173](image/4.5.5.6.1.1.png)
+
+再次提示，系统未知异常
+
+![image-20220516215335766](image/4.5.5.6.1.2.png)
+
+##### 2、查看报错
+
+在`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`updateAttr`方法里的`172`行有一个sql语法错误
+
+```
+UPDATE pms_attr_attrgroup_relation WHERE (attr_id = ?) 
+```
+
+![image-20220516215659753](image/4.5.5.6.2.png)
+
+##### 3、`attrGroup`没有获取到
+
+可以看到传过来的`attr`里面没有封装`attrGroup`
+
+![image-20220516220802079](image/4.5.5.6.3.1.png)
+
+查看前端请求，发现修改，没有涉及到`所属分组`，因此没有`attrGroup`属性
+
+![image-20220516221537247](image/4.5.5.6.3.2.png)
+
+##### 4、查看调用关系
+
+使用以下方法查看调用关系(或按`alt+F7`)
+
+1. 双击`updateAttr`方法
+2. 右键，选择`Find Usages`
+3. 查看调用
+
+可以看到，只有`AttrController`的`update`方法调用了
+
+![image-20220516223003550](image/4.5.5.6.4.1.png)
+
+使用以下方法查看调用关系链(或按快捷键`ctrl+alt+H`)
+
+1. 双击`updateAttr`方法
+2. 点击`Navigate`
+3. 选择`Call Hierarchy`
+4. 查看被调用关系链
+
+可以看到，只有`AttrController`的`update`方法调用了
+
+![image-20220516223538909](image/4.5.5.6.4.2.png)
+
+##### 5、分析
+
+###### 1、查看数据库
+
+查看数据库发现，~~已经新增了一条记录~~，但是`attr_group_id`为null
+
+(其实这条数据不是在调用修改方法新增的数据，而是调用`save`方法新增的数据，调用`save`方法可以看到会执行
+
+`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类的`saveAttr`方法
+
+```java
+@Override
+    public void saveAttr(AttrVo attr) {
+        AttrEntity attrEntity = new AttrEntity();
+        //将attr中的数据复制到attrEntity对应的字段里
+        BeanUtils.copyProperties(attr, attrEntity);
+        //1、保存基本数据
+        this.save(attrEntity);
+        //2、保存关联关系
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+        attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+        //调用this.save(attrEntity);方法后，会将数据库生成的attrId封装到AttrEntity里面
+        attrAttrgroupRelationEntity.setAttrId(attrEntity.getAttrId());
+        attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+    }
+```
+
+此时会在`attr_attrgroup_relation`表里添加数据，此时也只有`attr_id`有值，`attr_group_id`也为`null`)
+
+**先删除这条数据，再进行调试**
+
+![image-20220516231712740](image/4.5.5.6.5.1.png)
+
+###### 2、执行了`insert`方法
+
+第一次请求时，在`attr_attrgroup_relation`查不到数据(最初写修改`规格参数`时，代表的是新增`规格参数`没有设置`所属分组`的情况)
+
+，所以就插入了一条数据，但是由于是修改`销售属性`，没有`所属分组`选项，自然就没有`attrGroupId`
+
+![image-20220516230926422](image/4.5.5.6.5.2.png)
+
+###### 3、查看`insert`的sql语句
+
+可以看到只插入了`attr_id`字段
+
+![image-20220516231035665](image/4.5.5.6.5.3.png)
+
+###### 4、查看数据库
+
+可以看到`attr_group_id`字段为空
+
+![image-20220516231851424](image/4.5.5.6.5.4.png)
+
+###### 5、再次发送修改`销售属性`请求
+
+再次发送修改`销售属性`请求,可以看到已经查到了一条数据，走到了`update`方法里面去了
+
+此时同样没有`attrGroupId`字段
+
+![image-20220516231421001](image/4.5.5.6.5.5.png)
+
+###### 6、此时出现了sql语句异常
+
+![image-20220516231604459](image/4.5.5.6.5.6.png)
+
+##### 6、解决问题
+
+###### 1、`规格参数`和`销售属性`的请求参数一样
+
+点击`规格参数`里的`修改`按钮，可以看到url为: http://localhost:88/api/product/attr/update
+
+![image-20220516233308432](image/4.5.5.6.6.1.1.png)
+
+此时有`所属分组`，因此有`attrGroup`属性
+
+此时的`attrType`为`1`，表示的是`规格参数`
+
+![image-20220516233334265](image/4.5.5.6.6.1.2.png)
+
+点击`销售属性`里的`修改`按钮，可以看到url为: http://localhost:88/api/product/attr/update
+
+![image-20220516233824438](image/4.5.5.6.6.1.3.png)
+
+此时没有有`所属分组`，因此没有`attrGroup`属性
+
+此时的`attrType`为`0`，表示的是`销售属性`
+
+![image-20220516233859672](image/4.5.5.6.6.1.4.png)
+
+###### 2、`updateAttr`方法添加关联关系前加一个判断
+
+```java
+@Transactional
+@Override
+public void updateAttr(AttrVo attr) {
+    AttrEntity attrEntity = new AttrEntity();
+    BeanUtils.copyProperties(attr,attrEntity);
+    this.updateById(attrEntity);
+
+
+    AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+    attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+
+    LambdaQueryWrapper<AttrAttrgroupRelationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId,attr.getAttrId());
+    Integer count = attrAttrgroupRelationDao.selectCount(lambdaQueryWrapper);
+    //如果有attr和attrgroup的关联关系就修改该，没有就新增
+    if (count>0) {
+        //根据attr_id修改 pms_attr_attrgroup_relation 里的attr_group_id 字段
+        attrAttrgroupRelationDao.update(attrAttrgroupRelationEntity, lambdaQueryWrapper);
+    }else {
+        if (attr.getAttrGroupId()!=null) {
+            //添加attr和attrgroup的关联关系
+            attrAttrgroupRelationEntity.setAttrId(attr.getAttrId());
+            attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+        }
+    }
+}
+```
+
+![image-20220517000120934](image/4.5.5.6.6.2.1.png)
+
+此时的`attrType`为`0`，表示的是`销售属性`，没有`attr`和`attrGroup`的`关联关系`,不需要添加
+
+因此也可以这样判断，如果是**基本属性**才添加`attr`和`attrGroup`的`关联关系`
+
+这样想其实不规范，如果是**销售属性**，应该直接不查`attr`和`attrGroup`的`关联关系`，因为**销售属性**没有分组，自然没有它们的关联关系
+
+![image-20220518125355814](image/4.5.5.6.6.2.2.png)
+
+###### 3、使用枚举
+
+在`gulimall-common`模块的`src/main/java/com/atguigu/common`文件下新建`constant`文件夹
+
+在`com.atguigu.common.constant`包下新建`ProductConstant`枚举类
+
+```java
+package com.atguigu.common.constant;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/17
+ * @Description:
+ */
+public enum ProductConstant {
+    /**
+     * 基本属性
+     */
+    ATTR_TYPE_BASE(1,"基本属性"),
+    /**
+     * 销售属性
+     */
+    ATTR_TYPES_SALE(0,"销售属性");
+
+    private int code;
+    private String msg;
+
+    ProductConstant(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+}
+```
+
+![image-20220518115507158](image/4.5.5.6.6.3.png)
+
+###### 4、修改`updateAttr`方法
+
+修改`gulimall-product`模块下的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`updateAttr`方法
+
+```java
+@Transactional
+@Override
+public void updateAttr(AttrVo attr) {
+    AttrEntity attrEntity = new AttrEntity();
+    BeanUtils.copyProperties(attr,attrEntity);
+    this.updateById(attrEntity);
+
+
+    AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+    attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+
+    LambdaQueryWrapper<AttrAttrgroupRelationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId,attr.getAttrId());
+    Integer count = attrAttrgroupRelationDao.selectCount(lambdaQueryWrapper);
+    //如果有attr和attrgroup的关联关系就修改该，没有就新增
+    if (count>0) {
+        //根据attr_id修改 pms_attr_attrgroup_relation 里的attr_group_id 字段
+        attrAttrgroupRelationDao.update(attrAttrgroupRelationEntity, lambdaQueryWrapper);
+    }else {
+        //基本属性
+        if (attr.getAttrType()== ProductConstant.ATTR_TYPE_BASE.getCode()) {
+            //添加attr和attrgroup的关联关系
+            attrAttrgroupRelationEntity.setAttrId(attr.getAttrId());
+            attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+        }
+    }
+}
+```
+
+![image-20220518124449446](image/4.5.5.6.6.4.1.png)
+
+最好这样写
+
+如果是基本属性，才`更新`或`添加`关联关系
+
+```java
+@Transactional
+@Override
+public void updateAttr(AttrVo attr) {
+    AttrEntity attrEntity = new AttrEntity();
+    BeanUtils.copyProperties(attr, attrEntity);
+    this.updateById(attrEntity);
+
+    //如果是基本属性，就更新或添加关联关系
+    if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode()) {
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+        attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attr.getAttrId());
+        Integer count = attrAttrgroupRelationDao.selectCount(lambdaQueryWrapper);
+        //如果有attr和attrgroup的关联关系就修改该，没有就新增
+        if (count > 0) {
+            //根据attr_id修改 pms_attr_attrgroup_relation 里的attr_group_id 字段
+            attrAttrgroupRelationDao.update(attrAttrgroupRelationEntity, lambdaQueryWrapper);
+        } else {
+            //添加attr和attrgroup的关联关系
+            attrAttrgroupRelationEntity.setAttrId(attr.getAttrId());
+            attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+        }
+    }
+}
+```
+
+![image-20220518130019768](image/4.5.5.6.6.4.2.png)
+
+###### 5、修改`saveAttr`方法
+
+修改`gulimall-product`模块下的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`saveAttr`方法
+
+```java
+@Override
+public void saveAttr(AttrVo attr) {
+    AttrEntity attrEntity = new AttrEntity();
+    //将attr中的数据复制到attrEntity对应的字段里
+    BeanUtils.copyProperties(attr, attrEntity);
+    //1、保存基本数据
+    this.save(attrEntity);
+    //2、如果是基本属性,则还要保存关联关系
+    if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode()) {
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+        attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+        //调用this.save(attrEntity);方法后，会将数据库生成的attrId封装到AttrEntity里面
+        attrAttrgroupRelationEntity.setAttrId(attrEntity.getAttrId());
+        attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+    }
+}
+```
+
+![image-20220518123217004](image/4.5.5.6.6.5.png)
+
+###### 6、修改`queryBaseAttrPage`方法
+
+修改`gulimall-product`模块下的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`queryBaseAttrPage`方法，也使用**枚举**来代表`0`，或者`1`
+
+```java
+@Override
+public PageUtils queryBaseAttrPage(Map<String, Object> params, Long categoryId, String attrType) {
+    LambdaQueryWrapper<AttrEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    //判断是"基本属性"还是"销售属性"
+    lambdaQueryWrapper.eq(AttrEntity::getAttrType,
+            "base".equalsIgnoreCase(attrType)?
+                    ProductConstant.ATTR_TYPE_BASE.getCode():
+                    ProductConstant.ATTR_TYPES_SALE.getCode());
+    if (categoryId != 0) {
+        //如果有categoryId，则查该categoryId的数据
+        lambdaQueryWrapper.eq(AttrEntity::getCatelogId, categoryId);
+    }
+
+    String key = (String) params.get("key");
+    if (StringUtils.hasLength(key)) {
+        lambdaQueryWrapper.and((obj) -> {
+            //如果有查询条件，则判断该条件是否 与attrId相等 或 名字包含该条件
+            obj.eq(AttrEntity::getAttrId, key).or().like(AttrEntity::getAttrName, key);
+        });
+    }
+    IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), lambdaQueryWrapper);
+
+    //查询categoryName字段和groupName字段
+    List<AttrEntity> list = page.getRecords();
+    List<AttrRespVo> respVos = list.stream().map(attrEntity -> {
+        AttrRespVo attrRespVo = new AttrRespVo();
+        BeanUtils.copyProperties(attrEntity, attrRespVo);
+        //根据attrId到attr和attrgroup的中间表查询 attrgroupId
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
+        attrAttrgroupRelationQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId());
+        //根据attrgroupId查询中间表的该行数据，并封装到对象
+        if ("base".equalsIgnoreCase(attrType)) {
+            AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(attrAttrgroupRelationQueryWrapper);
+            if (attrAttrgroupRelationEntity != null) {
+                //如果查到attrgroupId，则根据attrgroupId查询attrgroupName，并添加到attrRespVo中
+                AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+                attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            }
+        }
+
+        LambdaQueryWrapper<CategoryEntity> categoryQueryWrapper = new LambdaQueryWrapper<>();
+        categoryQueryWrapper.eq(CategoryEntity::getCatId, attrEntity.getCatelogId());
+        //根据catelogId查询该行数据，并封装到对象
+        CategoryEntity categoryEntity = categoryDao.selectOne(categoryQueryWrapper);
+        if (categoryEntity != null) {
+            attrRespVo.setCatelogName(categoryEntity.getName());
+        }
+        return attrRespVo;
+    }).collect(Collectors.toList());
+
+    PageUtils pageUtils = new PageUtils(page);
+    //重新给数据
+    pageUtils.setList(respVos);
+    return pageUtils;
+}
+```
+
+![image-20220518121753838](image/4.5.5.6.6.6.png)
+
+###### 7、修改`getAttrInfo`方法
+
+修改`gulimall-product`模块下的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`getAttrInfo`方法
+
+```java
+@Override
+public AttrRespVo getAttrInfo(Long attrId) {
+    AttrRespVo attrRespVo = new AttrRespVo();
+    //根据attrId到attr表中查该行数据
+    AttrEntity attrEntity = this.getById(attrId);
+    BeanUtils.copyProperties(attrEntity, attrRespVo);
+
+    //如果是基本属性，需要设置分组信息
+    if (attrEntity.getAttrType()== ProductConstant.ATTR_TYPE_BASE.getCode()) {
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
+        attrAttrgroupRelationQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attrId);
+        //根据attrId到attrAttrgroupRelation关联关系表里查attrGroupId
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(attrAttrgroupRelationQueryWrapper);
+        if (attrAttrgroupRelationEntity != null) {
+            attrRespVo.setAttrGroupId(attrAttrgroupRelationEntity.getAttrGroupId());
+            //根据attrGroupId到attrGroup表里查groupName
+            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
+            if (attrGroupEntity != null) {
+                attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            }
+        }
+    }
+
+    //根据最后一级分类id到categoryService中查询完整三级分类id
+    Long catelogId = attrEntity.getCatelogId();
+    Long[] catelogPath = categoryService.findCatelogPath(catelogId);
+    if (catelogPath!=null){
+        attrRespVo.setCatelogPath(catelogPath);
+    }
+    return attrRespVo;
+}
+```
+
+![image-20220518122837889](image/4.5.5.6.6.7.png)
+
+#### 7、测试
+
+重启`gulimall-product`模块，刷新前端页面，点击`销售属性`里的新增
+
+![image-20220518130652375](image/4.5.5.7.1.png)
+
+已经新增成功了
+
+![image-20220518130752310](image/4.5.5.7.2.png)
+
+查看新增的属性的`attrId`
+
+![image-20220518150614220](image/4.5.5.7.3.png)
+
+可以看到已经不再`pms_attr_attrgroup_relation`表里添加关联关系了
+
+![image-20220518150726876](image/4.5.5.7.4.png)
+
+### 4.5.6、`属性分组`查询&删除分组关联
+
+#### 1、`属性分组`查询分组关联
+
+##### 1、查看请求
+
+点击`商品系统`下的`平台属性`下的`属性分组`,点击操作下的`关联`,会发送一个请求,来查询`属性分组`关联的`销售属性(基本属性)`
+
+url:  http://localhost:88/api/product/attrgroup/1/attr/relation?t=1652858166118
+
+![image-20220518151725272](image/4.5.6.1.1.1.png)
+
+接口文档：[10、获取属性分组的关联的所有属性 - 谷粒商城 - 易文档 (easydoc.net)](https://easydoc.net/s/78237135/ZUqEdvA4/LnjzZHPj)
+
+![image-20220518193749778](image/4.5.6.1.1.2.png)
+
+##### 2、添加`attrRelation`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrGroupController`类里添加`attrRelation`方法
+
+```java
+@Autowired
+private AttrService attrService;
+
+/**
+ *  localhost:88/api/product/attrgroup/1/attr/relation?t=1652858166118
+ * @return
+ */
+@GetMapping("/{attrgroupId}/attr/relation")
+public R attrRelation(@PathVariable("attrgroupId") Long attrgroupId){
+    List<AttrEntity> list = attrService.getRelationAttr(attrgroupId);
+    return R.ok().put("data",list);
+}
+```
+
+![image-20220518154325812](image/4.5.6.1.2.png)
+
+##### 3、添加`getRelationAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrService`接口里添加`getRelationAttr`抽象方法
+
+![image-20220518154451842](image/4.5.6.1.3.png)
+
+##### 4、实现`getRelationAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里添加方法
+
+实现未实现的`getRelationAttr`抽象方法
+
+![image-20220518154507704](image/4.5.6.1.4.png)
+
+##### 5、测试
+
+重启`gulimall-product`模块，刷新前端页面，重新点击`关联`,可以看到已经显示出来了
+
+![image-20220518154635843](image/4.5.6.1.5.png)
+
+#### 2、`属性分组`删除分组关联
+
+##### 1、查看请求
+
+点击移除按钮，查看请求的url
+
+url:  http://localhost:88/api/product/attrgroup/attr/relation/delete
+
+传递的参数为: `attrId`和`attrGroupId`
+
+![image-20220518155321920](image/4.5.6.2.1.1.png)
+
+![image-20220518155457971](image/4.5.6.2.1.2.png)
+
+接口文档：[12、删除属性与分组的关联关系 - 谷粒商城 - 易文档 (easydoc.net)](https://easydoc.net/s/78237135/ZUqEdvA4/qn7A2Fht)
+
+![image-20220518194431585](image/4.5.6.2.1.3.png)
+
+##### 2、新建`AttrGroupRelationVo`类
+
+在`gulimall-product`模块下的`com.atguigu.gulimall.product.vo`包下新建`AttrGroupRelationVo`类
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/18
+ * @Description:
+ */
+@Data
+public class AttrGroupRelationVo {
+
+    private Long attrId;
+
+    private Long attrGroupId;
+}
+```
+
+![image-20220518194549006](image/4.5.6.2.2.png)
+
+##### 3、添加`deleteRelation`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrGroupController`类里添加`deleteRelation`方法
+
+```java
+/**
+ * localhost:88/api/product/attrgroup/attr/relation/delete
+ * @return
+ */
+@PostMapping("/attr/relation/delete")
+public R deleteRelation(AttrGroupRelationVo[] attrGroupRelationVos){
+    attrService.deleteRelation(attrGroupRelationVos);
+    return R.ok();
+}
+```
+
+![image-20220518194834132](image/4.5.6.2.3.png)
+
+##### 4、添加`deleteRelation`抽象方法
+
+在`gulimall-product`模块下的`com.atguigu.gulimall.product.service.AttrService`类里添加`deleteRelation`抽象方法
+
+```java
+void deleteRelation(AttrGroupRelationVo[] attrGroupRelationVos);
+```
+
+![image-20220518195422431](image/4.5.6.2.4.png)
+
+##### 5、实现`deleteRelation`抽象方法
+
+在`gulimall-product`模块下的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里实现未实现的`deleteRelation`抽象方法
+
+```java
+/**
+ * delete from gulimall_pms.pms_attr_attrgroup_relation
+ * where (attr_id = 1 and attr_group_id=1)
+ * or (attr_id = 2 and attr_group_id=2)
+ * or (attr_id = 3 and attr_group_id=3);
+ * @param attrGroupRelationVos
+ */
+@Override
+public void deleteRelation(AttrGroupRelationVo[] attrGroupRelationVos) {
+    List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntities = Arrays.stream(attrGroupRelationVos).map((attrGroupRelationVo -> {
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+        BeanUtils.copyProperties(attrGroupRelationVo, attrAttrgroupRelationEntity);
+        return attrAttrgroupRelationEntity;
+    })).collect(Collectors.toList());
+
+    attrAttrgroupRelationDao.deleteBatchRelation(attrAttrgroupRelationEntities);
+}
+```
+
+![image-20220518200544137](image/4.5.6.2.5.png)
+
+##### 6、添加`deleteBatchRelation`抽象方法
+
+在`gulimall-product`模块里的`com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao`类里
+
+添加`deleteBatchRelation`抽象方法
+
+```java
+void deleteBatchRelation(@Param("entities") List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntities);
+```
+
+![image-20220518201025915](image/4.5.6.2.6.png)
+
+##### 7、添加`deleteBatchRelation`抽象方法的sql语句
+
+在`gulimall-product`模块的`src/main/resources/mapper/product/AttrAttrgroupRelationDao.xml`文件里添加sql语句
+
+```xml
+<!--批量删除attr_attrgroup_relation-->
+<!--
+    delete from gulimall_pms.pms_attr_attrgroup_relation
+    where (attr_id = 1 and attr_group_id=1)
+    or (attr_id = 2 and attr_group_id=2)
+    or (attr_id = 3 and attr_group_id=3);
+-->
+<delete id="deleteBatchRelation">
+    delete from gulimall_pms.pms_attr_attrgroup_relation where
+    <foreach collection="entities" item="item" separator=" or ">
+        (attr_id = #{item.attrId} and attr_group_id=#{item.attrGroupId})
+    </foreach>
+</delete>
+```
+
+![image-20220518201815102](image/4.5.6.2.7.png)
+
+##### 8、测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+点击`属性分组`下`操作`下里的`关联`,点击`删除`，显示`系统未知异常`
+
+###### 1、系统未知异常
+
+![image-20220518202518600](image/4.5.6.2.8.1.png)
+
+###### 2、查看报错信息
+
+查看`gulimall-product`模块的控制台的报错信息
+
+```
+No primary or default constructor found for class [Lcom.atguigu.gulimall.product.vo.AttrGroupRelationVo;
+没有找到类 [Lcom.atguigu.gulimall.product.vo.AttrGroupRelationVo; 的主要或默认构造函数；
+```
+
+![image-20220518202535851](image/4.5.6.2.8.2.png)
+
+###### 3、加`@RequestBody`注解
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrGroupController`类里修改`deleteRelation`方法
+
+![image-20220518202629893](image/4.5.6.2.8.3.png)
+
+###### 4、重新测试
+
+![image-20220518202749246](image/4.5.6.2.8.4.png)
+
+### 4.5.7、`属性分组`查询分组未关联的属性
+
+#### 1、查看请求
+
+点击`新建关联`会发送一个请求，查询**本分类下，没有被其他分组关联的属性**
+
+(比方说`主机`**属性分组**查询 `手机/手机通讯/手机`下的未被其他**属性分组**关联的**基本属性**)
+
+![image-20220518204930720](image/4.5.7.1.1.png)
+
+接口地址：[13、获取属性分组没有关联的其他属性 - 谷粒商城 - 易文档 (easydoc.net)](https://easydoc.net/s/78237135/ZUqEdvA4/d3EezLdO)
+
+![image-20220520093458443](image/4.5.7.1.2.png)
+
+#### 2、添加`attrNoRelation`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrGroupController`类里添加`attrNoRelation`方法
+
+```java
+/**
+ * 查询本分类下，没有被其他分组关联的属性
+ * (比方说"主机"属性分组查询 "手机/手机通讯/手机"下的未被其他属性分组关联的基本属性)
+ * localhost:88/api/product/attrgroup/1/noattr/relation?t=1652878342763&page=1&limit=10&key=
+ * @param attrgroupId 属性分组id
+ * @param params      分页参数
+ * @return
+ */
+@GetMapping("/{attrgroupId}/noattr/relation")
+public R attrNoRelation(@PathVariable("attrgroupId") Long attrgroupId,@RequestParam Map<String, Object> params){
+    PageUtils page = attrService.getNoRelationAttr(attrgroupId,params);
+    return R.ok().put("page",page);
+}
+```
+
+![image-20220518210857053](image/4.5.7.2.png)
+
+#### 3、添加`getNoRelationAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrService`类里添加`getNoRelationAttr`抽象方法
+
+```java
+PageUtils getNoRelationAttr(Long attrgroupId, Map<String, Object> params);
+```
+
+![image-20220518210924259](image/4.5.7.3.png)
+
+#### 4、实现`getNoRelationAttr`抽象方法
+
+在`gulimall-product`模块下的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里添加未实现的`getNoRelationAttr`抽象方法
+
+```java
+/**
+ * 查询本分类下，没有被其他分组关联的属性
+ * (比方说"主机"属性分组查询 "手机/手机通讯/手机"下的未被其他属性分组关联的基本属性)
+ * localhost:88/api/product/attrgroup/1/noattr/relation?t=1652878342763&page=1&limit=10&key=
+ * @param attrgroupId 属性分组id
+ * @param params      分页参数
+ * @return            分页对象
+ */
+@Override
+public PageUtils getNoRelationAttr(Long attrgroupId, Map<String, Object> params) {
+    //1、查询该attrgroupId的catelogId(当前分组只能关联自己所属的分类里面的所有属性)
+    AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrgroupId);
+    Long catelogId = attrGroupEntity.getCatelogId();
+
+    //2、当前分组只能关联本分类下的其他分组没有引用的属性
+    //2.1)、当前分类下的其他分组
+    LambdaQueryWrapper<AttrGroupEntity> attrGroupQueryWrapper = new LambdaQueryWrapper<>();
+    //ne：not equal
+    attrGroupQueryWrapper.eq(AttrGroupEntity::getCatelogId,catelogId).ne(AttrGroupEntity::getAttrGroupId,attrgroupId);
+    List<AttrGroupEntity> otherGroups = attrGroupDao.selectList(attrGroupQueryWrapper);
+    List<Long> otherAttrGroupIds = otherGroups.stream().map(AttrGroupEntity::getAttrGroupId).collect(Collectors.toList());
+
+    LambdaQueryWrapper<AttrEntity> attrQueryWrapper = new LambdaQueryWrapper<>();
+    attrQueryWrapper.eq(AttrEntity::getCatelogId, catelogId);
+    //2.2)、如果有其他分组，则查询这些分组关联的属性
+    //otherAttrGroupIds!=null && 有些多余
+    if (otherAttrGroupIds!=null && otherAttrGroupIds.size()>0) {
+        LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
+        attrAttrgroupRelationQueryWrapper.in(AttrAttrgroupRelationEntity::getAttrGroupId, otherAttrGroupIds);
+        List<AttrAttrgroupRelationEntity> otherAttrAttrgroupRelations = attrAttrgroupRelationDao.selectList(attrAttrgroupRelationQueryWrapper);
+        List<Long> otherAttrIds = otherAttrAttrgroupRelations.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+        //2.3)、如果有已被关联的属性，则从当前分类的所有属性中移除这些已被关联的属性;
+        if (otherAttrIds!=null && otherAttrIds.size()>0) {
+            attrQueryWrapper.notIn(AttrEntity::getAttrId, otherAttrIds);
+        }
+    }
+    //如果有查询条件，则添加查询条件
+    String key = (String) params.get("key");
+    if (StringUtils.hasLength(key)){
+        attrQueryWrapper.and(item->{
+            item.eq(AttrEntity::getAttrId,key).or().like(AttrEntity::getAttrName,key);
+        });
+    }
+    IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), attrQueryWrapper);
+    return new PageUtils(page);
+}
+```
+
+![image-20220518225631000](image/4.5.7.4.png)
+
+#### 5、测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+##### 1、已经显示出来了
+
+![image-20220518225512338](image/4.5.7.5.png)
+
+##### 2、还显示了销售属性
+
+![image-20220518230754485](image/4.5.7.5.2.1.png)
+
+![image-20220518230708756](image/4.5.7.5.2.2.png)
+
+##### 3、修改实现类的`getNoRelationAttr`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`getNoRelationAttr`方法
+
+```java
+attrQueryWrapper.eq(AttrEntity::getAttrType,ProductConstant.ATTR_TYPE_BASE.getCode());
+```
+
+![image-20220518230935342](image/4.5.7.5.3.png)
+
+##### 4、重新测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+已经不显示销售属性了
+
+![image-20220518231201080](image/4.5.7.5.4.png)
+
+#### 6、修改关联关系
+
+##### 1、重新查询
+
+删除**该分类下**其他`属性分组`与`基本属性`的**关联关系**后，再重新查询，发现可以查询出来
+
+![1](image/4.5.7.6.1.1.png)
+
+##### 2、添加关系
+
+在`gulimall_pms`数据库下的`pms_attr_attrgroup_relation`表里添加一行数据
+
+使`主机`组关联`入网型号`
+
+![image-20220518232418576](image/4.5.7.6.2.1.png)
+
+![image-20220518233043776](image/4.5.7.6.2.2.png)
+
+##### 3、还可以再次关联`入网型号`
+
+可以看到关联`入网型号`后，还可以再次关联`入网型号`
+
+![image-20220518233117780](image/4.5.7.6.3.png)
+
+##### 4、修改`getNoRelationAttr`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`getNoRelationAttr`方法
+
+删除`.ne(AttrGroupEntity::getAttrGroupId,attrgroupId)`，取消排除本分组
+
+查询所有分组(包括本分组，因为本分组已经关联的属性，不能再次关联)
+
+![image-20220518233615200](image/4.5.7.6.4.png)
+
+##### 5、重新测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+可以看到关联`入网型号`后，不可以再次关联`入网型号`
+
+![image-20220518234041402](image/4.5.7.6.5.png)
+
+#### 7、模糊查询
+
+##### 1、根据`属性id`
+
+![image-20220518234459174](image/4.5.7.7.1.1.png)
+
+![image-20220518234430923](image/4.5.7.7.1.2.png)
+
+##### 2、根据`属性名`
+
+![image-20220518234352730](image/4.5.7.7.2.1.png)
+
+![image-20220518234413311](image/4.5.7.7.2.2.png)
+
+可以看到，模糊查询没有什么问题
+
+### 4.5.8、`属性分组`添加关联关系
+
+#### 1、查看请求
+
+先删除`主机`和`入网型号`的关联关系，再重新添加,查看url
+
+url: http://localhost:88/api/product/attrgroup/attr/relation
+
+![image-20220518235355704](image/4.5.8.1.1.png)
+
+查询参数
+
+![image-20220518235618863](image/4.5.8.1.2.png)
+
+接口文档：[11、添加属性与分组关联关系 - 谷粒商城 - 易文档 (easydoc.net)](https://easydoc.net/s/78237135/ZUqEdvA4/VhgnaedC)
+
+![image-20220518235700293](image/4.5.8.1.3.png)
+
+#### 2、添加`addRelation`方法
+
+在`gulimall-product`模块里的`com.atguigu.gulimall.product.controller.AttrGroupController`类里添加`addRelation`方法
+
+```java
+@Autowired
+private AttrAttrgroupRelationService attrAttrgroupRelationService;
+
+/**
+ * localhost:88/api/product/attrgroup/attr/relation
+ */
+@PostMapping("/attr/relation")
+public R addRelation(@RequestBody List<AttrGroupRelationVo> attrGroupRelationVos){
+    attrAttrgroupRelationService.saveBatch(attrGroupRelationVos);
+    return R.ok();
+}
+```
+
+![image-20220519160608120](image/4.5.8.2.png)
+
+#### 3、添加`saveBatch`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrAttrgroupRelationService`接口里添加`saveBatch`抽象方法
+
+```java
+void saveBatch(List<AttrGroupRelationVo> attrGroupRelationVos);
+```
+
+![image-20220519160636605](image/4.5.8.3.png)
+
+#### 4、实现`saveBatch`抽象方法
+
+在`gulimall-product`模块里的`com.atguigu.gulimall.product.service.impl.AttrAttrgroupRelationServiceImpl`类里实现`saveBatch`抽象方法
+
+```java
+@Override
+public void saveBatch(List<AttrGroupRelationVo> attrGroupRelationVos) {
+    List<AttrAttrgroupRelationEntity> attrAttrgroupRelationEntities = attrGroupRelationVos.stream().map((item) -> {
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+        BeanUtils.copyProperties(item, attrAttrgroupRelationEntity);
+        return attrAttrgroupRelationEntity;
+    }).collect(Collectors.toList());
+
+    this.saveBatch(attrAttrgroupRelationEntities);
+}
+```
+
+![image-20220519161255770](image/4.5.8.4.png)
+
+#### 5、测试
+
+重启`gulimall-product`模块，刷新前端页面，添加`属性分组`里的关联关系
+
+##### 1、添加关联关系
+
+![GIF 2022-5-19 16-11-17](image/4.5.8.5.1.gif)
+
+##### 2、新增`规格参数`
+
+![image-20220519162129172](image/4.5.8.5.2.png)
+
+##### 3、新增成功，但是没有显示出来
+
+![image-20220519162615473](image/4.5.8.5.3.png)
+
+##### 4、报空指针异常
+
+在`gulimall-product`模块里的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`queryBaseAttrPage`方法的这一行报空指针
+
+很明显，`attrRespVo`对象是`103`行`new`出来的，不会是空指针
+
+只有`attrGroupEntity`是查出来，然后返回的对象，有可能在数据库中没找到
+
+![image-20220519163106480](image/4.5.8.5.4.1.png)
+
+传入的`attr_group_id`为`null`，数据库肯定查不到数据，所以返回`0`行数据，接收的``attrGroupEntity`自然为`null`
+
+![image-20220519163207584](image/4.5.8.5.4.2.png)
+
+##### 5、多加一个判断
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`queryBaseAttrPage`方法里 将`if (attrAttrgroupRelationEntity != null)`改为
+
+`if (attrAttrgroupRelationEntity != null && attrAttrgroupRelationEntity.getAttrGroupId()!=null) `
+
+![image-20220519164444114](image/4.5.8.5.5.png)
+
+同理，也应该修改其他类似代码
+
+##### 6、修改`saveAttr`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`saveAttr`方法里
+
+将`if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode())`改为
+
+`if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()!=null) `
+
+![image-20220519165943509](image/4.5.8.5.6.png)
+
+##### 7、修改`updateAttr`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrServiceImpl`类里的`updateAttr`方法里
+
+将`if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode())`改为
+
+`if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()!=null) `
+
+![image-20220519174303778](image/4.5.8.5.7.png)
+
+#### 6、重新测试
+
+重启`gulimall-product`模块，刷新前端页面
+
+##### 1、查询全部
+
+可以看到，刚刚添加的`机身颜色`已经显示出来了
+
+![image-20220519175025352](image/4.5.8.6.1.png)
+
+##### 2、建立关联关系
+
+在`商品系统/平台属性/属性分组`里建立关联关系也没有问题
+
+![GIF 2022-5-19 17-54-56](image/4.5.8.6.2.gif)
+
+##### 3、再次点击`规格参数`，查询不到数据
+
+再次点击`规格参数`，又查询不到数据了
+
+![image-20220519180029672](image/4.5.8.6.3.png)
+
+##### 4、查看控制台
+
+查看`gulimall-product`模块的控制台，可以看到查询到了两条数据，而需要的是`0`条或`1`条数据(**查不到数据**或**只查询到一条数据**)
+
+```bash
+nested exception is org.apache.ibatis.exceptions.TooManyResultsException: Expected one result (or null) to be returned by selectOne(), but found: 2
+嵌套异常是 org.apache.ibatis.exceptions.TooManyResultsException：期望 selectOne() 返回一个结果（或 null），但发现：2
+```
+
+![image-20220519180338886](image/4.5.8.6.4.png)
+
+##### 5、查看数据库
+
+在`gulimall_pms`数据库下的`pms_attr_attrgroup_relation`表里将`attr_id`=`6`并且`attr_group_id`为`null`的字段删掉
+
+也把`attr_id`为`4`的也删除掉，`attr_id`为`4`的是销售属性，不需要关联关系(这是以前修改代码前，插入的错误数据)
+
+![image-20220519181010383](image/4.5.8.6.5.1.png)
+
+![image-20220519213127175](image/4.5.8.6.5.2.png)
+
+##### 6、刷新前端页面
+
+![image-20220519213334536](image/4.5.8.6.6.png)
+
+#### 7、`规格参数`测试
+
+在`规格参数`里修改`所属分组`
+
+![GIF 2022-5-19 21-35-51](image/4.5.8.7.gif)
+
+不过这样做并不规范，最好在添加关联关系的时候查询一下再添加，防止恶意攻击
+
+## 4.6、商品服务-API-新增商品
+
+### 4.6.1、调试会员等级相关接口
+
+#### 1、发送请求
+
+##### 1、本应该发送的请求
+
+点击`/商品系统/商品维护/发送商品`,这是应该发送这个请求，
+
+调用`gulimall-member`模块的`com.atguigu.gulimall.member.controller.MemberLevelController`类的`list`方法
+
+url:  http://localhost:88/api/member/memberlevel/list?t=1652972635593&page=1&limit=500
+
+![dddd](image/4.6.1.1.1.png)
+
+##### 2、我的发送的请求
+
+可以看到，我这里只发送了两给`tree`请求，并没有发送应该发送的请求
+
+![image-20220519225349292](image/4.6.1.1.2.png)
+
+##### 3、方法一(非常不推荐)
+
+###### 1、查看发送请求的方法
+
+这个请求是`src\views\modules\product\spuadd.vue`文件的`getMemberLevels`方法发送的
+
+![image-20220519230722823](image/4.6.1.1.3.1.png)
+
+###### 2、在`created`阶段，调用该方法
+
+```javascript
+this.getMemberLevels();
+```
+
+其实在`mounted`中调用这个方法了，但是`mounted`里先用的`PubSub`报错了，所以没执行
+
+![image-20220519230014448](image/4.6.1.1.3.2.png)
+
+###### 3、查看请求
+
+可以看到已经发送这个请求了
+
+url: http://localhost:88/api/member/memberlevel/list?t=1652972635593&page=1&limit=500
+
+![image-20220519225853391](image/4.6.1.1.3.3.png)
+
+##### 4、方法二(建议)
+
+###### 1、控制台报错
+
+```
+PubSub is not defined ：PubSub 未定义
+```
+
+![image-20220519233039674](image/4.6.1.1.4.1.png)
+
+###### 2、安装 pubsub-js
+
+```
+npm install --save pubsub-js
+```
+
+![image-20220520000459261](image/4.6.1.1.4.2.png)
+
+###### 3、提升权限
+
+**方法一：**
+
+以管理员身份运行"VS Code"
+
+<img src="image/4.6.1.1.4.3.1.png" alt="image-20220519234508600" style="zoom:50%;" />
+
+
+
+**~~方法二：(不是这个用户)~~**
+
+1. 打开nodejs的安装目录
+2. 点击"npm_cache",右键选择"属性"
+3. 选择"SYSTEM"
+4. 点击"编辑"
+5. 选择"Authenticated Users"
+6. 点击完全控制
+7. 点击确定
+
+![image-20220519235446253](image/4.6.1.1.4.3.2.png)
+
+1. 打开nodejs的安装目录
+2. 点击"npm_gloa",右键选择"属性"
+3. 选择"SYSTEM"
+4. 点击"编辑"
+5. 选择"Authenticated Users"
+6. 点击完全控制
+7. 点击确定
+
+![image-20220520000204114](image/4.6.1.1.4.3.3.png)
+
+###### 4、重新安装 pubsub-js
+
+![image-20220519232622362](image/4.6.1.1.4.4.png)
+
+###### 5、导入`pubsub-js`
+
+在`B:\renren-fast-vue\src\views\modules\product\spuadd.vue`文件里的`<script>`标签里导入`pubsub-js`
+
+```javascript
+import PubSub from "pubsub-js";
+```
+
+![image-20220519234016831](image/4.6.1.1.4.5.png)
+
+###### 6、查看发送的请求
+
+重启后，已经发送这个请求了
+
+![image-20220519232903557](image/4.6.1.1.4.6.png)
+
+###### 7、接口文档
+
+url： https://easydoc.net/s/78237135/ZUqEdvA4/jCFganpf
+
+![image-20220520092904263](image/4.6.1.1.4.7.png)
+
+#### 2、加入注册中心
+
+在`gulimall-member`的`src\main\resources\application.yml`配置文件中添加配置，加入到注册中心(已经配置过了)
+
+```yaml
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+```
+
+![image-20220520085328741](image/4.6.1.2.png)
+
+#### 3、添加配置中心
+
+可以在`gulimall-member`模块的`src\main\resources`里新建`bootstrap.properties`文件，添加配置中心(在这里就先不做了)
+
+![image-20220520085535283](image/4.6.1.3.png)
+
+#### 4、开启服务注册与发现功能
+
+可以在`gulimall-member`模块的`com.atguigu.gulimall.member.GulimallMemberApplication`类里
+
+添加`@EnableDiscoveryClient`注解，开启服务注册与发现功能(这个已经做了)
+
+![image-20220520085840532](image/4.6.1.4.png)
+
+#### 5、添加`list`方法
+
+在`gulimall-member`模块的`com.atguigu.gulimall.member.controller.MemberLevelController`类里添加`list`方法
+
+其实这个方法已经写好了，没有访问成功的原因是**没有启动`gulimall-member`模块**，并且**没有配置`gulimall-member`模块的网关**
+
+![image-20220520093657422](image/4.6.1.5.png)
+
+#### 6、添加路由规则
+
+在`gulimall-gateway`模块的`src/main/resources/application.yml`配置文件中添加路由规则，匹配`gulimall-member`模块
+
+```yaml
+- id: member_route
+  uri: lb://gulimall-member
+  predicates:
+    - Path=/api/member/**
+  filters:
+    #http://localhost:88/api/member/memberlevel/list 变为 http://localhost:8000/member/memberlevel/list
+    - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+```
+
+![image-20220520100339120](image/4.6.1.6.png)
+
+#### 7、访问接口
+
+##### 1、直接访问成功
+
+直接访问没有问题 http://localhost:8000/member/memberlevel/list
+
+![image-20220520100105298](image/4.6.1.7.1.png)
+
+##### 2、通过网关访问失败
+
+通过网关访问失败： http://localhost:88/api/member/memberlevel/list
+
+![image-20220520100123403](image/4.6.1.7.2.png)
+
+#### 8、查找原因
+
+##### 1、查看控制台
+
+```
+nacos registry, gulimall-member 192.168.19.1:8000 register finished
+nacos 注册，gulimall-member 192.168.19.1:8000 注册完成
+```
+
+控制台显示已经注册成功了
+
+![image-20220520095821795](image/4.6.1.8.1.png)
+
+##### 2、查看报错
+
+这个是`NacosConfigProperties`的报错，不用管，现在还没有配置`配置中心`
+
+![image-20220520095757543](image/4.6.1.8.2.png)
+
+##### 3、查看`服务列表`
+
+url：http://localhost:8848/nacos
+
+用户名和密码都为 `nacos`
+
+可以看到没有发现`gulimall-member`这个服务
+
+![image-20220520100857910](image/4.6.1.8.3.png)
+
+##### 4、查看网关控制台
+
+可以看到`gulimall-gateway`模块的控制台显示，已正确匹配到了`gulimall-member`模块
+
+![image-20220520100931896](image/4.6.1.8.4.png)
+
+##### 5、关闭`隐藏空服务`
+
+关闭`服务管理/服务列表`里的`隐藏空服务`,这时可以看到`gulimall-member`服务,不过是空服务，`实例数`和`健康实例数`都为`0`
+
+这个服务是用代码注册进去的，而不是点`创建服务`创建的，应该不会出现是空服务啊
+
+![image-20220520102947342](image/4.6.1.8.5.png)
+
+##### 6、重启`nacos`
+
+关闭`nacos`，再重新打开
+
+![image-20220520104734701](image/4.6.1.8.6.png)
+
+##### 7、刷新`nacos`的页面
+
+打开`服务管理/服务列表`里的`隐藏空服务`,这时还可以看到`gulimall-member`服务,`实例数`和`健康实例数`也都为`1`了
+
+![image-20220520103649758](image/4.6.1.8.7.png)
+
+##### 8、重新通过网关访问
+
+url：http://localhost:88/api/member/memberlevel/list
+
+重新刷新通过网关访问的页面，这时已经访问成功了，真是奇葩:rage:
+
+![image-20220520103733124](image/4.6.1.8.8.png)
+
+#### 9、请求成功
+
+url：http://localhost:88/api/member/memberlevel/list?t=1652972635593&page=1&limit=500
+
+![image-20220520105207935](image/4.6.1.9.png)
+
+#### 10、接口文档
+
+url： https://easydoc.net/s/78237135/ZUqEdvA4/jCFganpf
+
+![4.6.1.10](image/4.6.1.10.png)
+
+### 4.6.2、查询包含本分类的所以品牌
+
+#### 1、复制代码
+
+**复制之前建议先备份**
+
+1. 打开"1.分布式基础（全栈开发篇）\资料源码.zip\docs\代码\前端\modules"目录
+2. 选择这些文件(也可以全选)(**建议全选复制，不然后面会有报错**)
+3. 选择"src/views'目录下的"moudules",然后右键
+4. 选择"在文件资源管理器中显示"
+5. 进入"modules"文件夹
+6. 右键，选择"粘贴"，粘贴到这里面
+
+![image-20220520110715920](image/4.6.2.1.1.png)
+
+然后点击`替换目标中的文件`
+
+![image-20220520110731311](image/4.6.2.1.2.png)
+
+#### 2、添加会员等级
+
+##### 1、应该有个测试数据
+
+点击`用户系统/会员等级`,应该会有个测试数据
+
+![image-20220520111518924](image/4.6.2.2.1.png)
+
+##### 2、不过我没有
+
+![image-20220520111430051](image/4.6.2.2.2.png)
+
+##### 3、添加`普通会员`
+
+`普通会员`设置为`默认等级`
+
+![image-20220520111355788](image/4.6.2.2.3.png)
+
+##### 4、添加`铜牌会员`
+
+![image-20220520111821514](image/4.6.2.2.4.png)
+
+##### 5、添加`银牌会员`
+
+![image-20220520112008322](image/4.6.2.2.5.png)
+
+#### 3、又缺少了这个请求
+
+又少了这个请求:  http://localhost:88/api/member/memberlevel/list?t=1652972635593&page=1&limit=500
+
+![image-20220520113911427](image/4.6.2.3.1.png)
+
+再把`pubsub-js`引进来就行了
+
+在`B:\renren-fast-vue\src\views\modules\product\spuadd.vue`文件里的`<script>`标签里导入`pubsub-js`
+
+```javascript
+import PubSub from "pubsub-js";
+```
+
+![image-20220520113858591](image/4.6.2.3.2.png)
+
+请求已经出来了
+
+![image-20220520114016202](image/4.6.2.3.3.png)
+
+#### 4、`选择分类`后缺少了一个请求
+
+当选择完`选择分类`后，应该发送一个请求，但是我的没有发送，并且在选择完`选择分类`后控制台报了两个错
+
+url： http://localhost:88/api/product/categorybrandrelation/brands/list?t=1653047129509&catId=225
+
+![image-20220520115525930](image/4.6.2.4.1.png)
+
+```
+vue.esm.js?efeb:591 [Vue warn]: Error in callback for watcher "paths": "TypeError: Cannot read properties of undefined (reading 'publish')"
+[Vue 警告]：观察者“路径”的回调错误：“TypeError：无法读取未定义的属性（正在读取'publish'）”
+vue.esm.js?efeb:1741 TypeError: Cannot read properties of undefined (reading 'publish')
+TypeError：无法读取未定义的属性（读取“publish”）
+```
+
+![image-20220520115547934](image/4.6.2.4.2.png)
+
+#### 5、添加`pubsub-js`到全局
+
+删掉在`B:\renren-fast-vue\src\views\modules\product\spuadd.vue`文件里的`<script>`标签里导入的`pubsub-js`
+
+![image-20220520120720294](image/4.6.2.5.1.png)
+
+在`src\main.js`里导入并使用`pubsub-js`
+
+```java
+import PubSub from 'pubsub-js'
+Vue.prototype.PubSub = PubSub
+```
+
+![image-20220520120813028](image/4.6.2.5.2.png)
+
+在`.eslintrc.js`里全局使用`PubSub`
+
+```javascript
+,
+  globals: {
+    PubSub: true,
+  }
+```
+
+![image-20220520120827362](image/4.6.2.5.3.png)
+
+已经发送请求了：http://localhost:88/api/product/categorybrandrelation/brands/list?t=1653047129509&catId=225
+
+![image-20220520120954196](image/4.6.2.5.4.png)
+
+接口文档: https://easydoc.net/s/78237135/ZUqEdvA4/HgVjlzWV
+
+![image-20220520201548014](image/4.6.2.5.5.png)
+
+#### 6、新建`BrandVo`类
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包里新建`BrandVo`类
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/20
+ * @Description:
+ */
+@Data
+public class BrandVo {
+    /**
+     * 品牌id
+     */
+    private Long brandId;
+    /**
+     * 品牌名字
+     */
+    private String brandName;
+}
+```
+
+![image-20220520203545414](image/4.6.2.6.png)
+
+#### 7、新建`relationBrandsList`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.CategoryBrandRelationController`类里
+
+新建`relationBrandsList`方法
+
+```java
+/**
+ *  localhost:88/api/product/categorybrandrelation/brands/list?t=1653048395592&catId=225
+ *  获取分类关联的品牌
+ *  1、Controller:处理请求，接受和校验数据
+ *  2、Service接受controller传来的数据，进行业务处理
+ *  3、Controller接受service处理完的数据，封装页面指定的vo
+ * @return
+ */
+@GetMapping("/brands/list")
+public R relationBrandsList(@RequestParam(value = "catId",required = true) Long catId){
+    List<BrandEntity> brandEntities = categoryBrandRelationService.getBrandsByCatId(catId);
+    List<BrandVo> brandVos = brandEntities.stream().map((item) -> {
+        BrandVo brandVo = new BrandVo();
+        brandVo.setBrandId(item.getBrandId());
+        brandVo.setBrandName(item.getName());
+        return brandVo;
+    }).collect(Collectors.toList());
+    return R.ok().put("data",brandVos);
+}
+```
+
+![image-20220520214042927](image/4.6.2.7.png)
+
+#### 8、添加`getBrandsByCatId`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.CategoryBrandRelationService`接口里
+
+添加`getBrandsByCatId`抽象方法
+
+```java
+List<BrandEntity> getBrandsByCatId(Long catId);
+```
+
+![image-20220520203454859](image/4.6.2.8.png)
+
+#### 9、实现`getBrandsByCatId`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryBrandRelationServiceImpl`类里
+
+实现`getBrandsByCatId`抽象方法
+
+```java
+@Override
+public List<BrandEntity> getBrandsByCatId(Long catId) {
+    LambdaQueryWrapper<CategoryBrandRelationEntity> categoryBrandRelationQueryWrapper = new LambdaQueryWrapper<>();
+    categoryBrandRelationQueryWrapper.eq(CategoryBrandRelationEntity::getCatelogId,catId);
+    List<CategoryBrandRelationEntity> categoryBrandRelationEntities = this.baseMapper.selectList(categoryBrandRelationQueryWrapper);
+
+    List<Long> brandIds = categoryBrandRelationEntities.stream().
+            map(CategoryBrandRelationEntity::getBrandId).collect(Collectors.toList());
+    List<BrandEntity> brandEntities = brandDao.selectBatchIds(brandIds);
+    return brandEntities;
+}
+```
+
+![image-20220520204754999](image/4.6.2.9.png)
+
+#### 10、测试
+
+重启`gulimall-product`模块，刷新前端页面，
+
+##### 1、已经发送请求了
+
+![image-20220520204950145](image/4.6.2.10.1.png)
+
+##### 2、查看返回的数据
+
+![image-20220520205355868](image/4.6.2.10.2.png)
+
+##### 3、将`手机1`改为`手机`
+
+将`gulimall_pms`数据库中的`pms_category_brand_relation`表里的`name`为`手机1`的字段改为`手机`
+
+![image-20220520205434818](image/4.6.2.10.3.png)
+
+##### 4、添加别的品牌的`关联分类`
+
+![GIF 2022-5-20 20-58-33](image/4.6.2.10.4.png)
+
+##### 5、选择品牌
+
+选择好`选择分类`后，可以看到已返回分类包含`手机/手机通讯/手机`的所有品牌，点击`选择品牌`的选择框后，可以显示这些品牌
+
+![image-20220520210139905](image/4.6.2.10.5.png)
+
+### 4.6.3、获取分类下所有分组&关联属性
+
+#### 1、查看请求
+
+##### 1、设置`基本信息`
+
+`基本信息`设置完成后，点击`下一步：设置基本参数`，这时会发送一个请求
+
+url：http://localhost:88/api/product/attrgroup/225/withattr?t=1653056166646
+
+(这里的数据随便填填就行了，现在也不会提交的数据库)
+
+(图片上传失败是因为`gulimall-third-party`模块没启动)
+
+![image-20220520220205600](image/4.6.3.1.1.png)
+
+##### 2、查看请求
+
+url：http://localhost:88/api/product/attrgroup/225/withattr?t=1653056166646
+
+![image-20220520215846566](image/4.6.3.1.2.png)
+
+##### 3、接口文档
+
+接口文档：https://easydoc.net/s/78237135/ZUqEdvA4/6JM6txHf
+
+<img src="image/4.6.3.1.3.png" alt="image-20220520221908190" style="zoom:50%;" />
+
+#### 2、新建`AttrGroupWithAttrsVo`类
+
+在`gulimall-product`的`com.atguigu.gulimall.product.vo`包下新建`AttrGroupWithAttrsVo`类
+
+复制`com.atguigu.gulimall.product.entity.AttrGroupEntity`类的字段，并删掉数据库相关注解
+
+调整`AttrGroupWithAttrsVo`类，修改成我们需要的`vo`对象
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+
+import com.atguigu.gulimall.product.entity.AttrEntity;
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/20
+ * @Description:
+ */
+@Data
+public class AttrGroupWithAttrsVo {
+    /**
+     * 分组id
+     */
+    private Long attrGroupId;
+    /**
+     * 组名
+     */
+    private String attrGroupName;
+    /**
+     * 排序
+     */
+    private Integer sort;
+    /**
+     * 描述
+     */
+    private String descript;
+    /**
+     * 组图标
+     */
+    private String icon;
+    /**
+     * 所属分类id
+     */
+    private Long catelogId;
+
+    private List<AttrEntity> attrs;
+
+}
+```
+
+![image-20220520233852985](image/4.6.3.2.png)
+
+#### 3、添加`getAttrGroupWithAttrs`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrGroupController`类里添加
+
+`getAttrGroupWithAttrs`方法，通过`catelogId`获取当前分类下**所有分组**&**关联属性**
+
+![image-20220520231533320](image/4.6.3.3.png)
+
+#### 4、添加`getAttrGroupWithAttrsByCatelogId`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.AttrGroupService`类里添加`getAttrGroupWithAttrsByCatelogId`抽象方法
+
+![image-20220520231548548](image/4.6.3.4.png)
+
+#### 5、实现`getAttrGroupWithAttrsByCatelogId`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.AttrGroupServiceImpl`类里实现`getAttrGroupWithAttrsByCatelogId`抽象方法，通过`catelogId`获取当前分类下**所有分组**&**关联属性**
+
+![image-20220520234608206](image/4.6.3.5.png)
+
+#### 6、查看回显
+
+已正确获得数据，但是没有回显到页面上，此时控制台也报了一个错
+
+![image-20220520234852186](image/4.6.3.6.png)
+
+#### 7、`spuadd.vue`的第679行报错
+
+可以看到`spuadd.vue`的第679行的`foreach`报错
+
+```
+TypeError: Cannot read properties of null (reading ' forEach')
+TypeError：无法读取 null 的属性（读取“forEach”）
+```
+
+![image-20220520235236298](image/4.6.3.7.png)
+
+#### 8、`showBaseAttrs()`方法里加一个判断
+
+在`src\views\modules\product\spuadd.vue`的`showBaseAttrs()`方法里的`foreach`里面加一个判断，没有`attrs`就不遍历
+
+```javascript
+data.data.forEach(item => {
+  if(item.attrs != null && item.attrs.length > 0){
+    let attrArray = [];
+    item.attrs.forEach(attr => {
+      attrArray.push({
+        attrId: attr.attrId,
+        attrValues: "",
+        showDesc: attr.showDesc
+      });
+    });
+    this.dataResp.baseAttrs.push(attrArray);
+  }
+});
+```
+
+![image-20220520235759910](image/4.6.3.8.png)
+
+#### 9、页面已成功显示
+
+重新测试，页面已成功显示数据
+
+![image-20220520235924882](image/4.6.3.9.png)
+
+### 4.6.4、新增商品(1)
+
+#### 1、发送请求
+
+##### 1、添加测试数据
+
+###### 1、新增`机身长度(mm)`
+
+在`商品系统/平台属性/规格参数`里新增`机身长度(mm)`
+
+![image-20220521200453301](image/4.6.4.1.1.1.png)
+
+###### 2、新增`机身材质工艺`
+
+在`商品系统/平台属性/规格参数`里新增`机身材质工艺`
+
+![image-20220521200845851](image/4.6.4.1.1.2.png)
+
+###### 3、删除`测试`
+
+删除`商品系统/平台属性/属性分组`里的`测试`
+
+![image-20220521201219156](image/4.6.4.1.1.3.png)
+
+###### 4、添加`主芯片`
+
+在`商品系统/平台属性/属性分组`里添加`主芯片`
+
+![image-20220521201609609](image/4.6.4.1.1.4.png)
+
+###### 5、新增`CPU品牌`
+
+在`商品系统/平台属性/规格参数`里新增`CPU品牌`
+
+![image-20220521202050971](image/4.6.4.1.1.5.png)
+
+###### 6、新增`CPU型号`
+
+在`商品系统/平台属性/规格参数`里新增`CPU型号`
+
+![image-20220521202428453](image/4.6.4.1.1.6.png)
+
+###### 7、修改`上市年份`里的`所属分组`
+
+在`商品系统/平台属性/规格参数`里修改`上市年份`里的`所属分组`为`主体`
+
+![image-20220521202603474](image/4.6.4.1.1.7.png)
+
+###### 8、修改`机身颜色`里的`所属分组`
+
+在`商品系统/平台属性/规格参数`里修改`机身颜色`里的`所属分组`为`基本信息`
+
+![image-20220521202705771](image/4.6.4.1.1.8.png)
+
+###### 9、修改`内存`里的`可选值`
+
+在`商品系统/平台属性/销售属性`里修改`内存`里的`可选值`
+
+![image-20220522110005717](image/4.6.4.1.1.9.png)
+
+###### 10、添加`版本`
+
+在`商品系统/平台属性/销售属性`里添加`版本`![image-20220522110314425](image/4.6.4.1.1.10.png)
+
+##### 2、录入商品信息
+
+###### 1、录入`基本属性`
+
+![image-20220521203305473](image/4.6.4.1.2.1.png)
+
+###### 2、录入`规格参数`里的`主体`
+
+![image-20220521203509597](image/4.6.4.1.2.2.png)
+
+###### 3、录入`规格参数`里的`基本信息`
+
+![image-20220521203913840](image/4.6.4.1.2.3.png)
+
+###### 4、录入`规格参数`里的`主芯片`
+
+![image-20220521204015874](image/4.6.4.1.2.4.png)
+
+###### 5、录入`销售属性`
+
+![image-20220521205929197](image/4.6.4.1.2.5.png)
+
+###### 6、修改`SKU信息`
+
+| 颜色   | 版本      | 商品名称                               | 标题                                                         | 副标题                                                       | 价格 |
+| ------ | --------- | -------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ---- |
+| 星河银 | 8GB+128GB | 华为 HUAWEI Mate30Pro 星河银 8GB+128GB | 华为 HUAWEI Mate30Pro 星河银 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 5799 |
+| 星河银 | 8GB+256GB | 华为 HUAWEI Mate30Pro 星河银 8GB+256GB | 华为 HUAWEI Mate30Pro 星河银 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 6299 |
+| 亮黑色 | 8GB+128GB | 华为 HUAWEI Mate30Pro 亮黑色 8GB+128GB | 华为 HUAWEI Mate30Pro 亮黑色 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 5799 |
+| 亮黑色 | 8GB+256GB | 华为 HUAWEI Mate30Pro 亮黑色 8GB+256GB | 华为 HUAWEI Mate30Pro 亮黑色 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 6299 |
+| 翡冷翠 | 8GB+128GB | 华为 HUAWEI Mate30Pro 翡冷翠 8GB+128GB | 华为 HUAWEI Mate30Pro 翡冷翠 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 5799 |
+| 翡冷翠 | 8GB+256GB | 华为 HUAWEI Mate30Pro 翡冷翠 8GB+256GB | 华为 HUAWEI Mate30Pro 翡冷翠 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 6299 |
+| 罗兰紫 | 8GB+128GB | 华为 HUAWEI Mate30Pro 罗兰紫 8GB+128GB | 华为 HUAWEI Mate30Pro 罗兰紫 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 5799 |
+| 罗兰紫 | 8GB+256GB | 华为 HUAWEI Mate30Pro 罗兰紫 8GB+256GB | 华为 HUAWEI Mate30Pro 罗兰紫 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机 | [现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》 | 6299 |
+
+![image-20220521213940120](image/4.6.4.1.2.6.png)
+
+###### 7、修改`SKU信息`里的`星河银 8GB+128GB`信息
+
+![image-20220521214707364](image/4.6.4.1.2.7.png)
+
+###### 8、修改`SKU信息`里的`星河银8GB+256GB`信息
+
+![image-20220521214923139](image/4.6.4.1.2.8.png)
+
+###### 9、修改`SKU信息`里的`亮黑色 8GB+128GB`信息
+
+![image-20220521215050927](image/4.6.4.1.2.9.png)
+
+###### 10、修改`SKU信息`里的`亮黑色 8GB+256GB`信息
+
+![image-20220521215354005](image/4.6.4.1.2.10.png)
+
+###### 11、修改`SKU信息`里的`翡冷翠 8GB+128GB`信息
+
+![image-20220521215557469](image/4.6.4.1.2.11.png)
+
+###### 12、修改`SKU信息`里的`翡冷翠 8GB+256GB`信息
+
+![image-20220521215911728](image/4.6.4.1.2.12.png)
+
+###### 13、修改`SKU信息`里的`罗兰紫 8GB+128GB`信息
+
+![image-20220521220119171](image/4.6.4.1.2.13.png)
+
+###### 14、修改`SKU信息`里的`罗兰紫 8GB+256GB`信息
+
+![image-20220521220313889](image/4.6.4.1.2.14.png)
+
+###### 15、查看发送的数据
+
+1. 打开控制台
+2. 点击`下一步：保存商品信息`
+3. 点击`Copy`
+4. **先放到记事本里保存，免得后面操作多了，不小心丢了**(后面写完后端代码后一定会用到，一定要存着，否者只能重新添加商品了)
+
+![image-20220521221004925](image/4.6.4.1.2.15.png)
+
+###### 附录：刚刚复制的json
+
+```json
+{"spuName":"华为 HUAWEI Mate30Pro","spuDescription":"华为 HUAWEI Mate30Pro","catalogId":225,"brandId":1,"weight":0.198,"publishStatus":0,"decript":["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//2b60049d-2c65-4550-87a6-99a0d6376f4c_73366cc235d68202.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//1824c7a7-0737-42d1-8584-0471f249b352_528211b97272d88a.jpg"],"images":["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//4ba4971c-3c88-4b7b-8522-e2fdd279300f_1f15cdbcf9e1273c.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//c78d93ce-f789-41c9-86da-91b0b165406f_3c24f9cd69534030.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//32ef9c77-5842-4dc9-8017-cfbe549c9213_8bf441260bffa42f.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7f9eb695-31df-4966-8f4d-ece1678e7ff7_23d9fbb256ea5d4a.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7716c68f-473b-4c03-8253-20447baa7796_28f296629cca865e.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg"],"bounds":{"buyBounds":500,"growBounds":500},"baseAttrs":[{"attrId":1,"attrValues":"LIO-A00","showDesc":1},{"attrId":3,"attrValues":"2019","showDesc":0},{"attrId":7,"attrValues":"158.3","showDesc":0},{"attrId":8,"attrValues":"其他","showDesc":0},{"attrId":9,"attrValues":"海思(Hisilicon)","showDesc":1},{"attrId":10,"attrValues":"HUAWEI Kirin 980","showDesc":1}],"skus":[{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"星河银"},{"attrId":11,"attrName":"版本","attrValue":"8GB+128GB"}],"skuName":"华为 HUAWEI Mate30Pro 星河银 8GB+128GB","price":"5799","skuTitle":"华为 HUAWEI Mate30Pro 星河银 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg","defaultImg":1}],"descar":["星河银","8GB+128GB"],"fullCount":3,"discount":0.98,"countStatus":1,"fullPrice":10000,"reducePrice":50,"priceStatus":1,"memberPrice":[{"id":3,"name":"铜牌会员","price":6259},{"id":4,"name":"铜牌会员","price":6219}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"星河银"},{"attrId":11,"attrName":"版本","attrValue":"8GB+256GB"}],"skuName":"华为 HUAWEI Mate30Pro 星河银 8GB+256GB","price":"6299","skuTitle":"华为 HUAWEI Mate30Pro 星河银 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg","defaultImg":1}],"descar":["星河银","8GB+256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"亮黑色"},{"attrId":11,"attrName":"版本","attrValue":"8GB+128GB"}],"skuName":"华为 HUAWEI Mate30Pro 亮黑色 8GB+128GB","price":"5799","skuTitle":"华为 HUAWEI Mate30Pro 亮黑色 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg","defaultImg":1},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//32ef9c77-5842-4dc9-8017-cfbe549c9213_8bf441260bffa42f.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7716c68f-473b-4c03-8253-20447baa7796_28f296629cca865e.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["亮黑色","8GB+128GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"亮黑色"},{"attrId":11,"attrName":"版本","attrValue":"8GB+256GB"}],"skuName":"华为 HUAWEI Mate30Pro 亮黑色 8GB+256GB","price":"6299","skuTitle":"华为 HUAWEI Mate30Pro 亮黑色 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg","defaultImg":1},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//32ef9c77-5842-4dc9-8017-cfbe549c9213_8bf441260bffa42f.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7716c68f-473b-4c03-8253-20447baa7796_28f296629cca865e.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["亮黑色","8GB+256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"翡冷翠"},{"attrId":11,"attrName":"版本","attrValue":"8GB+128GB"}],"skuName":"华为 HUAWEI Mate30Pro 翡冷翠 8GB+128GB","price":"5799","skuTitle":"华为 HUAWEI Mate30Pro 翡冷翠 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg","defaultImg":1},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//c78d93ce-f789-41c9-86da-91b0b165406f_3c24f9cd69534030.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7f9eb695-31df-4966-8f4d-ece1678e7ff7_23d9fbb256ea5d4a.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["翡冷翠","8GB+128GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"翡冷翠"},{"attrId":11,"attrName":"版本","attrValue":"8GB+256GB"}],"skuName":"华为 HUAWEI Mate30Pro 翡冷翠 8GB+256GB","price":"6299","skuTitle":"华为 HUAWEI Mate30Pro 翡冷翠 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg","defaultImg":1},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//c78d93ce-f789-41c9-86da-91b0b165406f_3c24f9cd69534030.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7f9eb695-31df-4966-8f4d-ece1678e7ff7_23d9fbb256ea5d4a.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["翡冷翠","8GB+256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"罗兰紫"},{"attrId":11,"attrName":"版本","attrValue":"8GB+128GB"}],"skuName":"华为 HUAWEI Mate30Pro 罗兰紫 8GB+128GB","price":"5799","skuTitle":"华为 HUAWEI Mate30Pro 罗兰紫 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg","defaultImg":1}],"descar":["罗兰紫","8GB+128GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"罗兰紫"},{"attrId":11,"attrName":"版本","attrValue":"8GB+256GB"}],"skuName":"华为 HUAWEI Mate30Pro 罗兰紫 8GB+256GB","price":"6299","skuTitle":"华为 HUAWEI Mate30Pro 罗兰紫 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机","skuSubtitle":"[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg","defaultImg":1}],"descar":["罗兰紫","8GB+256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]}]}
+```
+
+##### 3、接口文档
+
+接口文档： https://easydoc.net/s/78237135/ZUqEdvA4/5ULdV3dd
+
+![image-20220521220653670](image/4.6.4.1.3.png)
+
+#### 2、JSON生成Java实体类
+
+##### 1、格式化JSON
+
+将刚刚复制到JSON粘贴到输入框，点击`格式化校验`，检查JSON
+
+url: [在线JSON校验格式化工具（Be JSON）](https://www.bejson.com/json/format/)
+
+![image-20220521223643977](image/4.6.4.2.1.png)
+
+##### 2、复制`vo`包的路径
+
+复制`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包的路径
+
+![image-20220521223237967](image/4.6.4.2.2.png)
+
+##### 3、生成Java实体类
+
+1. 粘贴JOSN
+2. 输入"SpuSaveVo"
+3. 粘贴刚刚复制的路径 "com.atguigu.gulimall.product.vo"
+4. 点击"生成JavaBean"
+5. 检查一下代码是否正确
+6. 点击"下载代码"
+
+![image-20220521223304810](image/4.6.4.2.3.png)
+
+##### 附录：格式化后的Json
+
+```json
+{
+	"spuName": "华为 HUAWEI Mate30Pro",
+	"spuDescription": "华为 HUAWEI Mate30Pro",
+	"catalogId": 225,
+	"brandId": 1,
+	"weight": 0.198,
+	"publishStatus": 0,
+	"decript": ["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//2b60049d-2c65-4550-87a6-99a0d6376f4c_73366cc235d68202.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//1824c7a7-0737-42d1-8584-0471f249b352_528211b97272d88a.jpg"],
+	"images": ["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//4ba4971c-3c88-4b7b-8522-e2fdd279300f_1f15cdbcf9e1273c.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//c78d93ce-f789-41c9-86da-91b0b165406f_3c24f9cd69534030.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//32ef9c77-5842-4dc9-8017-cfbe549c9213_8bf441260bffa42f.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7f9eb695-31df-4966-8f4d-ece1678e7ff7_23d9fbb256ea5d4a.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7716c68f-473b-4c03-8253-20447baa7796_28f296629cca865e.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg"],
+	"bounds": {
+		"buyBounds": 500,
+		"growBounds": 500
+	},
+	"baseAttrs": [{
+		"attrId": 1,
+		"attrValues": "LIO-A00",
+		"showDesc": 1
+	}, {
+		"attrId": 3,
+		"attrValues": "2019",
+		"showDesc": 0
+	}, {
+		"attrId": 7,
+		"attrValues": "158.3",
+		"showDesc": 0
+	}, {
+		"attrId": 8,
+		"attrValues": "其他",
+		"showDesc": 0
+	}, {
+		"attrId": 9,
+		"attrValues": "海思(Hisilicon)",
+		"showDesc": 1
+	}, {
+		"attrId": 10,
+		"attrValues": "HUAWEI Kirin 980",
+		"showDesc": 1
+	}],
+	"skus": [{
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "星河银"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+128GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 星河银 8GB+128GB",
+		"price": "5799",
+		"skuTitle": "华为 HUAWEI Mate30Pro 星河银 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}],
+		"descar": ["星河银", "8GB+128GB"],
+		"fullCount": 3,
+		"discount": 0.98,
+		"countStatus": 1,
+		"fullPrice": 10000,
+		"reducePrice": 50,
+		"priceStatus": 1,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 6259
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 6219
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "星河银"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+256GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 星河银 8GB+256GB",
+		"price": "6299",
+		"skuTitle": "华为 HUAWEI Mate30Pro 星河银 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}],
+		"descar": ["星河银", "8GB+256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "亮黑色"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+128GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 亮黑色 8GB+128GB",
+		"price": "5799",
+		"skuTitle": "华为 HUAWEI Mate30Pro 亮黑色 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//32ef9c77-5842-4dc9-8017-cfbe549c9213_8bf441260bffa42f.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7716c68f-473b-4c03-8253-20447baa7796_28f296629cca865e.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["亮黑色", "8GB+128GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "亮黑色"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+256GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 亮黑色 8GB+256GB",
+		"price": "6299",
+		"skuTitle": "华为 HUAWEI Mate30Pro 亮黑色 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//32ef9c77-5842-4dc9-8017-cfbe549c9213_8bf441260bffa42f.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7716c68f-473b-4c03-8253-20447baa7796_28f296629cca865e.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["亮黑色", "8GB+256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "翡冷翠"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+128GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 翡冷翠 8GB+128GB",
+		"price": "5799",
+		"skuTitle": "华为 HUAWEI Mate30Pro 翡冷翠 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//c78d93ce-f789-41c9-86da-91b0b165406f_3c24f9cd69534030.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7f9eb695-31df-4966-8f4d-ece1678e7ff7_23d9fbb256ea5d4a.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["翡冷翠", "8GB+128GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "翡冷翠"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+256GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 翡冷翠 8GB+256GB",
+		"price": "6299",
+		"skuTitle": "华为 HUAWEI Mate30Pro 翡冷翠 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//f67879e3-0ac8-403d-8dd8-6f6d7b5d1a30_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//c78d93ce-f789-41c9-86da-91b0b165406f_3c24f9cd69534030.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//7f9eb695-31df-4966-8f4d-ece1678e7ff7_23d9fbb256ea5d4a.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["翡冷翠", "8GB+256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "罗兰紫"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+128GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 罗兰紫 8GB+128GB",
+		"price": "5799",
+		"skuTitle": "华为 HUAWEI Mate30Pro 罗兰紫 8GB+128GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}],
+		"descar": ["罗兰紫", "8GB+128GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "罗兰紫"
+		}, {
+			"attrId": 11,
+			"attrName": "版本",
+			"attrValue": "8GB+256GB"
+		}],
+		"skuName": "华为 HUAWEI Mate30Pro 罗兰紫 8GB+256GB",
+		"price": "6299",
+		"skuTitle": "华为 HUAWEI Mate30Pro 罗兰紫 8GB+256GB 麒麟990旗舰芯片OLED环幕屏双4000万徕卡电影四摄 4G全网通手机",
+		"skuSubtitle": "[现货抢购！享白条12期免息！]麒麟990， OLED环幕屏双4000万徕卡电影四摄：Mate30系列享12期免息》",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//48d94474-4aea-467a-814f-a6dd4b8ab497_73ab4d2e818d2211.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//0cd9fc14-8167-4e6e-8fbe-e9bd2bb7274d_919c850652e98031.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-05-21//b90b1cb4-edd9-4c91-8418-18594da32471_0d40c24b264aa511.jpg",
+			"defaultImg": 1
+		}],
+		"descar": ["罗兰紫", "8GB+256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}]
+}
+```
+
+#### 3、添加`vo`对象
+
+##### 1、使用生成的Java实体类
+
+解压刚刚生成的Java实体类，复制这些实体类
+
+![image-20220521223941902](image/4.6.4.3.1.1.png)
+
+粘贴到`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下
+
+![image-20220521224052736](image/4.6.4.3.1.2.png)
+
+##### 2、修改粘贴的Java实体类(不推荐)
+
+###### 1、修改`SpuSaveVo`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`SpuSaveVo`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class SpuSaveVo {
+
+    private String spuName;
+    private String spuDescription;
+    private Long catalogId;
+    private Long brandId;
+    private BigDecimal weight;
+    private int publishStatus;
+    private List<String> decript;
+    private List<String> images;
+    private Bounds bounds;
+    private List<BaseAttrs> baseAttrs;
+    private List<Skus> skus;
+
+}
+```
+
+![image-20220521225538198](image/4.6.4.3.2.1.png)
+
+###### 2、修改`Skus`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`Skus`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class Skus {
+
+    private List<Attr> attr;
+    private String skuName;
+    private BigDecimal price;
+    private String skuTitle;
+    private String skuSubtitle;
+    private List<Images> images;
+    private List<String> descar;
+    private int fullCount;
+    private BigDecimal discount;
+    private int countStatus;
+    private BigDecimal fullPrice;
+    private BigDecimal reducePrice;
+    private int priceStatus;
+    private List<MemberPrice> memberPrice;
+
+}
+```
+
+![image-20220521225626590](image/4.6.4.3.2.2.png)
+
+###### 3、修改`Bounds`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`Bounds`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class Bounds {
+
+    private BigDecimal buyBounds;
+    private BigDecimal growBounds;
+
+}
+```
+
+![image-20220521225730419](image/4.6.4.3.2.3.png)
+
+###### 4、修改`Attr`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`Attr`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class Attr {
+
+    private Long attrId;
+    private String attrName;
+    private String attrValue;
+
+}
+```
+
+![image-20220521225822709](image/4.6.4.3.2.4.png)
+
+###### 5、修改`MemberPrice`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`MemberPrice`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class MemberPrice {
+
+    private Long id;
+    private String name;
+    private BigDecimal price;
+
+}
+```
+
+![image-20220521225934901](image/4.6.4.3.2.5.png)
+
+###### 6、修改`Images`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`Images`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class Images {
+
+    private String imgUrl;
+    private int defaultImg;
+
+
+}
+```
+
+![image-20220521230008068](image/4.6.4.3.2.6.png)
+
+###### 7、修改`BaseAttrs`类
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下的`BaseAttrs`类
+
+```java
+/**
+  * Copyright 2022 bejson.com 
+  */
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+/**
+ * Auto-generated: 2022-05-21 22:37:36
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class BaseAttrs {
+
+    private Long attrId;
+    private String attrValues;
+    private int showDesc;
+
+
+}
+```
+
+![image-20220521230035175](image/4.6.4.3.2.7.png)
+
+##### 3、使用内部类(推荐)
+
+###### 1、修改成内部类报错
+
+
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+public class SpuSaveVo {
+
+    private String spuName;
+    private String spuDescription;
+    private Long catalogId;
+    private Long brandId;
+    private BigDecimal weight;
+    private int publishStatus;
+    private List<String> decript;
+    private List<String> images;
+    private Bounds bounds;
+    private List<BaseAttrs> baseAttrs;
+    private List<Skus> skus;
+
+    @Data
+    private class BaseAttrs {
+        private Long attrId;
+        private String attrValues;
+        private int showDesc;
+    }
+
+    @Data
+    private class Skus {
+        private List<Attr> attr;
+        private String skuName;
+        private BigDecimal price;
+        private String skuTitle;
+        private String skuSubtitle;
+        private List<Images> images;
+        private List<String> descar;
+        private int fullCount;
+        private BigDecimal discount;
+        private int countStatus;
+        private BigDecimal fullPrice;
+        private BigDecimal reducePrice;
+        private int priceStatus;
+        private List<MemberPrice> memberPrice;
+    }
+
+    @Data
+    private class Attr {
+        private Long attrId;
+        private String attrName;
+        private String attrValue;
+
+    }
+
+    @Data
+    private class Images {
+        private String imgUrl;
+        private int defaultImg;
+    }
+
+    @Data
+    private class MemberPrice {
+        private Long id;
+        private String name;
+        private BigDecimal price;
+    }
+
+    @Data
+    private class Bounds {
+        private BigDecimal buyBounds;
+        private BigDecimal growBounds;
+
+    }
+
+}
+```
+
+![image-20220522101000555](image/4.6.4.3.3.1.png)
+
+重启`gulimall-product`模块，控制台报错
+
+```
+org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot construct instance of `com.atguigu.gulimall.product.vo.SpuSaveVo$BaseAttrs` (although at least one Creator exists): can only instantiate non-static inner class by using default, no-argument constructor; nested exception is com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot construct instance of `com.atguigu.gulimall.product.vo.SpuSaveVo$BaseAttrs` (although at least one Creator exists): can only instantiate non-static inner class by using default, no-argument constructor
+
+org.springframework.http.converter.HttpMessageNotReadableException：JSON解析错误：无法构造`com.atguigu.gulimall.product.vo.SpuSaveVo$BaseAttrs`的实例（尽管至少存在一个Creator）：只能实例化非静态内部类 通过使用默认的无参数构造函数； 嵌套异常是 com.fasterxml.jackson.databind.exc.MismatchedInputException：无法构造 `com.atguigu.gulimall.product.vo.SpuSaveVo$BaseAttrs` 的实例（尽管至少存在一个 Creator）：只能实例化非静态内部 使用默认的无参数构造函数进行类
+```
+
+###### 2、修改为静态内部类
+
+本类下的所有内部类添加`staitc`关键字，修改为静态内部类
+
+![image-20220522101630956](image/4.6.4.3.3.2.png)
+
+##### 4、测试
+
+###### 1、打断点
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.controller.SpuInfoController`类的`save`方法
+
+并打断点，以测试`SpuSaveVo`是否可以正确封装数据
+
+然后以`debug`方式启动`gulimall-product`模块
+
+```java
+/**
+ * 保存
+ */
+@RequestMapping("/save")
+public R save(@RequestBody SpuSaveVo spuSaveVo) {
+    //spuInfoService.save(spuInfo);
+    return R.ok();
+}
+```
+
+![image-20220522120721302](image/4.6.4.3.4.1.png)
+
+###### 2、使用`Postman`发送请求
+
+1. 输入url：http://localhost:88/api/product/spuinfo/save
+2. 选择`Post`
+3. 点击`Body`
+4. 点击`raw`
+5. 选择`JSON`
+6. 粘贴控制台里复制的JSON
+7. 点击`Send`
+
+![image-20220522120320199](image/4.6.4.3.4.2.png)
+
+###### 3、查看封装的数据
+
+可以看到`SpuSaveVo`类已正确封装了数据
+
+![image-20220522101945488](image/4.6.4.3.4.3.png)
+
+#### 4、修改`save`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.controller.SpuInfoController`类的`save`方法
+
+**应该是`spuInfoService.saveSpuInfo(spuSaveVo);`，这里写错了**
+
+```java
+/**
+ * 保存
+ */
+@RequestMapping("/save")
+public R save(@RequestBody SpuSaveVo spuSaveVo) {
+    //spuInfoService.save(spuInfo);
+   spuInfoService.saveSouInfo(spuSaveVo);
+   return R.ok();
+}
+```
+
+![image-20220522093324236](image/4.6.4.4.png)
+
+#### 5、添加`saveSouInfo`抽象方法
+
+**(应该是添加`saveSouInfo`抽象方法，这里写错了)**
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SpuInfoService`接口里添加`saveSouInfo`抽象方法
+
+![image-20220522093446271](image/4.6.4.5.png)
+
+#### 6、实现`saveSouInfo`抽象方法
+
+**(应该是添加`saveSpuInfo`抽象方法，这里写错了)**
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里实现`saveSouInfo`抽象方法
+
+```java
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSouInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+
+    //2、保存Spu的描述图片 pms_spu_info_desc
+
+    //3、保存spu的图片集 pms_spu_images
+
+    //4、保存spu的规格参数；pms_product_attr_value
+
+    //5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+
+    //5、保存当前spu对应的所有sku信息;
+    //5.1)、sku的基本信息; pms_sku_info
+    //5.2)、sku的图片信息; pms_sku_images
+    //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
+    //5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+
+}
+```
+
+![image-20220522141406494](image/4.6.4.6.png)
+
+### 4.6.5、新增商品(2)
+
+#### 4.6.5.1、保存spu基本信息`pms_spu_info`
+
+##### 1、调用`saveBaseSpuInfo`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里的`saveSouInfo`方法里编写部分代码，用于保存spu基本信息
+
+```java
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSouInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+    SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+    this.saveBaseSpuInfo(spuInfoEntity);
+}
+```
+
+![image-20220522163949897](image/4.6.5.1.1.png)
+
+##### 2、创建`saveBaseSpuInfo`方法
+
+光标放在`SpuInfoServiceImpl`类的`saveSouInfo`里的`this.saveBaseSpuInfo(spuInfoEntity);`中的`;`前面
+
+使用`alt+enter`快捷键，选择`Create method 'saveBaseSpuInfo'`,然后选择`SpuInfoService`
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SpuInfoService`接口创建`saveBaseSpuInfo`抽象方法
+
+```java
+void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity);
+```
+
+光标放在`SpuInfoService`接口的`void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity);`中的`;`前面
+
+使用`alt+enter`快捷键，选择`Implement method 'saveBaseSpuInfo'`**(没有这个选项的随便在该抽象方法后面敲两个回车就有了)**
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里实现`saveBaseSpuInfo`抽象方法
+
+![GIF 2022-5-22 16-37-11](image/4.6.5.1.2.png)
+
+##### 3、编写`saveBaseSpuInfo`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里编写`saveBaseSpuInfo`方法
+
+```java
+@Override
+public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
+    this.baseMapper.insert(spuInfoEntity);
+}
+```
+
+![image-20220522171910439](image/4.6.5.1.3.png)
+
+##### 4、封装对象(方法一)
+
+###### 1、查看`SpuSaveVo`中缺少的字段
+
+可以看到`SpuSaveVo`类里相较于`SpuInfoEntity`没有`createTime`字段和`SpuSaveVo`字段
+
+![image-20220522172310652](image/4.6.5.1.4.1.png)
+
+###### 2、使用代码添加时间
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveBaseSpuInfo`方法
+
+```java
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSouInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+    SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+    BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+    spuInfoEntity.setCreateTime(new Date());
+    spuInfoEntity.setUpdateTime(new Date());
+    this.saveBaseSpuInfo(spuInfoEntity);
+}
+```
+
+![image-20220522172613649](image/4.6.5.1.4.2.png)
+
+##### 5、封装对象(方法二)
+
+###### 1、修改`saveBaseSpuInfo`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveBaseSpuInfo`方法
+
+```java
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSouInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+    SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+    BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+    this.saveBaseSpuInfo(spuInfoEntity);
+}
+```
+
+![image-20220522172710746](image/4.6.5.1.5.1.png)
+
+###### 2、添加`MetaObjectHandler`配置
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.config`包里新建`MyBatisConfig`类，继承`MetaObjectHandler`类
+
+**(应该把`LocalDateTime.class`改为`new Date()`)**
+
+```java
+package com.atguigu.gulimall.product.config;
+
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDateTime;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/22
+ * @Description:
+ */
+@Slf4j
+@Configuration
+public class MyMetaObjectHandler implements MetaObjectHandler {
+    @Override
+    public void insertFill(MetaObject metaObject) {
+        log.info("start insert fill...");
+        //this.setFieldValByName("createTime", new Date(), metaObject);
+        this.setFieldValByName("createTime", LocalDateTime.class, metaObject);
+        this.setFieldValByName("updateTime", LocalDateTime.class, metaObject);
+    }
+
+    @Override
+    public void updateFill(MetaObject metaObject) {
+        log.info("start update fill...");
+        this.setFieldValByName("updateTime", LocalDateTime.class, metaObject);
+    }
+}
+```
+
+![image-20220522180735126](image/4.6.5.1.5.2.png)
+
+###### 3、实体类`@TableField`添加注解
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.SpuInfoEntity`实体类的`createTime`和`updateTime`字段添加`@TableField`注解,测试时肯定会报错，这里想看一下会报什么错(如果使用的是`new Date()`就不会报错，并且还会得到正确的结果)
+
+(如果是MetaObjectHandler配置类使用的是LocalDateTime类型 要加@DateTimeFormat不加这个注解查询的时候会报错)
+
+```java
+/**
+ * 1、如果是MetaObjectHandler配置类使用的是LocalDateTime类型 要加@DateTimeFormat不加这个注解查询的时候会报错
+ *    DateUtil使用的是org.springblade.core.tool.utils.DateUtil;
+ *    @DateTimeFormat(pattern = DateUtil.PATTERN_DATETIME)
+ *    @JsonFormat(pattern = DateUtil.PATTERN_DATETIME)
+ *    @TableField(fill = FieldFill.INSERT)
+ * 2、如果使用的是 new Date() ,则只需要使用 @TableField(fill = FieldFill.INSERT)
+ *    @TableField(fill = FieldFill.INSERT)
+ */
+@TableField(fill = FieldFill.INSERT)
+private Date createTime;
+/**
+ * 
+ */
+@TableField(fill = FieldFill.INSERT_UPDATE)
+private Date updateTime;
+```
+
+![image-20220522182337080](image/4.6.5.1.5.3.png)
+
+别人的`DateUtil`工具类，不过它使用的是`new Date()`方式，不需要设置`@DateTimeFormat`，这里想看一看会报什么错
+
+```java
+package org.springblade.core.tool.utils;
+
+import lombok.experimental.UtilityClass;
+import org.springframework.util.Assert;
+
+import java.text.ParseException;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalQuery;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+/**
+ * 日期工具类
+ *
+ * @author L.cm
+ */
+@UtilityClass
+public class DateUtil {
+
+	public static final String PATTERN_DATETIME = "yyyy-MM-dd HH:mm:ss";
+	public static final String PATTERN_DATE = "yyyy-MM-dd";
+	public static final String PATTERN_TIME = "HH:mm:ss";
+	/**
+	 * 老 date 格式化
+	 */
+	public static final ConcurrentDateFormat DATETIME_FORMAT = ConcurrentDateFormat.of(PATTERN_DATETIME);
+	public static final ConcurrentDateFormat DATE_FORMAT = ConcurrentDateFormat.of(PATTERN_DATE);
+	public static final ConcurrentDateFormat TIME_FORMAT = ConcurrentDateFormat.of(PATTERN_TIME);
+	/**
+	 * java 8 时间格式化
+	 */
+	public static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DateUtil.PATTERN_DATETIME);
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DateUtil.PATTERN_DATE);
+	public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(DateUtil.PATTERN_TIME);
+
+	/**
+	 * 获取当前日期
+	 *
+	 * @return 当前日期
+	 */
+	public static Date now() {
+		return new Date();
+	}
+
+	/**
+	 * 添加年
+	 *
+	 * @param date       时间
+	 * @param yearsToAdd 添加的年数
+	 * @return 设置后的时间
+	 */
+	public static Date plusYears(Date date, int yearsToAdd) {
+		return DateUtil.set(date, Calendar.YEAR, yearsToAdd);
+	}
+
+	/**
+	 * 添加月
+	 *
+	 * @param date        时间
+	 * @param monthsToAdd 添加的月数
+	 * @return 设置后的时间
+	 */
+	public static Date plusMonths(Date date, int monthsToAdd) {
+		return DateUtil.set(date, Calendar.MONTH, monthsToAdd);
+	}
+
+	/**
+	 * 添加周
+	 *
+	 * @param date       时间
+	 * @param weeksToAdd 添加的周数
+	 * @return 设置后的时间
+	 */
+	public static Date plusWeeks(Date date, int weeksToAdd) {
+		return DateUtil.plus(date, Period.ofWeeks(weeksToAdd));
+	}
+
+	/**
+	 * 添加天
+	 *
+	 * @param date      时间
+	 * @param daysToAdd 添加的天数
+	 * @return 设置后的时间
+	 */
+	public static Date plusDays(Date date, long daysToAdd) {
+		return DateUtil.plus(date, Duration.ofDays(daysToAdd));
+	}
+
+	/**
+	 * 添加小时
+	 *
+	 * @param date       时间
+	 * @param hoursToAdd 添加的小时数
+	 * @return 设置后的时间
+	 */
+	public static Date plusHours(Date date, long hoursToAdd) {
+		return DateUtil.plus(date, Duration.ofHours(hoursToAdd));
+	}
+
+	/**
+	 * 添加分钟
+	 *
+	 * @param date         时间
+	 * @param minutesToAdd 添加的分钟数
+	 * @return 设置后的时间
+	 */
+	public static Date plusMinutes(Date date, long minutesToAdd) {
+		return DateUtil.plus(date, Duration.ofMinutes(minutesToAdd));
+	}
+
+	/**
+	 * 添加秒
+	 *
+	 * @param date         时间
+	 * @param secondsToAdd 添加的秒数
+	 * @return 设置后的时间
+	 */
+	public static Date plusSeconds(Date date, long secondsToAdd) {
+		return DateUtil.plus(date, Duration.ofSeconds(secondsToAdd));
+	}
+
+	/**
+	 * 添加毫秒
+	 *
+	 * @param date        时间
+	 * @param millisToAdd 添加的毫秒数
+	 * @return 设置后的时间
+	 */
+	public static Date plusMillis(Date date, long millisToAdd) {
+		return DateUtil.plus(date, Duration.ofMillis(millisToAdd));
+	}
+
+	/**
+	 * 添加纳秒
+	 *
+	 * @param date       时间
+	 * @param nanosToAdd 添加的纳秒数
+	 * @return 设置后的时间
+	 */
+	public static Date plusNanos(Date date, long nanosToAdd) {
+		return DateUtil.plus(date, Duration.ofNanos(nanosToAdd));
+	}
+
+	/**
+	 * 日期添加时间量
+	 *
+	 * @param date   时间
+	 * @param amount 时间量
+	 * @return 设置后的时间
+	 */
+	public static Date plus(Date date, TemporalAmount amount) {
+		Instant instant = date.toInstant();
+		return Date.from(instant.plus(amount));
+	}
+
+	/**
+	 * 减少年
+	 *
+	 * @param date  时间
+	 * @param years 减少的年数
+	 * @return 设置后的时间
+	 */
+	public static Date minusYears(Date date, int years) {
+		return DateUtil.set(date, Calendar.YEAR, -years);
+	}
+
+	/**
+	 * 减少月
+	 *
+	 * @param date   时间
+	 * @param months 减少的月数
+	 * @return 设置后的时间
+	 */
+	public static Date minusMonths(Date date, int months) {
+		return DateUtil.set(date, Calendar.MONTH, -months);
+	}
+
+	/**
+	 * 减少周
+	 *
+	 * @param date  时间
+	 * @param weeks 减少的周数
+	 * @return 设置后的时间
+	 */
+	public static Date minusWeeks(Date date, int weeks) {
+		return DateUtil.minus(date, Period.ofWeeks(weeks));
+	}
+
+	/**
+	 * 减少天
+	 *
+	 * @param date 时间
+	 * @param days 减少的天数
+	 * @return 设置后的时间
+	 */
+	public static Date minusDays(Date date, long days) {
+		return DateUtil.minus(date, Duration.ofDays(days));
+	}
+
+	/**
+	 * 减少小时
+	 *
+	 * @param date  时间
+	 * @param hours 减少的小时数
+	 * @return 设置后的时间
+	 */
+	public static Date minusHours(Date date, long hours) {
+		return DateUtil.minus(date, Duration.ofHours(hours));
+	}
+
+	/**
+	 * 减少分钟
+	 *
+	 * @param date    时间
+	 * @param minutes 减少的分钟数
+	 * @return 设置后的时间
+	 */
+	public static Date minusMinutes(Date date, long minutes) {
+		return DateUtil.minus(date, Duration.ofMinutes(minutes));
+	}
+
+	/**
+	 * 减少秒
+	 *
+	 * @param date    时间
+	 * @param seconds 减少的秒数
+	 * @return 设置后的时间
+	 */
+	public static Date minusSeconds(Date date, long seconds) {
+		return DateUtil.minus(date, Duration.ofSeconds(seconds));
+	}
+
+	/**
+	 * 减少毫秒
+	 *
+	 * @param date   时间
+	 * @param millis 减少的毫秒数
+	 * @return 设置后的时间
+	 */
+	public static Date minusMillis(Date date, long millis) {
+		return DateUtil.minus(date, Duration.ofMillis(millis));
+	}
+
+	/**
+	 * 减少纳秒
+	 *
+	 * @param date  时间
+	 * @param nanos 减少的纳秒数
+	 * @return 设置后的时间
+	 */
+	public static Date minusNanos(Date date, long nanos) {
+		return DateUtil.minus(date, Duration.ofNanos(nanos));
+	}
+
+	/**
+	 * 日期减少时间量
+	 *
+	 * @param date   时间
+	 * @param amount 时间量
+	 * @return 设置后的时间
+	 */
+	public static Date minus(Date date, TemporalAmount amount) {
+		Instant instant = date.toInstant();
+		return Date.from(instant.minus(amount));
+	}
+
+	/**
+	 * 设置日期属性
+	 *
+	 * @param date          时间
+	 * @param calendarField 更改的属性
+	 * @param amount        更改数，-1表示减少
+	 * @return 设置后的时间
+	 */
+	private static Date set(Date date, int calendarField, int amount) {
+		Assert.notNull(date, "The date must not be null");
+		Calendar c = Calendar.getInstance();
+		c.setLenient(false);
+		c.setTime(date);
+		c.add(calendarField, amount);
+		return c.getTime();
+	}
+
+	/**
+	 * 日期时间格式化
+	 *
+	 * @param date 时间
+	 * @return 格式化后的时间
+	 */
+	public static String formatDateTime(Date date) {
+		return DATETIME_FORMAT.format(date);
+	}
+
+	/**
+	 * 日期格式化
+	 *
+	 * @param date 时间
+	 * @return 格式化后的时间
+	 */
+	public static String formatDate(Date date) {
+		return DATE_FORMAT.format(date);
+	}
+
+	/**
+	 * 时间格式化
+	 *
+	 * @param date 时间
+	 * @return 格式化后的时间
+	 */
+	public static String formatTime(Date date) {
+		return TIME_FORMAT.format(date);
+	}
+
+	/**
+	 * 日期格式化
+	 *
+	 * @param date    时间
+	 * @param pattern 表达式
+	 * @return 格式化后的时间
+	 */
+	public static String format(Date date, String pattern) {
+		return ConcurrentDateFormat.of(pattern).format(date);
+	}
+
+	/**
+	 * java8 日期时间格式化
+	 *
+	 * @param temporal 时间
+	 * @return 格式化后的时间
+	 */
+	public static String formatDateTime(TemporalAccessor temporal) {
+		return DATETIME_FORMATTER.format(temporal);
+	}
+
+	/**
+	 * java8 日期时间格式化
+	 *
+	 * @param temporal 时间
+	 * @return 格式化后的时间
+	 */
+	public static String formatDate(TemporalAccessor temporal) {
+		return DATE_FORMATTER.format(temporal);
+	}
+
+	/**
+	 * java8 时间格式化
+	 *
+	 * @param temporal 时间
+	 * @return 格式化后的时间
+	 */
+	public static String formatTime(TemporalAccessor temporal) {
+		return TIME_FORMATTER.format(temporal);
+	}
+
+	/**
+	 * java8 日期格式化
+	 *
+	 * @param temporal 时间
+	 * @param pattern  表达式
+	 * @return 格式化后的时间
+	 */
+	public static String format(TemporalAccessor temporal, String pattern) {
+		return DateTimeFormatter.ofPattern(pattern).format(temporal);
+	}
+
+	/**
+	 * 将字符串转换为时间
+	 *
+	 * @param dateStr 时间字符串
+	 * @param pattern 表达式
+	 * @return 时间
+	 */
+	public static Date parse(String dateStr, String pattern) {
+		ConcurrentDateFormat format = ConcurrentDateFormat.of(pattern);
+		try {
+			return format.parse(dateStr);
+		} catch (ParseException e) {
+			throw Exceptions.unchecked(e);
+		}
+	}
+
+	/**
+	 * 将字符串转换为时间
+	 *
+	 * @param dateStr 时间字符串
+	 * @param format  ConcurrentDateFormat
+	 * @return 时间
+	 */
+	public static Date parse(String dateStr, ConcurrentDateFormat format) {
+		try {
+			return format.parse(dateStr);
+		} catch (ParseException e) {
+			throw Exceptions.unchecked(e);
+		}
+	}
+
+	/**
+	 * 将字符串转换为时间
+	 *
+	 * @param dateStr 时间字符串
+	 * @param pattern 表达式
+	 * @param query   移动查询
+	 * @return 时间
+	 */
+	public static <T> T parse(String dateStr, String pattern, TemporalQuery<T> query) {
+		return DateTimeFormatter.ofPattern(pattern).parse(dateStr, query);
+	}
+
+	/**
+	 * 时间转 Instant
+	 *
+	 * @param dateTime 时间
+	 * @return Instant
+	 */
+	public static Instant toInstant(LocalDateTime dateTime) {
+		return dateTime.atZone(ZoneId.systemDefault()).toInstant();
+	}
+
+	/**
+	 * Instant 转 时间
+	 *
+	 * @param instant Instant
+	 * @return Instant
+	 */
+	public static LocalDateTime toDateTime(Instant instant) {
+		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+	}
+
+	/**
+	 * 转换成 date
+	 *
+	 * @param dateTime LocalDateTime
+	 * @return Date
+	 */
+	public static Date toDate(LocalDateTime dateTime) {
+		return Date.from(DateUtil.toInstant(dateTime));
+	}
+
+	/**
+	 * 转换成 date
+	 *
+	 * @param localDate LocalDate
+	 * @return Date
+	 */
+	public static Date toDate(final LocalDate localDate) {
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+
+	/**
+	 * Converts local date time to Calendar.
+	 *
+	 * @param localDateTime LocalDateTime
+	 * @return Calendar
+	 */
+	public static Calendar toCalendar(final LocalDateTime localDateTime) {
+		return GregorianCalendar.from(ZonedDateTime.of(localDateTime, ZoneId.systemDefault()));
+	}
+
+	/**
+	 * localDateTime 转换成毫秒数
+	 *
+	 * @param localDateTime LocalDateTime
+	 * @return long
+	 */
+	public static long toMilliseconds(final LocalDateTime localDateTime) {
+		return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+	}
+
+	/**
+	 * localDate 转换成毫秒数
+	 *
+	 * @param localDate LocalDate
+	 * @return long
+	 */
+	public static long toMilliseconds(LocalDate localDate) {
+		return toMilliseconds(localDate.atStartOfDay());
+	}
+
+	/**
+	 * 转换成java8 时间
+	 *
+	 * @param calendar 日历
+	 * @return LocalDateTime
+	 */
+	public static LocalDateTime fromCalendar(final Calendar calendar) {
+		TimeZone tz = calendar.getTimeZone();
+		ZoneId zid = tz == null ? ZoneId.systemDefault() : tz.toZoneId();
+		return LocalDateTime.ofInstant(calendar.toInstant(), zid);
+	}
+
+	/**
+	 * 转换成java8 时间
+	 *
+	 * @param instant Instant
+	 * @return LocalDateTime
+	 */
+	public static LocalDateTime fromInstant(final Instant instant) {
+		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+	}
+
+	/**
+	 * 转换成java8 时间
+	 *
+	 * @param date Date
+	 * @return LocalDateTime
+	 */
+	public static LocalDateTime fromDate(final Date date) {
+		return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+	}
+
+	/**
+	 * 转换成java8 时间
+	 *
+	 * @param milliseconds 毫秒数
+	 * @return LocalDateTime
+	 */
+	public static LocalDateTime fromMilliseconds(final long milliseconds) {
+		return LocalDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZoneId.systemDefault());
+	}
+
+	/**
+	 * 比较2个时间差，跨度比较小
+	 *
+	 * @param startInclusive 开始时间
+	 * @param endExclusive   结束时间
+	 * @return 时间间隔
+	 */
+	public static Duration between(Temporal startInclusive, Temporal endExclusive) {
+		return Duration.between(startInclusive, endExclusive);
+	}
+
+	/**
+	 * 比较2个时间差，跨度比较大，年月日为单位
+	 *
+	 * @param startDate 开始时间
+	 * @param endDate   结束时间
+	 * @return 时间间隔
+	 */
+	public static Period between(LocalDate startDate, LocalDate endDate) {
+		return Period.between(startDate, endDate);
+	}
+
+	/**
+	 * 比较2个 时间差
+	 *
+	 * @param startDate 开始时间
+	 * @param endDate   结束时间
+	 * @return 时间间隔
+	 */
+	public static Duration between(Date startDate, Date endDate) {
+		return Duration.between(startDate.toInstant(), endDate.toInstant());
+	}
+
+	/**
+	 * 将秒数转换为日时分秒
+	 *
+	 * @param second 秒数
+	 * @return 时间
+	 */
+	public static String secondToTime(Long second) {
+		// 判断是否为空
+		if (second == null || second == 0L) {
+			return StringPool.EMPTY;
+		}
+		//转换天数
+		long days = second / 86400;
+		//剩余秒数
+		second = second % 86400;
+		//转换小时
+		long hours = second / 3600;
+		//剩余秒数
+		second = second % 3600;
+		//转换分钟
+		long minutes = second / 60;
+		//剩余秒数
+		second = second % 60;
+		if (days > 0) {
+			return StringUtil.format("{}天{}小时{}分{}秒", days, hours, minutes, second);
+		} else {
+			return StringUtil.format("{}小时{}分{}秒", hours, minutes, second);
+		}
+	}
+
+	/**
+	 * 获取今天的日期
+	 *
+	 * @return 时间
+	 */
+	public static String today() {
+		return format(new Date(), "yyyyMMdd");
+	}
+
+}
+```
+
+###### 4、使用`Postman`发送请求
+
+重启`gulimall-product`模块,使用`Postman`发送请求
+
+![image-20220522181338567](image/4.6.5.1.5.4.png)
+
+###### 5、查看报错
+
+```
+org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.reflection.ReflectionException: Could not set property 'createTime' of 'class com.atguigu.gulimall.product.entity.SpuInfoEntity' with value 'class java.time.LocalDateTime' Cause: java.lang.IllegalArgumentException: argument type mismatch
+
+org.mybatis.spring.MyBatisSystemException：嵌套异常是 org.apache.ibatis.reflection.ReflectionException：无法将 'class com.atguigu.gulimall.product.entity.SpuInfoEntity' 的属性'createTime'设置为'class java.time' .LocalDateTime' 原因：java.lang.IllegalArgumentException：参数类型不匹配
+```
+
+![image-20220522181444148](image/4.6.5.1.5.5.png)
+
+###### 6、`google`一下这个错
+
+`stackoverflow`上说需要使用`DateTimeFormatter.ISO_LOCAL_DATE_TIME`
+
+https://stackoverflow.com/questions/57972766/java-lang-illegalargumentexception-platform-class-java-time-localdatetime-with
+
+![image-20220522181635099](image/4.6.5.1.5.6.png)
+
+###### 7、属性值必须是常量
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.SpuInfoEntity`类的`createTime`方法上添加注解`@DateTimeFormat(pattern = DateTimeFormatter.ISO_LOCAL_DATE_TIME)`提示`Attribute value must be constant`
+
+删掉这个注解，测试一下
+
+![image-20220522181946429](image/4.6.5.1.5.7.png)
+
+###### 8、测试日期格式
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.GulimallProductApplicationTests`类添加`DateTimeFormatterTest`测试方法，进行测试
+
+```java
+@Test
+public void DateTimeFormatterTest(){
+   DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+   LocalDateTime localDateTime = LocalDateTime.now();//获取当前时间
+   String str = formatter.format(localDateTime);
+   System.out.println(localDateTime);//2022-01-24T11:06:34.473
+   System.out.println(str);
+}
+```
+
+测试结果:
+
+```
+2022-05-22T18:30:59:498
+2022-05-22T18:30:59:498
+```
+
+![image-20220522193641644](image/4.6.5.1.5.8.1.png)
+
+参考链接： https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
+
+![image-20220522193704482](image/4.6.5.1.5.8.2.png)修改`gulimall-product`模块的`com.atguigu.gulimall.product.GulimallProductApplicationTests`类的`DateTimeFormatterTest`测试方法，重新进行测试
+
+```java
+@Test
+public void DateTimeFormatterTest(){
+   DateTimeFormatter formatter1 = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+   LocalDateTime localDateTime1 = LocalDateTime.now();//获取当前时间
+   String str1 = formatter1.format(localDateTime1);
+   System.out.println(localDateTime1);//2022-01-24T11:06:34.473
+   System.out.println(str1);
+
+   System.out.println("==========================");
+   DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-ddTHH:mm:ss");
+   LocalDateTime localDateTime2 = LocalDateTime.now();//获取当前时间
+   String str2 = formatter2.format(localDateTime2);
+   System.out.println(localDateTime2);
+   System.out.println(str2);
+
+}
+```
+
+测试失败了：
+
+```
+java.lang.IllegalArgumentException: Unknown pattern letter: T
+java.lang.IllegalArgumentException：未知模式字母：T
+```
+
+![image-20220522194537130](image/4.6.5.1.5.8.3.png)
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.GulimallProductApplicationTests`类的`DateTimeFormatterTest`测试方法，重新进行测试
+
+```java
+@Test
+public void DateTimeFormatterTest(){
+   DateTimeFormatter formatter1 = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+   LocalDateTime localDateTime1 = LocalDateTime.now();//获取当前时间
+   String str1 = formatter1.format(localDateTime1);
+   System.out.println(localDateTime1);//2022-01-24T11:06:34.473
+   System.out.println(str1);
+
+   System.out.println("==========================");
+   DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+   LocalDateTime localDateTime2 = LocalDateTime.now();//获取当前时间
+   String str2 = formatter2.format(localDateTime2);
+   System.out.println(localDateTime2);
+   System.out.println(str2);
+
+}
+```
+
+输出的格式还是不对：
+
+```
+2022-05-22T19:46:24.884
+2022-05-22T19:46:24.884
+==========================
+2022-05-22T19:46:24.886
+2022-05-22T19:46:24
+```
+
+![image-20220522194710291](image/4.6.5.1.5.8.4.png)
+
+查看`DateTimeFormatter.ISO_LOCAL_DATE_TIME`
+
+![image-20220522195349302](image/4.6.5.1.5.8.5.png)
+
+
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.SpuInfoEntity`实体类的`createTime`和`updateTime`字段上添加注解，重启`gulimall-product`模块，使用`Postman`发送请求后，还是报错
+
+```java
+/**
+ * 1、如果是MetaObjectHandler配置类使用的是LocalDateTime类型 要加@DateTimeFormat不加这个注解查询的时候会报错
+ *       DateUtil使用的是org.springblade.core.tool.utils.DateUtil;
+ *    @DateTimeFormat(pattern = DateUtil.PATTERN_DATETIME)
+ *    @JsonFormat(pattern = DateUtil.PATTERN_DATETIME)
+ *    @TableField(fill = FieldFill.INSERT)
+ * 2、如果使用的是 new Date() ,则只需要使用 @TableField(fill = FieldFill.INSERT)
+ *       @TableField(fill = FieldFill.INSERT)
+ */
+@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@TableField(fill = FieldFill.INSERT)
+private Date createTime;
+/**
+ * 
+ */
+@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@TableField(fill = FieldFill.INSERT_UPDATE)
+private Date updateTime;
+```
+
+![image-20220522195303101](image/4.6.5.1.5.8.6.png)
+
+###### 9、最终方案
+
+还是使用了最初应该使用的方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.config.MyMetaObjectHandler`类
+
+将` LocalDateTime.class`全部修改为`new Date()`
+
+```java
+package com.atguigu.gulimall.product.config;
+
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Date;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/22
+ * @Description:
+ */
+@Slf4j
+@Configuration
+public class MyMetaObjectHandler implements MetaObjectHandler {
+    @Override
+    public void insertFill(MetaObject metaObject) {
+        log.info("start insert fill...");
+        //this.setFieldValByName("createTime", new Date(), metaObject);
+        this.setFieldValByName("createTime", new Date(), metaObject);
+        this.setFieldValByName("updateTime", new Date(), metaObject);
+    }
+
+    @Override
+    public void updateFill(MetaObject metaObject) {
+        log.info("start update fill...");
+        this.setFieldValByName("updateTime", new Date(), metaObject);
+    }
+}
+```
+
+![image-20220522201105155](image/4.6.5.1.5.9.1.png)
+
+重启`gulimall-product`模块，使用`Postman`发送请求
+
+![image-20220522201604822](image/4.6.5.1.5.9.2.png)
+
+`gulimall-product`模块的`com.atguigu.gulimall.product.entity.SpuInfoEntity`类
+
+```java
+package com.atguigu.gulimall.product.entity;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * spu信息
+ * 
+ * @author 无名氏
+ * @email 2185180175@qq.com
+ * @date 2022-04-17 18:19:58
+ */
+@Data
+@TableName("pms_spu_info")
+public class SpuInfoEntity implements Serializable {
+   private static final long serialVersionUID = 1L;
+
+   /**
+    * 商品id
+    */
+   @TableId
+   private Long id;
+   /**
+    * 商品名称
+    */
+   private String spuName;
+   /**
+    * 商品描述
+    */
+   private String spuDescription;
+   /**
+    * 所属分类id
+    */
+   private Long catalogId;
+   /**
+    * 品牌id
+    */
+   private Long brandId;
+   /**
+    * 
+    */
+   private BigDecimal weight;
+   /**
+    * 上架状态[0 - 下架，1 - 上架]
+    */
+   private Integer publishStatus;
+   /**
+    * 1、如果是MetaObjectHandler配置类使用的是LocalDateTime类型 要加@DateTimeFormat不加这个注解查询的时候会报错
+    *       DateUtil使用的是org.springblade.core.tool.utils.DateUtil;
+    *    @DateTimeFormat(pattern = DateUtil.PATTERN_DATETIME)
+    *    @JsonFormat(pattern = DateUtil.PATTERN_DATETIME)
+    *    @TableField(fill = FieldFill.INSERT)
+    * 2、如果使用的是 new Date() ,则只需要使用 @TableField(fill = FieldFill.INSERT)
+    *       @TableField(fill = FieldFill.INSERT)
+    */
+   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+   @TableField(fill = FieldFill.INSERT)
+   private Date createTime;
+   /**
+    * 
+    */
+   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+   @TableField(fill = FieldFill.INSERT_UPDATE)
+   private Date updateTime;
+
+}
+```
+
+可以看到插入到时间精确到了`毫秒`
+
+![image-20220522201403809](image/4.6.5.1.5.9.3.png)
+
+查看数据库,数据库的时间精确到了`秒`(四舍五入)
+
+![image-20220522201644762](image/4.6.5.1.5.9.4.png)
+
+删掉`gulimall-product`模块的`com.atguigu.gulimall.product.entity.SpuInfoEntity`类`createTime`字段和`updateTime`字段上的`@DateTimeFormat`和`@JsonFormat`注解
+
+![image-20220522201719091](image/4.6.5.1.5.9.5.png)
+
+重启`gulimall-product`模块，重新使用`Postman`发送请求，控制台还是精确到`毫秒`,数据库还是精确到`秒`(四舍五入)
+
+![image-20220522201908544](image/4.6.5.1.5.9.7.png)
+
+截断`gulimall_pms`模块的`pms_spu_info`，删除数据并使`id`重新从`1`开始
+
+![image-20220522212108872](image/4.6.5.1.5.9.8.png)
+
+##### 6、修改`saveSouInfo`为`saveSpuInfo`
+
+修改`saveSouInfo`为`saveSpuInfo`，之前这个方法名写错了
+
+双击选中`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法
+
+右键选择`Find Usages`，查看哪些类调用了该方法
+
+![image-20220522225959312](image/4.6.5.1.6.1.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.SpuInfoController`类的`save`方法里，
+
+把`saveSouInfo`修改为`saveSpuInfo`
+
+![image-20220522221105775](image/4.6.5.1.6.2.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SpuInfoService`接口里，把`saveSouInfo`抽象方法修改为`saveSpuInfo`
+
+![image-20220522221206062](image/4.6.5.1.6.3.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里把`saveSpuInfo`方法改为`saveSpuInfo`
+
+![image-20220522230202137](image/4.6.5.1.6.4.png)
+
+#### 4.6.5.2、保存Spu的描述信息`pms_spu_info_desc`
+
+##### 1、调用`saveSpuInfoDesc`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里的`saveSouInfo`方法里编写部分代码，用于保存Spu的描述图片
+
+```java
+@Autowired
+SpuInfoDescService spuInfoDescService;
+
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+    SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+    BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+    this.saveBaseSpuInfo(spuInfoEntity);
+
+    //2、保存Spu的描述信息 pms_spu_info_desc
+    List<String> decript = spuSaveVo.getDecript();
+    if (decript!=null && decript.size()>0) {
+        SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+        //this.saveBaseSpuInfo(spuInfoEntity);执行后，会将生成的id赋值到puInfoDescEntity的spuId里
+        spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+        //将List<String>转为String，用逗号分隔
+        spuInfoDescEntity.setDecript(String.join(",", decript));
+        spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+    }
+}
+```
+
+![image-20220523001135275](image/4.6.5.2.1.png)
+
+##### 2、创建`saveSpuInfoDesc`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SpuInfoDescService`接口里添加`saveSpuInfoDesc`抽象方法
+
+```java
+void saveSpuInfoDesc(SpuInfoDescEntity spuInfoDescEntity);
+```
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoDescServiceImpl`类里实现`saveSpuInfoDesc`抽象方法
+
+![GIF 2022-5-23 0-13-40](image/4.6.5.2.2.gif)
+
+##### 3、修改`saveSpuInfoDesc`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoDescServiceImpl`类里的`saveSpuInfoDesc`方法
+
+```java
+@Override
+public void saveSpuInfoDesc(SpuInfoDescEntity spuInfoDescEntity) {
+    this.baseMapper.insert(spuInfoDescEntity);
+}
+```
+
+![image-20220522224957138](image/4.6.5.2.3.png)
+
+#### 4.6.5.3、保存spu的图片集`pms_spu_images`
+
+##### 1、调用`saveImages`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里的`saveSouInfo`方法里编写部分代码，用于保存Spu的图片集
+
+```java
+@Autowired
+SpuInfoDescService spuInfoDescService;
+@Autowired
+SpuImagesService spuImagesService;
+
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+    SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+    BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+    this.saveBaseSpuInfo(spuInfoEntity);
+
+    //2、保存Spu的描述图片 pms_spu_info_desc
+    List<String> decript = spuSaveVo.getDecript();
+    if (decript!=null && decript.size()>0) {
+        SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+        spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+        spuInfoDescEntity.setDecript(String.join(",", decript));
+        spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+    }
+    
+    //3、保存spu的图片集 pms_spu_images
+    List<String> images = spuSaveVo.getImages();
+    if (images!=null && images.size()>0) {
+        spuImagesService.saveImages(spuInfoEntity.getId(), images);
+    }
+}
+```
+
+![image-20220523201222020](image/4.6.5.3.1.png)
+
+##### 2、添加`saveImages`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SpuImagesService`类里添加`saveImages`抽象方法
+
+```java
+void saveImages(Long id, List<String> images);
+```
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuImagesServiceImpl`类实现`saveImages`抽象方法
+
+![GIF 2022-5-23 20-13-04](image/4.6.5.3.2.gif)
+
+##### 3、实现`saveImages`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuImagesServiceImpl`类里的`saveImages`方法添加具体实现
+
+```java
+/**
+ * 批量保存图片
+ * @param id        spuId
+ * @param images    图片集的url
+ */
+@Override
+public void saveImages(Long id, List<String> images) {
+    if (CollectionUtils.isEmpty(images)){
+        return;
+    }
+
+    List<SpuImagesEntity> spuImagesEntities = images.stream().map(image -> {
+        SpuImagesEntity spuImagesEntity = new SpuImagesEntity();
+        spuImagesEntity.setSpuId(id);
+        spuImagesEntity.setImgUrl(image);
+        return spuImagesEntity;
+    }).collect(Collectors.toList());
+    this.saveBatch(spuImagesEntities);
+}
+```
+
+![image-20220523202313469](image/4.6.5.3.3.png)
+
+#### 4.6.5.4、保存spu的规格参数`pms_product_attr_value`
+
+##### 1、私有访问权限无法访问
+
+```bash
+'com.atguigu.gulimall.product.vo.SpuSaveVo.BaseAttrs' has private access in 'com.atguigu.gulimall.product.vo.SpuSaveVo'
+
+'com.atguigu.gulimall.product.vo.SpuSaveVo.BaseAttrs' 在 'com.atguigu.gulimall.product.vo.SpuSaveVo' 中具有私有访问权限
+```
+
+![image-20220523204943855](image/4.6.5.4.1.png)
+
+##### 2、将`SpuSaveVo`的内部类都改为公有
+
+将`gulimall-product`模块的`com.atguigu.gulimall.product.vo.SpuSaveVo`类的所有内部类的访问权限都改为`public`
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+public class SpuSaveVo {
+
+    private String spuName;
+    private String spuDescription;
+    private Long catalogId;
+    private Long brandId;
+    private BigDecimal weight;
+    private int publishStatus;
+    private List<String> decript;
+    private List<String> images;
+    private Bounds bounds;
+    private List<BaseAttrs> baseAttrs;
+    private List<Skus> skus;
+
+    @Data
+    public static class BaseAttrs {
+        private Long attrId;
+        private String attrValues;
+        private int showDesc;
+    }
+
+    @Data
+    public static class Skus {
+        private List<Attr> attr;
+        private String skuName;
+        private BigDecimal price;
+        private String skuTitle;
+        private String skuSubtitle;
+        private List<Images> images;
+        private List<String> descar;
+        private int fullCount;
+        private BigDecimal discount;
+        private int countStatus;
+        private BigDecimal fullPrice;
+        private BigDecimal reducePrice;
+        private int priceStatus;
+        private List<MemberPrice> memberPrice;
+    }
+
+    @Data
+    public static class Attr {
+        private Long attrId;
+        private String attrName;
+        private String attrValue;
+
+    }
+
+    @Data
+    public static class Images {
+        private String imgUrl;
+        private int defaultImg;
+    }
+
+    @Data
+    public static class MemberPrice {
+        private Long id;
+        private String name;
+        private BigDecimal price;
+    }
+
+    @Data
+    public static class Bounds {
+        private BigDecimal buyBounds;
+        private BigDecimal growBounds;
+
+    }
+
+
+
+}
+```
+
+<img src="image/4.6.5.4.2.png" alt="image-20220523204847342" style="zoom: 33%;" />
+
+##### 3、调用`saveProductAttr`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里的`saveSouInfo`方法里编写部分代码，保存spu的规格参数
+
+```java
+@Autowired
+SpuInfoDescService spuInfoDescService;
+@Autowired
+SpuImagesService spuImagesService;
+@Autowired
+AttrService attrService;
+@Autowired
+ProductAttrValueService productAttrValueService;
+
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+    //1、保存spu基本信息 pms_spu_info
+    SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+    BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+    this.saveBaseSpuInfo(spuInfoEntity);
+
+    //2、保存Spu的描述图片 pms_spu_info_desc
+    List<String> decript = spuSaveVo.getDecript();
+    if (decript!=null && decript.size()>0) {
+        SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+        spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+        spuInfoDescEntity.setDecript(String.join(",", decript));
+        spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+    }
+
+    //3、保存spu的图片集 pms_spu_images
+    List<String> images = spuSaveVo.getImages();
+    if (images!=null && images.size()>0) {
+        spuImagesService.saveImages(spuInfoEntity.getId(), images);
+    }
+
+    //4、保存spu的规格参数；pms_product_attr_value
+    List<SpuSaveVo.BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+    if (!CollectionUtils.isEmpty(baseAttrs)) {
+        List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map(attr -> {
+            ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+            productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+            if (attr.getAttrId() != null) {
+                productAttrValueEntity.setAttrId(attr.getAttrId());
+                productAttrValueEntity.setAttrValue(attr.getAttrValues());
+                productAttrValueEntity.setQuickShow(attr.getShowDesc());
+                AttrEntity attrEntity = attrService.getById(attr.getAttrId());
+                if (attrEntity != null) {
+                    productAttrValueEntity.setAttrName(attrEntity.getAttrName());
+                }
+            }
+            return productAttrValueEntity;
+        }).collect(Collectors.toList());
+
+        productAttrValueService.saveProductAttr(productAttrValueEntities);
+    }
+}
+```
+
+![image-20220523211034830](image/4.6.5.4.3.png)
+
+##### 4、添加`saveProductAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.ProductAttrValueService`类里添加`saveProductAttr`抽象方法
+
+```java
+void saveProductAttr(List<ProductAttrValueEntity> productAttrValueEntities);
+```
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里实现`saveProductAttr`抽象方法
+
+![GIF 2022-5-23 21-11-06](image/4.6.5.4.4.gif)
+
+##### 5、实现`saveProductAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里的`saveProductAttr`方法里添加具体实现
+
+```java
+@Override
+public void saveProductAttr(List<ProductAttrValueEntity> productAttrValueEntities) {
+    this.saveBatch(productAttrValueEntities);
+}
+```
+
+![image-20220523211149789](image/4.6.5.4.5.png)
+
+#### 4.6.5.5、保存当前spu对应的所有sku信息
+
+##### 1、复制`sku`的信息到`skuInfoEntity`
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里的`saveProductAttr`方法里复制`sku`的信息到`skuInfoEntity`
+
+![image-20220523213603802](image/4.6.5.5.1.png)
+
+##### 2、查看可以复制的字段
+
+比对`gulimall-product`模块的`com.atguigu.gulimall.product.vo.SpuSaveVo.Skus`类
+
+和`com.atguigu.gulimall.product.entity.SkuInfoEntity`类
+
+可以看到`skuName`、`price`、`skuTitle`、`skuSubtitle`这些字段可以拷贝
+
+![image-20220523213242536](image/4.6.5.5.2.png)
+
+##### 3、保存sku的基本信息
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里的`saveProductAttr`方法里保存sku的基本信息,调用`skuImagesService`类的`saveBatch`方法
+
+```java
+package com.atguigu.gulimall.product.service.impl;
+
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.product.dao.SpuInfoDao;
+import com.atguigu.gulimall.product.entity.*;
+import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+@Service("spuInfoService")
+public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+    @Autowired
+    SpuImagesService spuImagesService;
+    @Autowired
+    AttrService attrService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+    @Autowired
+    SkuInfoService skuInfoService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                new QueryWrapper<SpuInfoEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+        //1、保存spu基本信息 pms_spu_info
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+        this.saveBaseSpuInfo(spuInfoEntity);
+
+        //2、保存Spu的描述 pms_spu_info_desc
+        List<String> decript = spuSaveVo.getDecript();
+        if (decript!=null && decript.size()>0) {
+            SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+            spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+            spuInfoDescEntity.setDecript(String.join(",", decript));
+            spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+        }
+
+        //3、保存spu的图片集 pms_spu_images
+        List<String> images = spuSaveVo.getImages();
+        if (images!=null && images.size()>0) {
+            spuImagesService.saveImages(spuInfoEntity.getId(), images);
+        }
+
+        //4、保存spu的规格参数；pms_product_attr_value
+        List<SpuSaveVo.BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+        if (!CollectionUtils.isEmpty(baseAttrs)) {
+            List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map(attr -> {
+                ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+                productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+                if (attr.getAttrId() != null) {
+                    productAttrValueEntity.setAttrId(attr.getAttrId());
+                    productAttrValueEntity.setAttrValue(attr.getAttrValues());
+                    productAttrValueEntity.setQuickShow(attr.getShowDesc());
+                    AttrEntity attrEntity = attrService.getById(attr.getAttrId());
+                    if (attrEntity != null) {
+                        productAttrValueEntity.setAttrName(attrEntity.getAttrName());
+                    }
+                }
+                return productAttrValueEntity;
+            }).collect(Collectors.toList());
+
+            productAttrValueService.saveProductAttr(productAttrValueEntities);
+        }
+
+        //5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+        List<SpuSaveVo.Skus> skus = spuSaveVo.getSkus();
+        if (!CollectionUtils.isEmpty(skus)){
+            //由于spu的id需要与 图片 销售属性 等进行关联，所以不能调用批量保存方法
+            skus.forEach(sku->{
+                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                //private String skuName;
+                //private BigDecimal price;
+                //private String skuTitle;
+                //private String skuSubtitle;
+                BeanUtils.copyProperties(sku,skuInfoEntity);
+                //private Long spuId;
+                skuInfoEntity.setSpuId(spuInfoEntity.getId());
+                //private String skuDesc;
+                //private Long catalogId;
+                skuInfoEntity.setCatalogId(spuInfoEntity.getCatalogId());
+                //private Long brandId;
+                skuInfoEntity.setBrandId(spuInfoEntity.getBrandId());
+                //private String skuDefaultImg;
+                List<SpuSaveVo.Images> skuImages = sku.getImages();
+                Optional<SpuSaveVo.Images> defaultImgOptional = skuImages.stream().filter(item -> item.getDefaultImg() == 1).findFirst();
+                defaultImgOptional.ifPresent(defaultImg -> skuInfoEntity.setSkuDefaultImg(defaultImg.getImgUrl()));
+                //private Long saleCount;
+                skuInfoEntity.setSaleCount(0L);
+                skuInfoService.saveSkuInfo(skuInfoEntity);
+            });
+        }
+        //5、保存当前spu对应的所有sku信息;
+        //5.1)、sku的基本信息; pms_sku_info
+        //5.2)、sku的图片信息; pms_sku_images
+        //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
+        //5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+
+    }
+
+    @Override
+    public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
+        this.baseMapper.insert(spuInfoEntity);
+    }
+
+
+}
+```
+
+![image-20220523221527652](image/4.6.5.5.3.png)
+
+##### 4、添加`saveSkuInfo`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SkuInfoService`接口添加`saveSkuInfo`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SkuInfoServiceImpl`类里实现`saveSkuInfo`抽象方法
+
+![GIF 2022-5-23 22-17-54](image/4.6.5.5.4.gif)
+
+##### 5、实现`saveSkuInfo`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SkuInfoServiceImpl`类里的`saveSkuInfo`方法里添加具体实现
+
+![image-20220523221930967](image/4.6.5.5.5.png)
+
+##### 6、批量保存sku的图片信息
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里的`saveProductAttr`方法里调用`skuImagesService`对象的`saveBatch`方法，批量保存sku的图片信息
+
+```java
+package com.atguigu.gulimall.product.service.impl;
+
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.product.dao.SpuInfoDao;
+import com.atguigu.gulimall.product.entity.*;
+import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+@Service("spuInfoService")
+public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+    @Autowired
+    SpuImagesService spuImagesService;
+    @Autowired
+    AttrService attrService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+    @Autowired
+    SkuInfoService skuInfoService;
+    @Autowired
+    SkuImagesService skuImagesService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                new QueryWrapper<SpuInfoEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+        //1、保存spu基本信息 pms_spu_info
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+        this.saveBaseSpuInfo(spuInfoEntity);
+
+        //2、保存Spu的描述 pms_spu_info_desc
+        List<String> decript = spuSaveVo.getDecript();
+        if (decript!=null && decript.size()>0) {
+            SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+            spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+            spuInfoDescEntity.setDecript(String.join(",", decript));
+            spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+        }
+
+        //3、保存spu的图片集 pms_spu_images
+        List<String> images = spuSaveVo.getImages();
+        if (images!=null && images.size()>0) {
+            spuImagesService.saveImages(spuInfoEntity.getId(), images);
+        }
+
+        //4、保存spu的规格参数；pms_product_attr_value
+        List<SpuSaveVo.BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+        if (!CollectionUtils.isEmpty(baseAttrs)) {
+            List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map(attr -> {
+                ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+                productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+                if (attr.getAttrId() != null) {
+                    productAttrValueEntity.setAttrId(attr.getAttrId());
+                    productAttrValueEntity.setAttrValue(attr.getAttrValues());
+                    productAttrValueEntity.setQuickShow(attr.getShowDesc());
+                    AttrEntity attrEntity = attrService.getById(attr.getAttrId());
+                    if (attrEntity != null) {
+                        productAttrValueEntity.setAttrName(attrEntity.getAttrName());
+                    }
+                }
+                return productAttrValueEntity;
+            }).collect(Collectors.toList());
+
+            productAttrValueService.saveProductAttr(productAttrValueEntities);
+        }
+
+        //5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+
+        //5、保存当前spu对应的所有sku信息;
+        List<SpuSaveVo.Skus> skus = spuSaveVo.getSkus();
+        if (!CollectionUtils.isEmpty(skus)){
+            //由于spu的id需要与 图片 销售属性 等进行关联，所以不能调用批量保存方法
+            skus.forEach(sku->{
+                //5.1)、sku的基本信息; pms_sku_info
+                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                //private String skuName;
+                //private BigDecimal price;
+                //private String skuTitle;
+                //private String skuSubtitle;
+                BeanUtils.copyProperties(sku,skuInfoEntity);
+                //private Long spuId;
+                skuInfoEntity.setSpuId(spuInfoEntity.getId());
+                //private String skuDesc;
+                //private Long catalogId;
+                skuInfoEntity.setCatalogId(spuInfoEntity.getCatalogId());
+                //private Long brandId;
+                skuInfoEntity.setBrandId(spuInfoEntity.getBrandId());
+                //private String skuDefaultImg;
+                List<SpuSaveVo.Images> skuImages = sku.getImages();
+                Optional<SpuSaveVo.Images> defaultImgOptional = skuImages.stream().filter(item -> item.getDefaultImg() == 1).findFirst();
+                defaultImgOptional.ifPresent(defaultImg -> skuInfoEntity.setSkuDefaultImg(defaultImg.getImgUrl()));
+                //private Long saleCount;
+                skuInfoEntity.setSaleCount(0L);
+                skuInfoService.saveSkuInfo(skuInfoEntity);
+                //保存sku基本信息后，会返回新增数据生成的id
+                Long skuId = skuInfoEntity.getSkuId();
+
+                //5.2)、sku的图片信息; pms_sku_images
+                List<SkuImagesEntity> skuImagesEntities = sku.getImages().stream().map(img -> {
+                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                    skuImagesEntity.setSkuId(skuId);
+                    skuImagesEntity.setImgUrl(img.getImgUrl());
+                    skuImagesEntity.setDefaultImg(img.getDefaultImg());
+                    return skuImagesEntity;
+                }).collect(Collectors.toList());
+                skuImagesService.saveBatch(skuImagesEntities);
+
+            });
+        }
+
+
+
+        //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
+        //5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+
+    }
+
+    @Override
+    public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
+        this.baseMapper.insert(spuInfoEntity);
+    }
+
+
+}
+```
+
+![image-20220523223744919](image/4.6.5.5.6.png)
+
+##### 7、批量保存sku的销售属性信息
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里的`saveProductAttr`方法里调用`skuSaleAttrValueService`对象的`saveBatch`方法，批量保存sku的销售属性信息
+
+```java
+package com.atguigu.gulimall.product.service.impl;
+
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.product.dao.SpuInfoDao;
+import com.atguigu.gulimall.product.entity.*;
+import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+@Service("spuInfoService")
+public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+    @Autowired
+    SpuImagesService spuImagesService;
+    @Autowired
+    AttrService attrService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+    @Autowired
+    SkuInfoService skuInfoService;
+    @Autowired
+    SkuImagesService skuImagesService;
+    @Autowired
+    SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                new QueryWrapper<SpuInfoEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+        //1、保存spu基本信息 pms_spu_info
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+        this.saveBaseSpuInfo(spuInfoEntity);
+
+        //2、保存Spu的描述 pms_spu_info_desc
+        List<String> decript = spuSaveVo.getDecript();
+        if (decript!=null && decript.size()>0) {
+            SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+            spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+            spuInfoDescEntity.setDecript(String.join(",", decript));
+            spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+        }
+
+        //3、保存spu的图片集 pms_spu_images
+        List<String> images = spuSaveVo.getImages();
+        if (images!=null && images.size()>0) {
+            spuImagesService.saveImages(spuInfoEntity.getId(), images);
+        }
+
+        //4、保存spu的规格参数；pms_product_attr_value
+        List<SpuSaveVo.BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+        if (!CollectionUtils.isEmpty(baseAttrs)) {
+            List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map(attr -> {
+                ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+                productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+                if (attr.getAttrId() != null) {
+                    productAttrValueEntity.setAttrId(attr.getAttrId());
+                    productAttrValueEntity.setAttrValue(attr.getAttrValues());
+                    productAttrValueEntity.setQuickShow(attr.getShowDesc());
+                    AttrEntity attrEntity = attrService.getById(attr.getAttrId());
+                    if (attrEntity != null) {
+                        productAttrValueEntity.setAttrName(attrEntity.getAttrName());
+                    }
+                }
+                return productAttrValueEntity;
+            }).collect(Collectors.toList());
+
+            productAttrValueService.saveProductAttr(productAttrValueEntities);
+        }
+
+        //5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+
+        //5、保存当前spu对应的所有sku信息;
+        List<SpuSaveVo.Skus> skus = spuSaveVo.getSkus();
+        if (!CollectionUtils.isEmpty(skus)){
+            //由于spu的id需要与 图片 销售属性 等进行关联，所以不能调用批量保存方法
+            skus.forEach(sku->{
+                //5.1)、sku的基本信息; pms_sku_info
+                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                //private String skuName;
+                //private BigDecimal price;
+                //private String skuTitle;
+                //private String skuSubtitle;
+                BeanUtils.copyProperties(sku,skuInfoEntity);
+                //private Long spuId;
+                skuInfoEntity.setSpuId(spuInfoEntity.getId());
+                //private String skuDesc;
+                //private Long catalogId;
+                skuInfoEntity.setCatalogId(spuInfoEntity.getCatalogId());
+                //private Long brandId;
+                skuInfoEntity.setBrandId(spuInfoEntity.getBrandId());
+                //private String skuDefaultImg;
+                List<SpuSaveVo.Images> skuImages = sku.getImages();
+                Optional<SpuSaveVo.Images> defaultImgOptional = skuImages.stream().filter(item -> item.getDefaultImg() == 1).findFirst();
+                defaultImgOptional.ifPresent(defaultImg -> skuInfoEntity.setSkuDefaultImg(defaultImg.getImgUrl()));
+                //private Long saleCount;
+                skuInfoEntity.setSaleCount(0L);
+                skuInfoService.saveSkuInfo(skuInfoEntity);
+                //保存sku基本信息后，会返回新增数据生成的id
+                Long skuId = skuInfoEntity.getSkuId();
+
+                //5.2)、sku的图片信息; pms_sku_images
+                List<SkuImagesEntity> skuImagesEntities = sku.getImages().stream().map(img -> {
+                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                    skuImagesEntity.setSkuId(skuId);
+                    skuImagesEntity.setImgUrl(img.getImgUrl());
+                    skuImagesEntity.setDefaultImg(img.getDefaultImg());
+                    return skuImagesEntity;
+                }).collect(Collectors.toList());
+                skuImagesService.saveBatch(skuImagesEntities);
+
+                //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
+                List<SpuSaveVo.Attr> attrs = sku.getAttr();
+                List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrs.stream().map(attr -> {
+                    SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
+                    BeanUtils.copyProperties(attr, skuSaleAttrValueEntity);
+                    skuSaleAttrValueEntity.setSkuId(skuId);
+                    return skuSaleAttrValueEntity;
+                }).collect(Collectors.toList());
+                skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+
+                //5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+
+            });
+        }
+
+
+    }
+
+    @Override
+    public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
+        this.baseMapper.insert(spuInfoEntity);
+    }
+
+
+}
+```
+
+![image-20220523230155354](image/4.6.5.5.7.png)
+
+### 4.6.6、调用远程服务
+
+#### 1、调用远程服务步骤
+
+1. 服务双方上线，并且放到注册中心中
+2. 服务双方开启服务注册和发现功能(`@EnableDiscoveryClient`)
+3. 服务消费方编写`feign`接口，在接口声明调用`哪个服务`(`@FeignClient`)的`哪个接口`(`@RequestMapping`)
+4. 服务消费方开启远程调用功能(`@EnableFeignClients`)
+
+#### 2、保存spu的积分信息
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法，想要保存spu的积分信息，即修改`gulimall_sms`数据库的`sms_spu_bounds`表
+
+![image-20220601114158761](image/4.6.6.2.0.1.png)
+
+此时需要远程调用`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.controller.SpuBoundsController`类的`save`方法
+
+![image-20220601114238502](image/4.6.6.2.0.2.png)
+
+##### 1、新建`CouponFeignService`类
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product`包下新建`feign`文件夹
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.feign`包里新建`CouponFeignService`类
+
+![image-20220601121222193](image/4.6.6.2.1.png)
+
+##### 2、开启远程调用
+
+在`gulimall-product`模块的启动类`GulimallProductApplication`上添加注解
+
+```java
+@EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
+```
+
+![image-20220601121502104](image/4.6.6.2.2.png)
+
+##### 3、新建`SpuBoundTo`类
+
+在`gulimall-common`模块的`com.atguigu.common`包下新建`to`文件夹
+
+在`gulimall-common`模块的`com.atguigu.common.to`包下新建`SpuBoundTo`类用于远程调用`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.controller.SpuBoundsController`类的`save`方法时传输对象数据
+
+![image-20220601121411961](image/4.6.6.2.3.png)
+
+##### 4、修改请求方式
+
+在`gulimall-coupon`模块里修改`com.atguigu.gulimall.coupon.controller.SpuBoundsController`类的`save`的请求方式为`@PostMapping`
+
+```java
+  @PostMapping("/save")
+      public R save(@RequestBody SpuBoundsEntity spuBounds){
+spuBoundsService.save(spuBounds);
+
+      return R.ok();
+  }
+```
+
+![image-20220601122053306](image/4.6.6.2.4.png)
+
+##### 5、添加`saveSpuBounds`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.feign.CouponFeignService`接口来里添加`saveSpuBounds`抽象方法
+
+```java
+package com.atguigu.gulimall.product.feign;
+
+import com.atguigu.common.to.SpuBoundTo;
+import com.atguigu.common.utils.R;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/1
+ * @Description:
+ */
+@FeignClient("gulimall-coupon")
+public interface CouponFeignService {
+
+    /**
+     * 1、CouponFeignService . saveSpuBounds(spuBoundTo);
+     *   1)、@RequestBody将这个对象转为json。
+     *   2)、找到gul imall-coupon服务， 给/coupon/spubounds/save发送请求。
+     *       将上一步转的json放在请求体位置，发送请求;
+     *   3)、对方服务收到请求。请求体里有json数据。
+     *       (@RequestBody SpuBoundsEntity spuBounds );将请求体的json转为SpuBoundsEntity;
+     * 只要ison数据模型是兼容的。双方服务无需使用同一个to
+     * @param spuBoundTo
+     * @return
+     */
+    @PostMapping("/coupon/spubounds/save")
+    R saveSpuBounds(@RequestBody SpuBoundTo spuBoundTo);
+}
+```
+
+![image-20220601122610199](image/4.6.6.5.png)
+
+##### 6、保存spu的积分信息
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里的`saveProductAttr`方法里调用`couponFeignService`对象的`saveSpuBounds`方法，用于保存spu的积分信息
+
+```java
+@Autowired
+CouponFeignService couponFeignService;
+
+//5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+SpuSaveVo.Bounds bounds = spuSaveVo.getBounds();
+SpuBoundTo spuBoundTo = new SpuBoundTo();
+BeanUtils.copyProperties(bounds,spuBoundTo);
+spuBoundTo.setSpuId(spuInfoEntity.getId());
+couponFeignService.saveSpuBounds(spuBoundTo);
+```
+
+![image-20220601122753256](image/4.6.6.2.6.png)
+
+#### 3、保存sku的优惠、满减、打折等信息
+
+![image-20220601123339903](image/4.6.6.3.0.png)
+
+##### 1、新建`SkuReductionTo`类
+
+复制`gulimall-product`模块的`com.atguigu.gulimall.product.vo.SpuSaveVo`类的这些属性和`MemberPrice`内部类
+
+![image-20220601123703015](image/4.6.6.3.1.1.png)
+
+在`gulimall-common`模块新建`com.atguigu.common.to`包下新建`SkuReductionTo`类，粘贴刚刚复制的`SpuSaveVo`类的属性和`MemberPrice`内部类,再添加`skuId`字段
+
+```java
+package com.atguigu.common.to;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/1
+ * @Description:
+ */
+@Data
+public class SkuReductionTo {
+
+    private Long skuId;
+    /**
+     * 满几件打几折
+     * countStatus: 是否可以叠加优惠
+     */
+    private int fullCount;
+    private BigDecimal discount;
+    private int countStatus;
+    /**
+     * 满多少减多少
+     * priceStatus：是否可以叠加优惠
+     */
+    private BigDecimal fullPrice;
+    private BigDecimal reducePrice;
+    private int priceStatus;
+    /**
+     * 会员价格
+     */
+    private List<MemberPrice> memberPrice;
+
+    @Data
+    public static class MemberPrice {
+        private Long id;
+        private String name;
+        private BigDecimal price;
+    }
+}
+```
+
+![image-20220601124110777](image/4.6.6.3.1.2.png)
+
+##### 2、调用`gulimall-coupon`服务
+
+再`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法里添加代码，调用`gulimall-coupon`服务，用于保存`sku的优惠、满减、打折等信息`
+
+```java
+//5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+SkuReductionTo skuReductionTo = new SkuReductionTo();
+BeanUtils.copyProperties(sku,skuReductionTo);
+skuReductionTo.setSkuId(skuId);
+R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+```
+
+![image-20220601124401637](image/4.6.6.3.2.png)
+
+##### 3、添加`saveSkuReduction`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.feign.CouponFeignService`接口里添加`saveSkuReduction`抽象方法
+
+```java
+void saveSkuReduction(SkuReductionTo skuReductionTo);
+```
+
+![image-20220601150651848](image/4.6.6.3.3.png)
+
+##### 4、添加`saveInfo`方法
+
+在`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.service.SkuFullReductionService`类里添加`saveInfo`方法，用于保存满减和折扣信息
+
+```java
+/**
+ * 保存满减和折扣信息
+ */
+@PostMapping("/saveinfo")
+public R saveInfo(@RequestBody SkuReductionTo reductionTo){
+    skuFullReductionService.saveSkuReduction(reductionTo);
+
+    return R.ok();
+}
+```
+
+![image-20220601151040320](image/4.6.6.3.4.png)
+
+##### 5、修改`saveSkuReduction`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.feign.CouponFeignService`接口里修改`saveSkuReduction`抽象方法
+
+```java
+@PostMapping("/coupon/skufullreduction/saveinfo")
+R saveSkuReduction(@RequestBody SkuReductionTo skuReductionTo);
+```
+
+![image-20220601150926019](image/4.6.6.3.5.png)
+
+##### 6、添加`saveSkuReduction`抽象方法
+
+在`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.service.SkuFullReductionService`接口里添加`saveSkuReduction`抽象方法
+
+```java
+void saveSkuReduction(SkuReductionTo reductionTo);
+```
+
+![image-20220601151118002](image/4.6.6.3.6.1.png)
+
+![image-20220601151149222](image/4.6.6.3.6.2.png)
+
+##### 7、实现`saveSkuReduction`抽象方法
+
+在`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.service.impl.SkuFullReductionServiceImpl`类里实现`saveSkuReduction`抽象方法
+
+```java
+@Override
+public void saveSkuReduction(SkuReductionTo reductionTo) {
+    //1、sku的 优惠(满几件打几折) 信息；gulimall_sms->sms_sku_ladder
+    SkuLadderEntity skuLadderEntity = new SkuLadderEntity();
+    skuLadderEntity.setSkuId(reductionTo.getSkuId());
+    skuLadderEntity.setFullCount(reductionTo.getFullCount());
+    skuLadderEntity.setDiscount(reductionTo.getDiscount());
+    //是否可以叠加优惠
+    skuLadderEntity.setAddOther(reductionTo.getCountStatus());
+    skuLadderService.save(skuLadderEntity);
+
+    //2、sku的 满减(满多少减多少) 信息；sms_sku_full_reduction
+    SkuFullReductionEntity skuFullReductionEntity = new SkuFullReductionEntity();
+    BeanUtils.copyProperties(reductionTo, skuFullReductionEntity);
+    skuFullReductionEntity.setAddOther(reductionTo.getPriceStatus());
+    this.save(skuFullReductionEntity);
+
+    //3、sku的 打折 信息；sms_ member_price
+    List<SkuReductionTo.MemberPrice> memberPrice = reductionTo.getMemberPrice();
+    List<MemberPriceEntity> memberPriceEntities = memberPrice.stream().map(member -> {
+        MemberPriceEntity memberPriceEntity = new MemberPriceEntity();
+        memberPriceEntity.setSkuId(reductionTo.getSkuId());
+        memberPriceEntity.setMemberLevelId(member.getId());
+        memberPriceEntity.setMemberLevelName(member.getName());
+        memberPriceEntity.setMemberPrice(member.getPrice());
+        memberPriceEntity.setAddOther(1);
+        return memberPriceEntity;
+    }).collect(Collectors.toList());
+    memberPriceService.saveBatch(memberPriceEntities);
+}
+```
+
+![image-20220601153731834](image/4.6.6.3.7.png)
+
+##### 8、添加`getCode`方法
+
+在`gulimall-common`模块的`com.atguigu.common.utils.R`类里添加`getCode`方法,用于获取状态码
+
+```java
+public Integer getCode(){
+   return (Integer) this.get("code");
+}
+```
+
+![image-20220601154315951](image/4.6.6.3.8.png)
+
+##### 9、获取远程访问的状态码，在失败后记录日志
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法里面添加部分代码,用于获取远程访问`gulimall-coupon`模块时返回的状态码，并在失败后记录日志
+
+在`保存spu的积分信息`的`couponFeignService.saveSpuBounds(spuBoundTo);`方法里接收返回值，如果远程访问失败则记录日志
+
+```java
+//5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+SpuSaveVo.Bounds bounds = spuSaveVo.getBounds();
+SpuBoundTo spuBoundTo = new SpuBoundTo();
+BeanUtils.copyProperties(bounds,spuBoundTo);
+spuBoundTo.setSpuId(spuInfoEntity.getId());
+R r = couponFeignService.saveSpuBounds(spuBoundTo);
+if (r.getCode()!=0){
+    log.error("远程保存spu积分信息失败");
+}
+```
+
+![image-20220601155006225](image/4.6.6.3.9.1.png)
+
+在`保存sku的优惠、满减、打折等信息`的`couponFeignService.saveSkuReduction(skuReductionTo);`方法里接收返回值，如果远程访问失败则记录日志
+
+```java
+//5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+SkuReductionTo skuReductionTo = new SkuReductionTo();
+BeanUtils.copyProperties(sku,skuReductionTo);
+skuReductionTo.setSkuId(skuId);
+R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+if (r1.getCode()!=0){
+    log.error("远程保存sku优惠信息失败");
+}
+```
+
+![image-20220601154858415](image/4.6.6.3.9.2.png)
+
+`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的完整代码
+
+```java
+package com.atguigu.gulimall.product.service.impl;
+
+import com.atguigu.common.to.SkuReductionTo;
+import com.atguigu.common.to.SpuBoundTo;
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.product.dao.SpuInfoDao;
+import com.atguigu.gulimall.product.entity.*;
+import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+@Service("spuInfoService")
+public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+    @Autowired
+    SpuImagesService spuImagesService;
+    @Autowired
+    AttrService attrService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+    @Autowired
+    SkuInfoService skuInfoService;
+    @Autowired
+    SkuImagesService skuImagesService;
+    @Autowired
+    SkuSaleAttrValueService skuSaleAttrValueService;
+    @Autowired
+    CouponFeignService couponFeignService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                new QueryWrapper<SpuInfoEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+        //1、保存spu基本信息 pms_spu_info
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+        this.saveBaseSpuInfo(spuInfoEntity);
+
+        //2、保存Spu的描述 pms_spu_info_desc
+        List<String> decript = spuSaveVo.getDecript();
+        if (decript!=null && decript.size()>0) {
+            SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+            spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+            spuInfoDescEntity.setDecript(String.join(",", decript));
+            spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+        }
+
+        //3、保存spu的图片集 pms_spu_images
+        List<String> images = spuSaveVo.getImages();
+        if (images!=null && images.size()>0) {
+            spuImagesService.saveImages(spuInfoEntity.getId(), images);
+        }
+
+        //4、保存spu的规格参数；pms_product_attr_value
+        List<SpuSaveVo.BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+        if (!CollectionUtils.isEmpty(baseAttrs)) {
+            List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map(attr -> {
+                ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+                productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+                if (attr.getAttrId() != null) {
+                    productAttrValueEntity.setAttrId(attr.getAttrId());
+                    productAttrValueEntity.setAttrValue(attr.getAttrValues());
+                    productAttrValueEntity.setQuickShow(attr.getShowDesc());
+                    AttrEntity attrEntity = attrService.getById(attr.getAttrId());
+                    if (attrEntity != null) {
+                        productAttrValueEntity.setAttrName(attrEntity.getAttrName());
+                    }
+                }
+                return productAttrValueEntity;
+            }).collect(Collectors.toList());
+
+            productAttrValueService.saveProductAttr(productAttrValueEntities);
+        }
+
+        //5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+        SpuSaveVo.Bounds bounds = spuSaveVo.getBounds();
+        SpuBoundTo spuBoundTo = new SpuBoundTo();
+        BeanUtils.copyProperties(bounds,spuBoundTo);
+        spuBoundTo.setSpuId(spuInfoEntity.getId());
+        R r = couponFeignService.saveSpuBounds(spuBoundTo);
+        if (r.getCode()!=0){
+            log.error("远程保存spu积分信息失败");
+        }
+
+        //5、保存当前spu对应的所有sku信息;
+        List<SpuSaveVo.Skus> skus = spuSaveVo.getSkus();
+        if (!CollectionUtils.isEmpty(skus)){
+            //由于spu的id需要与 图片 销售属性 等进行关联，所以不能调用批量保存方法
+            skus.forEach(sku->{
+                //5.1)、sku的基本信息; pms_sku_info
+                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                //private String skuName;
+                //private BigDecimal price;
+                //private String skuTitle;
+                //private String skuSubtitle;
+                BeanUtils.copyProperties(sku,skuInfoEntity);
+                //private Long spuId;
+                skuInfoEntity.setSpuId(spuInfoEntity.getId());
+                //private String skuDesc;
+                //private Long catalogId;
+                skuInfoEntity.setCatalogId(spuInfoEntity.getCatalogId());
+                //private Long brandId;
+                skuInfoEntity.setBrandId(spuInfoEntity.getBrandId());
+                //private String skuDefaultImg;
+                List<SpuSaveVo.Images> skuImages = sku.getImages();
+                Optional<SpuSaveVo.Images> defaultImgOptional = skuImages.stream().filter(item -> item.getDefaultImg() == 1).findFirst();
+                defaultImgOptional.ifPresent(defaultImg -> skuInfoEntity.setSkuDefaultImg(defaultImg.getImgUrl()));
+                //private Long saleCount;
+                skuInfoEntity.setSaleCount(0L);
+                skuInfoService.saveSkuInfo(skuInfoEntity);
+                //保存sku基本信息后，会返回新增数据生成的id
+                Long skuId = skuInfoEntity.getSkuId();
+
+                //5.2)、sku的图片信息; pms_sku_images
+                List<SkuImagesEntity> skuImagesEntities = sku.getImages().stream().map(img -> {
+                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                    skuImagesEntity.setSkuId(skuId);
+                    skuImagesEntity.setImgUrl(img.getImgUrl());
+                    skuImagesEntity.setDefaultImg(img.getDefaultImg());
+                    return skuImagesEntity;
+                }).collect(Collectors.toList());
+                skuImagesService.saveBatch(skuImagesEntities);
+
+                //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
+                List<SpuSaveVo.Attr> attrs = sku.getAttr();
+                List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrs.stream().map(attr -> {
+                    SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
+                    BeanUtils.copyProperties(attr, skuSaleAttrValueEntity);
+                    skuSaleAttrValueEntity.setSkuId(skuId);
+                    return skuSaleAttrValueEntity;
+                }).collect(Collectors.toList());
+                skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+
+                //5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+                SkuReductionTo skuReductionTo = new SkuReductionTo();
+                BeanUtils.copyProperties(sku,skuReductionTo);
+                skuReductionTo.setSkuId(skuId);
+                R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+                if (r1.getCode()!=0){
+                    log.error("远程保存sku优惠信息失败");
+                }
+            });
+        }
+
+
+    }
+
+    @Override
+    public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
+        this.baseMapper.insert(spuInfoEntity);
+    }
+
+
+}
+```
+
+### 4.6.7、测试
+
+#### 1、修改配置
+
+##### 1、点击`Edit Configurations...`
+
+点击功能区内运行类的右边、运行按钮左边的下三角，选择`Edit Configurations...`
+
+![image-20220601155532934](image/4.6.7.1.1.png)
+
+##### 2、新建`Compound`
+
+点击弹出的`Run/Debug Configurations`框里左上角的`+`号，在下方的框里选择`Compound`
+
+![image-20220601155708909](image/4.6.7.1.2.png)
+
+##### 3、在`Compound`里添加各个模块
+
+在新建的`Compound`里面的右边的框的左上角点击`+`号，把下面这些服务添加进来
+
+1. GulimallCouponApplication
+2. GulimallGatewayApplication
+3. GulimallMemberApplication
+4. GulimallProductApplication
+5. GulimallThirdPartyApplication
+6. RenrenApplication
+
+![image-20220601155949929](image/4.6.7.1.3.png)
+
+##### 4、修改模块最大内存占用
+
+###### 1、点击编辑按钮
+
+点击`Spring Boot'GulimallCouponApplication'`，然后点击`Compound`里面的右边的框的左上角的编辑按钮
+
+![image-20220601160037029](image/4.6.7.1.4.1.png)
+
+###### 2、限制单个模块最大内存
+
+在`GulimallCouponApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallCouponApplication`模块的最大内存占用为`100m`
+
+同理修改其他7个模块的最大内存占用
+
+```
+-Xmx100m
+```
+
+![image-20220601160256195](image/4.6.7.1.4.2.png)
+
+在`GulimallGatewayApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallGatewayApplication`模块的最大内存占用为`100m`
+
+![image-20220601160348699](image/4.6.7.1.4.3.png)
+
+在`GulimallMemberApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallMemberApplication`模块的最大内存占用为`100m`
+
+![image-20220601160419110](image/4.6.7.1.4.4.png)
+
+在`GulimallOrderApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallOrderApplication`模块的最大内存占用为`100m`
+
+![image-20220601160507405](image/4.6.7.1.4.5.png)
+
+在`GulimallProductApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallProductApplication`模块的最大内存占用为`100m`
+
+![image-20220601160536846](image/4.6.7.1.4.6.png)
+
+在`GulimallThirdPartyApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallThirdPartyApplication`模块的最大内存占用为`100m`
+
+![image-20220601160602726](image/4.6.7.1.4.7.png)
+
+在`GulimallWareApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallWareApplication`模块的最大内存占用为`100m`
+
+![image-20220601160630466](image/4.6.7.1.4.8.png)
+
+在`RenrenApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`RenrenApplication`模块的最大内存占用为`100m`
+
+![image-20220601160655782](image/4.6.7.1.4.9.png)
+
+#### 2、添加断点
+
+##### 1、打断点
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法的开头打一个断点，用于测试
+
+![image-20220611235807652](image/4.6.7.2.1.png)
+
+##### 2、打开`Run Dashboard`
+
+###### 1、没有`Run Dashboard`选项
+
+![image-20220606232040208](image/4.6.7.2.2.1.png)
+
+###### 2、添加组件
+
+在`gulimall\.idea\workspace.xml`里添加组件
+
+![image-20220606232154637](image/4.6.7.2.2.2.png)
+
+###### 3、添加的组件被删除了
+
+点别的文件，在返回`gulimall\.idea\workspace.xml`发现，刚刚添加的组件被删除了
+
+![image-20220606232544250](image/4.6.7.2.2.3.png)
+
+###### 4、改成`Services`了:disappointed_relieved:
+
+我这个版本的IDEA已经把`Run Dashboard`改成`Services`了
+
+![image-20220606232751462](image/4.6.7.2.2.4.png)
+
+##### 3、以`debug`方式启动`GulimallProductApplication`模块
+
+![image-20220606232934382](image/4.6.7.2.3.png)
+
+##### 4、发送请求
+
+使用`Postman`发送新增商品的那个请求
+
+![image-20220606235141570](image/4.6.7.2.4.png)
+
+##### 5、修改事务隔离级别
+
+查看`gulimall_pms`数据库的`pms_sou_info`表
+
+![image-20220606234532035](image/4.6.7.2.5.1.png)
+
+//这个`isolation`少了一个`o`，果然百度的东西不靠谱
+
+```mysql
+set session transaction isolatin level READ UNCOMMITTED;
+```
+
+这个是正确的
+
+```mysql
+set session transaction isolation level read uncommitted;
+```
+
+![image-20220606234716582](image/4.6.7.2.5.2.png)
+
+重新刷新`gulimall_pms`数据库下的`pms_spu_info`表，可以看到已经有数据了
+
+![image-20220607000248976](image/4.6.7.2.5.5.png)
+
+##### :rocket:如果没有数据
+
+如果重新刷新发现还没有，这是navicate软件的问题:disappointed_relieved:
+
+![image-20220607000740209](image/4.6.7.2.5.3.png)
+
+选中`gulimall_pms`数据库，右键选择`新建查询`
+
+![image-20220606235935459](image/4.6.7.2.5.5.png)
+
+在新创建的对话框内输入如下语句，查看`pms_spu_info`表，点击`运行`
+
+```
+SELECT * FROM pms_spu_info;
+```
+
+![image-20220607000040075](image/4.6.7.2.5.6.png)
+
+或者直接在设置`当前会话事务隔离级别`的命令行界面里执行也行
+
+![image-20220607000145379](image/4.6.7.2.5.7.png)

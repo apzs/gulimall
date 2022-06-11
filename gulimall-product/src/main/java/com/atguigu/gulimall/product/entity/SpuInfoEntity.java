@@ -1,12 +1,16 @@
 package com.atguigu.gulimall.product.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.math.BigDecimal;
-import java.io.Serializable;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * spu信息
@@ -50,12 +54,24 @@ public class SpuInfoEntity implements Serializable {
 	 */
 	private Integer publishStatus;
 	/**
-	 * 
+	 * 1、如果是MetaObjectHandler配置类使用的是LocalDateTime类型 要加@DateTimeFormat不加这个注解查询的时候会报错
+	 * 	  DateUtil使用的是org.springblade.core.tool.utils.DateUtil;
+	 *    @DateTimeFormat(pattern = DateUtil.PATTERN_DATETIME)
+	 *    @JsonFormat(pattern = DateUtil.PATTERN_DATETIME)
+	 *    @TableField(fill = FieldFill.INSERT)
+	 * 2、如果使用的是 new Date() ,则只需要使用 @TableField(fill = FieldFill.INSERT)
+	 * 	  @TableField(fill = FieldFill.INSERT)
 	 */
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(fill = FieldFill.INSERT)
 	private Date createTime;
 	/**
 	 * 
 	 */
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private Date updateTime;
 
 }

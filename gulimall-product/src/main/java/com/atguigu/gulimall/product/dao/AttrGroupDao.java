@@ -3,6 +3,7 @@ package com.atguigu.gulimall.product.dao;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 /**
  * 属性分组
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2022-04-17 18:19:58
  */
 @Mapper
+@Repository
 public interface AttrGroupDao extends BaseMapper<AttrGroupEntity> {
 	
 }

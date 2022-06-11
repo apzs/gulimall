@@ -11,5 +11,19 @@
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
 
+    <!--批量删除attr_attrgroup_relation-->
+    <!--
+        delete from gulimall_pms.pms_attr_attrgroup_relation
+        where (attr_id = 1 and attr_group_id=1)
+        or (attr_id = 2 and attr_group_id=2)
+        or (attr_id = 3 and attr_group_id=3);
+    -->
+    <delete id="deleteBatchRelation">
+        delete from gulimall_pms.pms_attr_attrgroup_relation where
+        <foreach collection="entities" item="item" separator=" or ">
+            (attr_id = #{item.attrId} and attr_group_id=#{item.attrGroupId})
+        </foreach>
+    </delete>
+
 
 </mapper>

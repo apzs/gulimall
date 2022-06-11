@@ -17,7 +17,24 @@ spring:
           predicates:
             - Path=/api/product/**
           filters:
+            # (?<segment>/?.*) 和 $\{segment} 为固定写法
             #http://localhost:88/api/product/category/list/tree 变为 http://localhost:10000/product/category/list/tree
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
+        - id: third_party_route
+          uri: lb://gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            #http://localhost:88/api/thirdparty/oss/policy 变为 http://localhost:30000/oss/policy
+            - RewritePath=/api/thirdparty/(?<segment>/?.*),/$\{segment}
+
+        - id: member_route
+          uri: lb://gulimall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            #http://localhost:88/api/member/memberlevel/list 变为 http://localhost:8000/member/memberlevel/list
             - RewritePath=/api/(?<segment>/?.*),/$\{segment}
 
         - id: admin_route

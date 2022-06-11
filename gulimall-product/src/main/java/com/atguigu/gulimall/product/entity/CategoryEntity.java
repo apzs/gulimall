@@ -6,7 +6,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.apache.ibatis.type.Alias;
 
 import javax.print.attribute.standard.MediaSize;
 
@@ -19,6 +21,7 @@ import javax.print.attribute.standard.MediaSize;
  */
 @Data
 @TableName("pms_category")
+//@Alias("categoryEntity")
 public class CategoryEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -42,6 +45,8 @@ public class CategoryEntity implements Serializable {
 	private Integer catLevel;
 	/**
 	 * 是否显示[0-不显示，1显示]
+	 * value: 默认值
+	 * delval: 删除后的值
 	 */
 	@TableLogic(value = "1",delval = "0")
 	private Integer showStatus;
@@ -65,6 +70,7 @@ public class CategoryEntity implements Serializable {
 	/**
 	 * 子分类
 	 */
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	@TableField(exist = false)
 	private List<CategoryEntity> children;
 
