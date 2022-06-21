@@ -12,6 +12,8 @@ spring:
     deserialization:
       #      不允许`float`强转成`int`
       ACCEPT_FLOAT_AS_INT: false
+    date-format: yyyy-MM-dd HH-mm-ss
+    time-zone: GMT+8
 #    alicloud:
 #      access-key: LTAl4FwfjSycd1APnuG9bjj
 #      secret-key: O6xaxyiWfSlitcOkSuK27ju4hXT5HI
@@ -33,5 +35,9 @@ server:
 logging:
   level:
     com.atguigu.gulimall: debug
+
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 5000
 
 

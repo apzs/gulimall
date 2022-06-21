@@ -37,6 +37,14 @@ spring:
             #http://localhost:88/api/member/memberlevel/list 变为 http://localhost:8000/member/memberlevel/list
             - RewritePath=/api/(?<segment>/?.*),/$\{segment}
 
+        - id: ware_route
+          uri: lb://gulimall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            #http://localhost:88/api/ware/wareinfo/list 变为 http://localhost:11000/ware/wareinfo/list
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
         - id: admin_route
           uri: lb://renren-fast
           predicates:

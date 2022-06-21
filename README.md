@@ -1093,7 +1093,7 @@ ssh -T git@gitee.com
 
 ![在URL里输入刚才复制的ssh](image/1.7.10.3.png)
 
-ps：点击close后发现在下载java 11，删除该项目，修改版本在重新新建项目，可以发现没有下载java 11
+ps：点击`clone`后发现在下载java 11，删除该项目，修改版本在重新新建项目，可以发现没有下载java 11
 
 ![修改版本在重新新建项目](image/1.7.10.3.2.png)
 
@@ -18565,6 +18565,8 @@ public class AttrRespVo extends AttrVo{
 
 在大型项目中，连表查询很危险，做**笛卡儿积**会使数据量非常大，因此也不推荐使用**外键**，使用`service`来处理表之间的关系
 
+在`streat`的`map`那，IDEA提示建议使用`peek`来代替`map`；`java.util.Stream.peek()`主要用于支持调试。如果流管道不包含终端操作，则不会使用任何元素，并且根本不会调用peek()操作。所以最好不要使用`peek`
+
 ```java
 @Autowired
 CategoryDao categoryDao;
@@ -20632,7 +20634,7 @@ url：http://localhost:88/api/product/attrgroup/225/withattr?t=1653056166646
 
 ##### 3、接口文档
 
-接口文档：https://easydoc.net/s/78237135/ZUqEdvA4/6JM6txHf
+接口文档在`商品系统/17、获取分类下所有分组&关联属性`里：https://easydoc.net/s/78237135/ZUqEdvA4/6JM6txHf
 
 <img src="image/4.6.3.1.3.png" alt="image-20220520221908190" style="zoom:50%;" />
 
@@ -20907,7 +20909,7 @@ data.data.forEach(item => {
 
 ##### 3、接口文档
 
-接口文档： https://easydoc.net/s/78237135/ZUqEdvA4/5ULdV3dd
+接口文档 在`商品系统/19、新增商品`里： https://easydoc.net/s/78237135/ZUqEdvA4/5ULdV3dd
 
 ![image-20220521220653670](image/4.6.4.1.3.png)
 
@@ -24341,6 +24343,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
 ### 4.6.7、测试
 
+测试之前最好把`gulimall_pms`数据库备份一下，免得后面调试发现代码写错了，不知道这次添加了哪些数据，从而导致删错数据
+
+![image-20220612161346948](image/4.6.7.0.png)
+
 #### 1、修改配置
 
 ##### 1、点击`Edit Configurations...`
@@ -24434,6 +24440,26 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
 在`gulimall\.idea\workspace.xml`里添加组件
 
+```xml
+<component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+```
+
 ![image-20220606232154637](image/4.6.7.2.2.2.png)
 
 ###### 3、添加的组件被删除了
@@ -24454,13 +24480,19 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
 ##### 4、发送请求
 
-使用`Postman`发送新增商品的那个请求
+使用`Postman`发送以前新增商品时(保存的有`json`数据)的那个请求
 
-![image-20220606235141570](image/4.6.7.2.4.png)
+url：http://localhost:88/api/product/spuinfo/save
+
+![image-20220606235141570](image/4.6.7.2.4.1.png)
+
+然后点击调试的`Step Over(步过)`按钮，直到执行`this.saveBaseSpuInfo(spuInfoEntity);`方法完毕
+
+![image-20220612160514320](image/4.6.7.2.4.2.png)
 
 ##### 5、修改事务隔离级别
 
-查看`gulimall_pms`数据库的`pms_sou_info`表
+查看`gulimall_pms`数据库的`pms_sou_info`表,发现并没有数据，这是因为事务没有提交，可以修改当前会话的隔离级别为`读未提交`这样就可以看到还未提交的数据了
 
 ![image-20220606234532035](image/4.6.7.2.5.1.png)
 
@@ -24482,7 +24514,7 @@ set session transaction isolation level read uncommitted;
 
 ![image-20220607000248976](image/4.6.7.2.5.5.png)
 
-##### :rocket:如果没有数据
+##### 📝 如果没有数据
 
 如果重新刷新发现还没有，这是navicate软件的问题:disappointed_relieved:
 
@@ -24503,3 +24535,4525 @@ SELECT * FROM pms_spu_info;
 或者直接在设置`当前会话事务隔离级别`的命令行界面里执行也行
 
 ![image-20220607000145379](image/4.6.7.2.5.7.png)
+
+#### 3、spu_id异常
+
+##### 1、报了个异常
+
+点击调试的`Step Over(步过)`按钮，直到执行`this.saveBaseSpuInfo(spuInfoEntity);`方法完毕
+
+在执行`this.saveBaseSpuInfo(spuInfoEntity);`方法的时候，抛了个异常
+
+```
+Error updating database.  Cause: java.sql.SQLException: Field 'spu_id' doesn't have a default value
+更新数据库时出错。 原因：java.sql.SQLException：字段 'spu_id' 没有默认值
+```
+
+![image-20220612162902508](image/4.6.7.3.1.png)
+
+可以看到，代码明明设置了`spuId`和`descipt`，但是执行的`sql`语句却只插入了`descipt`字段
+
+```mysql
+INSERT INTO pms_spu_info_desc ( decript ) VALUES ( ? ) 
+```
+
+##### 2、查看`pms_spu_info_desc`表结构
+
+查看`gulimall_pns`数据库的`pms_spu_info_desc`表的表结构
+
+选中`gulimall_pns`数据库的`pms_spu_info_desc`表，右键选择`设计表`
+
+![image-20220612163500782](image/4.6.7.3.2.1.png)
+
+可以看到`spu_id`字段不是**自动递增**的,这个字段是spu的id，是需要指定的
+
+而`mybatis`当成了自增的，所以插入的时候只插入了`descipt`字段，所以就抛了个异常
+
+![image-20220612163540243](image/4.6.7.3.2.2.png)
+
+##### 3、修改`SpuInfoDescEntity`类的字段注解
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.entity.SpuInfoDescEntity`类的`spuId`字段的`@TableId`注解上添加参数，指出id为输入的
+
+```java
+@TableId(type = IdType.INPUT)
+private Long spuId;
+```
+
+![image-20220612164332539](image/4.6.7.3.3.png)
+
+##### 4、重新测试
+
+重新以`debug`方式启动`GulimallProductApplication`模块
+
+![image-20220612164854483](image/4.6.7.3.4.1.png)
+
+重新在`Postman`里面发送请求
+
+![image-20220612165111157](image/4.6.7.3.4.2.png)
+
+继续点击调试的`Step Over(步过)`按钮，直到执行`this.saveBaseSpuInfo(spuInfoEntity);`方法完毕
+
+![image-20220612165210715](image/4.6.7.3.4.3.png)
+
+打开`navicat`，在命令行里查询`pms_spu_info_desc`表，可以看到执行成功了
+
+```java
+select * from pms_spu_info_desc;
+```
+
+![image-20220612165408926](image/4.6.7.3.4.4.png)
+
+可以看到，这次执行的sql语句就没有问题了
+
+![image-20220612165628681](image/4.6.7.3.4.5.png)
+
+#### 4、保存spu的图片集
+
+点击调试的`Step Over(步过)`按钮，直到执行`spuImagesService.saveImages(spuInfoEntity.getId(), images);`方法完毕
+
+控制台可以看到插入了很多的数据
+
+![image-20220612165941643](image/4.6.7.4.1.png)
+
+打开`navicat`，在命令行里查询`pms_spu_info_desc`表，可以看到spu的图片集已经保存成功了
+
+```mysql
+select * from pms_spu_images;
+```
+
+![image-20220612170119892](image/4.6.7.4.2.png)
+
+#### 5、保存spu的规格参数
+
+在`productAttrValueService.saveProductAttr(productAttrValueEntities);`这段代码上打个断点
+
+![image-20220612170714934](image/4.6.7.5.1.png)
+
+点击`Resume Program`按钮，执行到下一个断点，到`productAttrValueService.saveProductAttr(productAttrValueEntities);`这条语句
+
+![image-20220612171237828](image/4.6.7.5.2.png)
+
+点击调试的`Step Over(步过)`按钮，执行`productAttrValueService.saveProductAttr(productAttrValueEntities);`
+
+控制台可以看到已经执行成功了
+
+![image-20220612171013680](image/4.6.7.5.3.png)
+
+打开`navicat`，在命令行里查询`pms_product_attr_value;`表，可以看到执行成功了
+
+```mysql
+select * from pms_product_attr_value;
+```
+
+![image-20220612171503231](image/4.6.7.5.4.png)
+
+#### 6、远程保存spu的积分信息
+
+点击调试的`Step Over(步过)`按钮，执行`R r = couponFeignService.saveSpuBounds(spuBoundTo);`
+
+执行这一步时间稍微会长一些，大概几秒
+
+![image-20220612173109279](image/4.6.7.6.1.1.png)
+
+选择`gulimall_sms`数据库，右键选择`新建查询`
+
+![image-20220612183822411](image/4.6.7.6.1.2.png)
+
+在里面输入sql语句，选中刚刚输入sql语句，点击`运行已选择的`，就可以看到已经执行成功了
+
+```mysql
+#设置事务隔离级别
+set session transaction isolation level read uncommitted;
+select * from sms_spu_bounds;
+```
+
+![image-20220613172225685](image/4.6.7.6.1.3.png)
+
+📝 如果抛了类型转换异常
+
+```
+java.lang.classCastException: java.lang.Integer cannot be cast to java.lang.String
+java.lang.classCastException：java.lang.Integer 不能转换为 java.lang.String
+```
+
+![image-20220612173525024](image/4.6.7.6.2.1.png)
+
+只需要修改`gulimall-common`模块的`com.atguigu.common.utils.R`类的`getCode`方法
+
+```java
+public Integer getCode(){
+   return (Integer) this.get("code");
+}
+```
+
+![image-20220612173828646](image/4.6.7.6.2.2.png)
+
+📝如果请求超时了，可以在`gulimall-product`模块的`src\main\resources\application.yml`配置文件里配置超时时间
+
+```yaml
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 5000
+```
+
+![image-20220612194409602](image/4.6.7.6.3.png)
+
+#### 7、保存sku的基本信息
+
+在这些代码上添加断点
+
+```mysql
+skuInfoService.saveSkuInfo(skuInfoEntity);
+skuImagesService.saveBatch(skuImagesEntities);
+skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+```
+
+![image-20220612184727878](image/4.6.7.7.1.png)
+
+点击`Resume Program`按钮，执行到下一个断点，到`skuInfoService.saveSkuInfo(skuInfoEntity);`这里
+
+![image-20220612184840945](image/4.6.7.7.2.png)
+
+点击调试的`Step Over(步过)`按钮，执行`skuInfoService.saveSkuInfo(skuInfoEntity);`
+
+![image-20220612185003469](image/4.6.7.7.3.png)
+
+在`gulimall_pms`数据库的命令行里查询`pms_sku_info`表，可以看到已经执行成功了
+
+```mysql
+select * from pms_sku_info;
+```
+
+![image-20220612185214403](image/4.6.7.7.4.png)
+
+#### 8、保存sku的图片信息
+
+点击`Resume Program`按钮，执行到下一个断点，到`skuImagesService.saveBatch(skuImagesEntities);`这里
+
+![image-20220612185351159](image/4.6.7.8.1.png)
+
+点击调试的`Step Over(步过)`按钮，执行`skuImagesService.saveBatch(skuImagesEntities);`
+
+![image-20220612185428681](image/4.6.7.8.2.png)
+
+在`gulimall_pms`数据库的命令行里查询`pms_sku_images`表，可以看到已经执行成功了，但是有很多空的`img_url`也被插入进来了
+
+```mysql
+ select * from pms_sku_images;
+```
+
+![image-20220612185714965](image/4.6.7.8.3.png)
+
+在`skuImagesService.saveBatch(skuImagesEntities);`这里添加一个待办事项
+
+```
+//TODO 没有图片；路径的无需保存
+```
+
+![image-20220612185924619](image/4.6.7.8.4.png)
+
+#### 9、保存sku的销售属性信息
+
+点击`Resume Program`按钮，执行到下一个断点，到` skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);`这里
+
+![image-20220612190054935](image/4.6.7.9.1.png)
+
+点击调试的`Step Over(步过)`按钮，执行` skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);`
+
+![image-20220612190159595](image/4.6.7.9.2.png)
+
+在`gulimall_pms`数据库的命令行里查询`pms_sku_sale_attr_value`表，可以看到已经执行成功了
+
+```mysql
+select * from pms_sku_sale_attr_value;
+```
+
+![image-20220612190332004](image/4.6.7.9.3.png)
+
+#### 10、远程保存sku的优惠、满减、打折等信息
+
+点击`Resume Program`按钮，执行到下一个断点，到`R r1 = couponFeignService.saveSkuReduction(skuReductionTo);`这里
+
+![image-20220612190433233](image/4.6.7.10.1.png)
+
+点击调试的`Step Over(步过)`按钮，执行`R r1 = couponFeignService.saveSkuReduction(skuReductionTo);`
+
+![image-20220612190957155](image/4.6.7.10.2.png)
+
+在`gulimall_sms`数据库的命令行里查询`sms_sku_full_reduction`表，可以看到已经执行成功了，但是有很多都为0的数据
+
+```mysql
+select * from sms_sku_full_reduction;
+```
+
+![image-20220612210049416](image/4.6.7.10.3.png)
+
+在`gulimall_sms`数据库的命令行里查询`sms_sku_ladder`表，可以看到已经执行成功了，但是有很多都为0的数据
+
+```mysql
+select * from sms_sku_ladder;
+```
+
+![image-20220612205848035](image/4.6.7.10.4.png)
+
+在`gulimall_sms`数据库的命令行里查询`sms_member_price`表，可以看到已经执行成功了，但是有很多都为0的数据
+
+```java
+select * from sms_member_price;
+```
+
+![image-20220612205651548](image/4.6.7.10.5.png)
+
+#### 11、保存所有spu信息
+
+点击`Resume Program`按钮，执行到下一个断点，到`skuInfoService.saveSkuInfo(skuInfoEntity);`这里,用于保存第二个spu信息
+
+![image-20220612191302481](image/4.6.7.11.1.png)
+
+一直点击`Resume Program`按钮，直到执行完所有
+
+![image-20220612191443305](image/4.6.7.11.2.png)
+
+在`gulimall_pms`数据库的命令行中执行sql语句，查询`pms_sku_info`信息，可以看到8条数据已成功插入
+
+```
+select * from pms_sku_info;
+```
+
+![image-20220612191706272](image/4.6.7.11.3.png)
+
+### 4.6.8、商品保存其他问题
+
+#### 1、图片的url为空时不保存到数据库
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法里，
+
+在`skuImagesService.saveBatch(skuImagesEntities);`方法调用之前
+
+收集数据之前，添加过滤条件，如果图片的url为空，就过滤掉；当图片的url不为空时才保留
+
+```java
+List<SkuImagesEntity> skuImagesEntities = sku.getImages().stream().map(img -> {
+    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+    skuImagesEntity.setSkuId(skuId);
+    skuImagesEntity.setImgUrl(img.getImgUrl());
+    skuImagesEntity.setDefaultImg(img.getDefaultImg());
+    return skuImagesEntity;
+}).filter(entry->{
+    //如果图片的url为空，就过滤掉
+    return StringUtils.hasLength(entry.getImgUrl());
+}).collect(Collectors.toList());
+skuImagesService.saveBatch(skuImagesEntities);
+```
+
+![image-20220613210153936](image/4.6.8.1.png)
+
+#### 2、当有`打折`或`满减`信息才调用远程服务
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法里，
+
+在执行`R r1 = couponFeignService.saveSkuReduction(skuReductionTo);`方法之前，添加判断当有`打折`或`满减`信息时才调用远程服务
+
+```java
+//满几件打几折、满多少减多少，如果有一项有数据才调用远程服务
+if (skuReductionTo.getFullCount()>0 || skuReductionTo.getFullPrice().compareTo(BigDecimal.ONE) > 0){
+    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+    if (r1.getCode()!=0){
+        log.error("远程保存sku优惠信息失败");
+    }
+}
+```
+
+![image-20220612200805478](image/4.6.8.2.png)
+
+`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的完整代码
+
+```java
+package com.atguigu.gulimall.product.service.impl;
+
+import com.atguigu.common.to.SkuReductionTo;
+import com.atguigu.common.to.SpuBoundTo;
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.product.dao.SpuInfoDao;
+import com.atguigu.gulimall.product.entity.*;
+import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+@Service("spuInfoService")
+public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+    @Autowired
+    SpuImagesService spuImagesService;
+    @Autowired
+    AttrService attrService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
+    @Autowired
+    SkuInfoService skuInfoService;
+    @Autowired
+    SkuImagesService skuImagesService;
+    @Autowired
+    SkuSaleAttrValueService skuSaleAttrValueService;
+    @Autowired
+    CouponFeignService couponFeignService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                new QueryWrapper<SpuInfoEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveSpuInfo(SpuSaveVo spuSaveVo) {
+        //1、保存spu基本信息 pms_spu_info
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        BeanUtils.copyProperties(spuSaveVo,spuInfoEntity);
+        this.saveBaseSpuInfo(spuInfoEntity);
+
+        //2、保存Spu的描述 pms_spu_info_desc
+        List<String> decript = spuSaveVo.getDecript();
+        if (decript!=null && decript.size()>0) {
+            SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+            spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
+            spuInfoDescEntity.setDecript(String.join(",", decript));
+            spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
+        }
+
+        //3、保存spu的图片集 pms_spu_images
+        List<String> images = spuSaveVo.getImages();
+        if (images!=null && images.size()>0) {
+            spuImagesService.saveImages(spuInfoEntity.getId(), images);
+        }
+
+        //4、保存spu的规格参数；pms_product_attr_value
+        List<SpuSaveVo.BaseAttrs> baseAttrs = spuSaveVo.getBaseAttrs();
+        if (!CollectionUtils.isEmpty(baseAttrs)) {
+            List<ProductAttrValueEntity> productAttrValueEntities = baseAttrs.stream().map(attr -> {
+                ProductAttrValueEntity productAttrValueEntity = new ProductAttrValueEntity();
+                productAttrValueEntity.setSpuId(spuInfoEntity.getId());
+                if (attr.getAttrId() != null) {
+                    productAttrValueEntity.setAttrId(attr.getAttrId());
+                    productAttrValueEntity.setAttrValue(attr.getAttrValues());
+                    productAttrValueEntity.setQuickShow(attr.getShowDesc());
+                    AttrEntity attrEntity = attrService.getById(attr.getAttrId());
+                    if (attrEntity != null) {
+                        productAttrValueEntity.setAttrName(attrEntity.getAttrName());
+                    }
+                }
+                return productAttrValueEntity;
+            }).collect(Collectors.toList());
+
+            productAttrValueService.saveProductAttr(productAttrValueEntities);
+        }
+
+        //5、保存spu的积分信息; gulimall_sms->sms_spu_bounds
+        SpuSaveVo.Bounds bounds = spuSaveVo.getBounds();
+        SpuBoundTo spuBoundTo = new SpuBoundTo();
+        BeanUtils.copyProperties(bounds,spuBoundTo);
+        spuBoundTo.setSpuId(spuInfoEntity.getId());
+        R r = couponFeignService.saveSpuBounds(spuBoundTo);
+        if (r.getCode()!=0){
+            log.error("远程保存spu积分信息失败");
+        }
+
+        //5、保存当前spu对应的所有sku信息;
+        List<SpuSaveVo.Skus> skus = spuSaveVo.getSkus();
+        if (!CollectionUtils.isEmpty(skus)){
+            //由于spu的id需要与 图片 销售属性 等进行关联，所以不能调用批量保存方法
+            skus.forEach(sku->{
+                //5.1)、sku的基本信息; pms_sku_info
+                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
+                //private String skuName;
+                //private BigDecimal price;
+                //private String skuTitle;
+                //private String skuSubtitle;
+                BeanUtils.copyProperties(sku,skuInfoEntity);
+                //private Long spuId;
+                skuInfoEntity.setSpuId(spuInfoEntity.getId());
+                //private String skuDesc;
+                //private Long catalogId;
+                skuInfoEntity.setCatalogId(spuInfoEntity.getCatalogId());
+                //private Long brandId;
+                skuInfoEntity.setBrandId(spuInfoEntity.getBrandId());
+                //private String skuDefaultImg;
+                List<SpuSaveVo.Images> skuImages = sku.getImages();
+                Optional<SpuSaveVo.Images> defaultImgOptional = skuImages.stream().filter(item -> item.getDefaultImg() == 1).findFirst();
+                defaultImgOptional.ifPresent(defaultImg -> skuInfoEntity.setSkuDefaultImg(defaultImg.getImgUrl()));
+                //private Long saleCount;
+                skuInfoEntity.setSaleCount(0L);
+                skuInfoService.saveSkuInfo(skuInfoEntity);
+                //保存sku基本信息后，会返回新增数据生成的id
+                Long skuId = skuInfoEntity.getSkuId();
+
+                //5.2)、sku的图片信息; pms_sku_images
+                List<SkuImagesEntity> skuImagesEntities = sku.getImages().stream().map(img -> {
+                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                    skuImagesEntity.setSkuId(skuId);
+                    skuImagesEntity.setImgUrl(img.getImgUrl());
+                    skuImagesEntity.setDefaultImg(img.getDefaultImg());
+                    return skuImagesEntity;
+                }).filter(entry->{
+                    //如果图片的url为空，就过滤掉
+                    return !StringUtils.hasLength(entry.getImgUrl());
+                }).collect(Collectors.toList());
+                skuImagesService.saveBatch(skuImagesEntities);
+                //TODO 没有图片；路径的无需保存
+                //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
+                List<SpuSaveVo.Attr> attrs = sku.getAttr();
+                List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrs.stream().map(attr -> {
+                    SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
+                    BeanUtils.copyProperties(attr, skuSaleAttrValueEntity);
+                    skuSaleAttrValueEntity.setSkuId(skuId);
+                    return skuSaleAttrValueEntity;
+                }).collect(Collectors.toList());
+                skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
+
+                //5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+                SkuReductionTo skuReductionTo = new SkuReductionTo();
+                BeanUtils.copyProperties(sku,skuReductionTo);
+                skuReductionTo.setSkuId(skuId);
+                //满几件打几折、满多少减多少，如果有一项有数据才调用远程服务
+                if (skuReductionTo.getFullCount()>0 || skuReductionTo.getFullPrice().compareTo(BigDecimal.ONE) > 0){
+                    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+                    if (r1.getCode()!=0){
+                        log.error("远程保存sku优惠信息失败");
+                    }
+                }
+            });
+        }
+
+
+    }
+
+    @Override
+    public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
+        this.baseMapper.insert(spuInfoEntity);
+    }
+
+
+}
+```
+
+#### 3、设置会员价格也远程调用
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法里在`5.4`功能里修改代码，当有`打折`或`满减`或`设置会员价格`信息才调用远程服务
+
+**这些价格应该与`BigDecimal.ZERO`比，之前代码写的有问题**
+
+```java
+//5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+SkuReductionTo skuReductionTo = new SkuReductionTo();
+BeanUtils.copyProperties(sku,skuReductionTo);
+skuReductionTo.setSkuId(skuId);
+
+//查询是否有会员价格
+Optional<SkuReductionTo.MemberPrice> memberPriceList = skuReductionTo.getMemberPrice().stream().filter(memberPrice -> {
+    return memberPrice.getPrice().compareTo(BigDecimal.ZERO) > 0;
+}).findFirst();
+//满几件打几折、满多少减多少、会员价格，如果有一项有数据才调用远程服务
+if (skuReductionTo.getFullCount()>0
+        || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0
+        || memberPriceList.isPresent()){
+    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+    if (r1.getCode()!=0){
+        log.error("远程保存sku优惠信息失败");
+    }
+}
+```
+
+![image-20220612205101515](image/4.6.8.3.png)
+
+#### 4、当有满减信息才保存
+
+修改`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.service.impl.SkuFullReductionServiceImpl`类的`saveSkuReduction`方法，当有满减信息才保存
+
+```java
+//有满减信息才保存
+if (reductionTo.getFullPrice().compareTo(BigDecimal.ZERO)>0) {
+    //2、sku的 满减(满多少减多少) 信息；sms_sku_full_reduction
+    SkuFullReductionEntity skuFullReductionEntity = new SkuFullReductionEntity();
+    BeanUtils.copyProperties(reductionTo, skuFullReductionEntity);
+    skuFullReductionEntity.setAddOther(reductionTo.getPriceStatus());
+    this.save(skuFullReductionEntity);
+}
+```
+
+![image-20220612203149627](image/4.6.8.4.png)
+
+#### 5、当会员价格大于0才保存
+
+修改`gulimall-coupon`模块`com.atguigu.gulimall.coupon.service.impl.SkuFullReductionServiceImpl`类里的`saveSkuReduction`方法，当会员价格大于0(修改了会员价格)才保存
+
+```java
+    //3、sku的会员优惠信息；sms_ member_price
+    List<SkuReductionTo.MemberPrice> memberPrice = reductionTo.getMemberPrice();
+    List<MemberPriceEntity> memberPriceEntities = memberPrice.stream().filter(member->{
+        return member.getPrice().compareTo(BigDecimal.ZERO)>0;
+    }).map(member -> {
+        MemberPriceEntity memberPriceEntity = new MemberPriceEntity();
+        memberPriceEntity.setSkuId(reductionTo.getSkuId());
+        memberPriceEntity.setMemberLevelId(member.getId());
+        memberPriceEntity.setMemberLevelName(member.getName());
+        memberPriceEntity.setMemberPrice(member.getPrice());
+        memberPriceEntity.setAddOther(1);
+        return memberPriceEntity;
+    }).collect(Collectors.toList());
+    memberPriceService.saveBatch(memberPriceEntities);
+}
+```
+
+![image-20220612204104653](image/4.6.8.5.png)
+
+### 4.6.9、重新测试
+
+#### 1、重启项目
+
+选择IDEA下边选项框的`Services`选项，点击`GulimallProductApplication`,右键选择`Return`，重新以`debug`方式启动`GulimallProductApplication`项目
+
+![image-20220612210946079](image/4.6.9.1.1.png)
+
+点击`GulimallCouponApplication`,右键选择`Return`，重新以`debug`方式启动`GulimallCouponApplication`项目
+
+![image-20220612211004238](image/4.6.9.1.2.png)
+
+#### 2、添加基本信息
+
+在`商品系统`->`商品维护`->`发布商品`里添加商品的基本信息
+
+`商品名称`里输入`Apple iPhoneXS 苹果XS手机`
+
+`商品描述`输入`苹果手机`
+
+`选择分类`选择`手机/手机通讯/手机`
+
+`选择品牌`选择`Apple`
+
+`商品重量(Kg)`输入`0.198`
+
+`设置积分`里，`金币`输入`500`，`成长值`输入`500`
+
+![image-20220612211954522](image/4.6.9.2.1.png)
+
+`商品介绍`选以下两个图片
+
+![image-20220612212014107](image/4.6.9.2.2.png)
+
+然后点击`下一步：设置基本参数`
+
+#### 3、添加规格参数
+
+在`规格参数`里,主体内的`入网型号`选择`A2100`，上市年份选择`2018`（基本信息和主芯片在这里我就不选了）
+
+然后点击`下一步：设置销售属性`
+
+![image-20220612212342961](image/4.6.9.3.png)
+
+#### 4、添加销售属性
+
+在`销售属性`里的`选择销售属性`的`颜色`里，添加并选择`银色`、`深空灰色`、`金色`
+
+`内存`选择`4G`
+
+`版本`里，添加并选择`64GB`、`256GB`、`512GB`
+
+然后点击`下一步：设置SKU信息`
+
+![image-20220612212701344](image/4.6.9.4.png)
+
+#### 5、添加SKU信息
+
+##### 1、添加基本信息
+
+在`销售属性`里添加如下信息，其中有些信息是已经自动生成好的(顺序可能不同)
+
+| 颜色     | 版本  | 商品名称                                 | 标题                                     | 副标题                                        | 价格 |
+| -------- | ----- | ---------------------------------------- | ---------------------------------------- | --------------------------------------------- | ---- |
+| 银色     | 64GB  | Apple IPhoneXS 苹果XS手机 银色 64GB      | Apple IPhoneXS 苹果XS手机 银色 64GB      | 国行正品【白条六期免息】                      | 5999 |
+| 银色     | 256GB | Apple IPhoneXS 苹果XS手机 银色 256GB     | Apple IPhoneXS 苹果XS手机 银色 256GB     | 国行正品【白条六期免息】                      | 6799 |
+| 银色     | 512GB | Apple IPhoneXS 苹果XS手机 银色 512GB     | Apple IPhoneXS 苹果XS手机 银色 512GB     | 国行正品【白条六期免息】苹果XS手机 银色 512GB | 6999 |
+| 深空灰色 | 64GB  | Apple IPhoneXS 苹果XS手机 深空灰色 64GB  | Apple IPhoneXS 苹果XS手机 深空灰色 64GB  | 国行正品【白条六期免息】                      | 5999 |
+| 深空灰色 | 256GB | Apple IPhoneXS 苹果XS手机 深空灰色 256GB | Apple IPhoneXS 苹果XS手机 深空灰色 256GB | 国行正品【白条六期免息】                      | 6799 |
+| 深空灰色 | 512GB | Apple IPhoneXS 苹果XS手机 深空灰色 512GB | Apple IPhoneXS 苹果XS手机 深空灰色 512GB | 国行正品【白条六期免息】                      | 6999 |
+| 金色     | 64GB  | Apple IPhoneXS 苹果XS手机 金色 64GB      | Apple IPhoneXS 苹果XS手机 金色 64GB      | 国行正品【白条六期免息】                      | 5999 |
+| 金色     | 256GB | Apple IPhoneXS 苹果XS手机 金色 256GB     | Apple IPhoneXS 苹果XS手机 金色 256GB     | 国行正品【白条六期免息】                      | 6799 |
+| 金色     | 512GB | Apple IPhoneXS 苹果XS手机 金色 512GB     | Apple IPhoneXS 苹果XS手机 金色 512GB     | 国行正品【白条六期免息】                      | 6999 |
+
+![image-20220612213201736](image/4.6.9.5.1.png)
+
+##### 2、添加详细信息
+
+在`银色  64GB  Apple IPhoneXS 苹果XS手机 银色 64GB  Apple IPhoneXS 苹果XS手机 银色 64GB  国行正品【白条六期免息】  5999` (第一条信息)的`价格`右边，点击`>`右箭头，在这里添加详细信息
+
+点击`+`号，然后选择一张图片，以添加这个图片，选择一些图片作为这个`SKU`的图片集，并选择其中一个点击`设为默认`，用来做默认图片
+
+在`设置折扣`里，满`2`件，打`0.98`折，并勾选`可叠加优惠`
+
+在`设置满减`里，满`10000`元，减`50`元，并勾选`可叠加优惠`
+
+在`设置会员价`里，`铜牌会员`设置会员价为`5980`元，`银牌会员`(这里前端字打错了)设置会员价为`5970`元
+
+![image-20220612214656192](image/4.6.9.5.2.png)
+
+
+
+按`f12`打开控制台，在控制台里选择`Console`，然后点击`下一步：保留商品信息`,先**不**要点击`提示`里的`确定`
+
+在控制台输出的信息那点击右键，选择`Save as...`，**先放到记事本里保存，免得后面操作多了，不小心丢了**(华为的那个也保留着，后面还用得上)
+
+![image-20220612214825166](image/4.6.9.5.3.png)
+
+##### 4、发送的完整json
+
+删除最开头的`spuadd.vue?c0e3:697 ~~~~~`，后面部分即为正确的、完整的json
+
+```json
+{"spuName":"Apple IPhoneXS 苹果XS手机","spuDescription":"苹果手机","catalogId":225,"brandId":4,"weight":0.198,"publishStatus":0,"decript":["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//b7a3191e-d5a6-42e8-8281-18ddc2d29403_e07b540657023162.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//71246fc6-087a-419d-844e-a1e62922ab96_f205d9c99a2b4b01.jpg"],"images":["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//5e4d1c49-2942-468d-87fb-eb259f7f918b_ccd1077b985c7150.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//c1b028c5-f81e-4265-8cf9-535cc039d18a_e3284f319e256a5d.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//de48b8a0-b324-464f-8306-0c1e09882a52_e07b540657023162.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//0c4393db-d129-49f3-882d-8d6fde2f0cc0_63e862164165f483.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//01801cde-23bc-4b15-83b0-0523258c608e_b8494bf281991f94.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//74119d69-c5d7-4360-8a76-e227f29a3e8f_23cd65077f12f7f5.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//fbf9ec4a-36ed-45d1-8be9-ade51d403627_6a1b2703a9ed8737.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//08d83819-6e74-45ee-81de-9d40d05dd2a2_749d8efdff062fb0.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//556506ed-b1c8-445c-8cb3-d1cab4977459_f6982a3217eb2fa3.jpg","https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//b3f1fc35-b636-447e-8f41-9cacf70c3679_749d8efdff062fb0.jpg"],"bounds":{"buyBounds":500,"growBounds":500},"baseAttrs":[{"attrId":1,"attrValues":"A2100","showDesc":1},{"attrId":3,"attrValues":"2018","showDesc":0}],"skus":[{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"银色"},{"attrId":12,"attrName":"版本","attrValue":"64GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 银色 64GB","price":"5999","skuTitle":"Apple IPhoneXS 苹果XS手机 银色 64GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//74119d69-c5d7-4360-8a76-e227f29a3e8f_23cd65077f12f7f5.jpg","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//08d83819-6e74-45ee-81de-9d40d05dd2a2_749d8efdff062fb0.jpg","defaultImg":1},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["银色","64GB"],"fullCount":2,"discount":0.98,"countStatus":1,"fullPrice":10000,"reducePrice":50,"priceStatus":1,"memberPrice":[{"id":3,"name":"铜牌会员","price":5980},{"id":4,"name":"铜牌会员","price":5970}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"银色"},{"attrId":12,"attrName":"版本","attrValue":"256GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 银色 256GB","price":"6799","skuTitle":"Apple IPhoneXS 苹果XS手机 银色 256GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["银色","256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"银色"},{"attrId":12,"attrName":"版本","attrValue":"512GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 银色 512GB","price":"6999","skuTitle":"Apple IPhoneXS 苹果XS手机 银色 512GB","skuSubtitle":"国行正品【白条六期免息】苹果XS手机 银色 512GB","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["银色","512GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"深空灰色"},{"attrId":12,"attrName":"版本","attrValue":"64GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 深空灰色 64GB","price":"5999","skuTitle":"Apple IPhoneXS 苹果XS手机 深空灰色 64GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["深空灰色","64GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"深空灰色"},{"attrId":12,"attrName":"版本","attrValue":"256GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 深空灰色 256GB","price":"6799","skuTitle":"Apple IPhoneXS 苹果XS手机 深空灰色 256GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["深空灰色","256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"深空灰色"},{"attrId":12,"attrName":"版本","attrValue":"512GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 深空灰色 512GB","price":"6999","skuTitle":"Apple IPhoneXS 苹果XS手机 深空灰色 512GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["深空灰色","512GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"金色"},{"attrId":12,"attrName":"版本","attrValue":"64GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 金色 64GB","price":"5999","skuTitle":"Apple IPhoneXS 苹果XS手机 金色 64GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["金色","64GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"金色"},{"attrId":12,"attrName":"版本","attrValue":"256GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 金色 256GB","price":"6799","skuTitle":"Apple IPhoneXS 苹果XS手机 金色 256GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["金色","256GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]},{"attr":[{"attrId":4,"attrName":"颜色","attrValue":"金色"},{"attrId":12,"attrName":"版本","attrValue":"512GB"}],"skuName":"Apple IPhoneXS 苹果XS手机 金色 512GB","price":"6999","skuTitle":"Apple IPhoneXS 苹果XS手机 金色 512GB","skuSubtitle":"国行正品【白条六期免息】","images":[{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0},{"imgUrl":"","defaultImg":0}],"descar":["金色","512GB"],"fullCount":0,"discount":0,"countStatus":0,"fullPrice":0,"reducePrice":0,"priceStatus":0,"memberPrice":[{"id":3,"name":"铜牌会员","price":0},{"id":4,"name":"铜牌会员","price":0}]}]}
+```
+
+##### 5、格式化后的json
+
+```json
+{
+	"spuName": "Apple IPhoneXS 苹果XS手机",
+	"spuDescription": "苹果手机",
+	"catalogId": 225,
+	"brandId": 4,
+	"weight": 0.198,
+	"publishStatus": 0,
+	"decript": ["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//b7a3191e-d5a6-42e8-8281-18ddc2d29403_e07b540657023162.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//71246fc6-087a-419d-844e-a1e62922ab96_f205d9c99a2b4b01.jpg"],
+	"images": ["https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//5e4d1c49-2942-468d-87fb-eb259f7f918b_ccd1077b985c7150.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//c1b028c5-f81e-4265-8cf9-535cc039d18a_e3284f319e256a5d.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//de48b8a0-b324-464f-8306-0c1e09882a52_e07b540657023162.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//0c4393db-d129-49f3-882d-8d6fde2f0cc0_63e862164165f483.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//01801cde-23bc-4b15-83b0-0523258c608e_b8494bf281991f94.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//74119d69-c5d7-4360-8a76-e227f29a3e8f_23cd65077f12f7f5.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//fbf9ec4a-36ed-45d1-8be9-ade51d403627_6a1b2703a9ed8737.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//08d83819-6e74-45ee-81de-9d40d05dd2a2_749d8efdff062fb0.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//556506ed-b1c8-445c-8cb3-d1cab4977459_f6982a3217eb2fa3.jpg", "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//b3f1fc35-b636-447e-8f41-9cacf70c3679_749d8efdff062fb0.jpg"],
+	"bounds": {
+		"buyBounds": 500,
+		"growBounds": 500
+	},
+	"baseAttrs": [{
+		"attrId": 1,
+		"attrValues": "A2100",
+		"showDesc": 1
+	}, {
+		"attrId": 3,
+		"attrValues": "2018",
+		"showDesc": 0
+	}],
+	"skus": [{
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "银色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "64GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 银色 64GB",
+		"price": "5999",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 银色 64GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//74119d69-c5d7-4360-8a76-e227f29a3e8f_23cd65077f12f7f5.jpg",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "https://gulimall-anonymous.oss-cn-beijing.aliyuncs.com/2022-06-12//08d83819-6e74-45ee-81de-9d40d05dd2a2_749d8efdff062fb0.jpg",
+			"defaultImg": 1
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["银色", "64GB"],
+		"fullCount": 2,
+		"discount": 0.98,
+		"countStatus": 1,
+		"fullPrice": 10000,
+		"reducePrice": 50,
+		"priceStatus": 1,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 5980
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 5970
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "银色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "256GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 银色 256GB",
+		"price": "6799",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 银色 256GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["银色", "256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "银色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "512GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 银色 512GB",
+		"price": "6999",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 银色 512GB",
+		"skuSubtitle": "国行正品【白条六期免息】苹果XS手机 银色 512GB",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["银色", "512GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "深空灰色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "64GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 深空灰色 64GB",
+		"price": "5999",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 深空灰色 64GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["深空灰色", "64GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "深空灰色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "256GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 深空灰色 256GB",
+		"price": "6799",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 深空灰色 256GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["深空灰色", "256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "深空灰色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "512GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 深空灰色 512GB",
+		"price": "6999",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 深空灰色 512GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["深空灰色", "512GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "金色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "64GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 金色 64GB",
+		"price": "5999",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 金色 64GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["金色", "64GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "金色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "256GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 金色 256GB",
+		"price": "6799",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 金色 256GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["金色", "256GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}, {
+		"attr": [{
+			"attrId": 4,
+			"attrName": "颜色",
+			"attrValue": "金色"
+		}, {
+			"attrId": 12,
+			"attrName": "版本",
+			"attrValue": "512GB"
+		}],
+		"skuName": "Apple IPhoneXS 苹果XS手机 金色 512GB",
+		"price": "6999",
+		"skuTitle": "Apple IPhoneXS 苹果XS手机 金色 512GB",
+		"skuSubtitle": "国行正品【白条六期免息】",
+		"images": [{
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}, {
+			"imgUrl": "",
+			"defaultImg": 0
+		}],
+		"descar": ["金色", "512GB"],
+		"fullCount": 0,
+		"discount": 0,
+		"countStatus": 0,
+		"fullPrice": 0,
+		"reducePrice": 0,
+		"priceStatus": 0,
+		"memberPrice": [{
+			"id": 3,
+			"name": "铜牌会员",
+			"price": 0
+		}, {
+			"id": 4,
+			"name": "铜牌会员",
+			"price": 0
+		}]
+	}]
+}
+```
+
+#### 6、抛出类型强转异常
+
+##### 1、系统未知异常
+
+点击前端`提示`对话框的`确定按钮`后，提示`保存失败，原因【系统未知异常】`，查看请求，发现`msg`是`系统未知异常`
+
+![image-20220612215347322](image/4.6.9.6.1.png)
+
+##### 2、查看后端的控制台
+
+查看`GulimallProductApplication`模块的控制台，可以看到抛出了`.ClassCastException`(类强转)异常
+
+`com.atguigu.gulimall.product.vo.SpuSaveVo$MemberPrice`不能被强转为`com.atguigu.common.to.SkuReductionTo$MemberPrice`
+
+```
+java.lang.ClassCastException: com.atguigu.gulimall.product.vo.SpuSaveVo$MemberPrice cannot be cast to com.atguigu.common.to.SkuReductionTo$MemberPrice
+	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:174) ~[na:1.8.0_301]
+```
+
+![image-20220612234832710](image/4.6.9.6.2.1.png)
+
+调试发现`BeanUtils.copyProperties(sku,skuReductionTo);`把`Skus`里的`MemberPrice`集合，赋给了`SkuReductionTo`里的`memberPrice`，这样就导致`memberPrice`是`com.atguigu.gulimall.product.vo.SpuSaveVo$MemberPrice`类型的集合，而不是本类的`com.atguigu.common.to.SkuReductionTo$MemberPrice`类型的集合，
+
+所以当遍历时，编译器强转为本类的`com.atguigu.gulimall.product.vo.SpuSaveVo$MemberPrice`集合，就发生了类强转异常
+
+(遍历时编译器检查的`memberPrice`集合类型为`com.atguigu.common.to.SkuReductionTo$MemberPrice`;而`BeanUtils.copyProperties(sku,skuReductionTo);`是在运行时执行的，编译器无法预知其类型，其把`com.atguigu.gulimall.product.vo.SpuSaveVo$MemberPrice`类型的集合赋给了`memberPrice`；在运行`memberPrice`遍历代码时发现与预期类型不一致，强转类型就发生了类强转异常)
+
+![image-20220613161427467](image/4.6.9.6.2.2.png)
+
+##### 3、尝试不显式获取返回类型会不会报错
+
+测试之前报错是不是因为以下代码显式获取了返回类型为`SkuReductionTo.MemberPrice`而报的错
+
+```java
+Optional<SkuReductionTo.MemberPrice> memberPriceList = skuReductionTo.getMemberPrice().stream().filter(memberPrice -> {
+    return memberPrice.getPrice().compareTo(BigDecimal.ZERO) > 0;
+}).findFirst();
+```
+
+在该代码前，添加代码，如下所示
+
+```java
+//5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+SkuReductionTo skuReductionTo = new SkuReductionTo();
+System.out.println(skuReductionTo.getMemberPrice());
+BeanUtils.copyProperties(sku,skuReductionTo);
+System.out.println(skuReductionTo.getMemberPrice());
+skuReductionTo.setSkuId(skuId);
+skuReductionTo.getMemberPrice().forEach(e->{
+    System.out.println(e);
+    System.out.println(e.getId()+" "+e.getName()+" "+e.getPrice());
+});
+```
+
+`GulimallProductApplication`模块控制台打印`skuReductionTo.getMemberPrice()`可以看到`memberPrice()`为`SpuSaveVo$MemberPrice`类型的集合
+
+![image-20220613001145096](image/4.6.9.6.3.1.png)
+
+点击调试的`Step Over(步过)`按钮，继续向下运行。
+
+在点击调试的`Step Over(步过)`按钮，步过`skuReductionTo.getMemberPrice().forEach(e->{`发现没有再向下运行了，这时应该是发生异常了，再次点击`Step Over(步过)`按钮，就跳到的捕获异常的类里去了
+
+![image-20220613165957636](image/4.6.9.6.3.2.png)
+
+点击`Step Out(步出)`，直接执行到本类相应方法结束
+
+![  ](image/4.6.9.6.3.3.png)
+
+多次点击`Step Out(步出)`，执行完所有异常捕获类，就看到了控制台异常信息
+
+![image-20220613165144512](image/4.6.9.6.3.4.png)
+
+
+
+##### 4、解决方法
+
+📝 可以先把远程调用的先注释掉，因为没使用分布式事务，这些远程调用无法回滚，注释掉避免许多无用的数据被提交
+
+![image-20220613163711487](image/4.6.9.6.4.0.png)
+
+###### 方法一
+
+不使用`BeanUtils.copyProperties(sku, skuReductionTo);`方法拷贝的`SkuReductionTo`类里的`memberPrice`
+
+直接使用原数据的`sku`对象的`memberPrice`进行判断
+
+```java
+//5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+SkuReductionTo skuReductionTo = new SkuReductionTo();
+BeanUtils.copyProperties(sku, skuReductionTo);
+skuReductionTo.setSkuId(skuId);
+System.out.println(skuReductionTo.getMemberPrice());
+
+Optional<SpuSaveVo.MemberPrice> firstMemberPrice = sku.getMemberPrice().stream()
+        .filter(memberPrice -> memberPrice.getPrice().compareTo(BigDecimal.ZERO) > 0)
+        .findFirst();
+
+//满几件打几折、满多少减多少、会员价格，如果有一项有数据才调用远程服务
+if (skuReductionTo.getFullCount() > 0
+        || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0
+        || firstMemberPrice.isPresent()) {
+    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+    if (r1.getCode() != 0) {
+        log.error("远程保存sku优惠信息失败");
+    }
+}
+```
+
+![image-20220613163009555](image/4.6.9.6.4.1.1.png)
+
+可以看到`sku`里的`memberPrice`类型为`SpuSaveVo$MemberPrice`，就是它应该的类型，此时肯定不会报错
+
+下面的方法在处理`skuReductionTo`里的错误的`SpuSaveVo$MemberPrice`类型没有报错的原因是：发生了远程调用，远程调用是通过`json`来传输数据，`SpuSaveVo$MemberPrice`类和`SkuReductionTo$MemberPrice`类的所有数据字段名称和类型都相同，所以转化的`json`数据都一样，在服务提供方接收`json`转化为`SkuReductionTo$MemberPrice`类型时也不会出错
+
+(`SpuSaveVo$MemberPrice`类和`SkuReductionTo$MemberPrice`类的所有数据字段名称和类型都相同，但是类强转失败的原因是它们之间没有继承关系，所以这两个类不能强转)
+
+![image-20220613171053930](image/4.6.9.6.4.1.2.png)
+
+###### 方法二
+
+`SpuSaveVo$MemberPrice`类和`SkuReductionTo$MemberPrice`类的所有数据字段名称和类型都相同，所以转化的`json`数据都一样，可以先将`SpuSaveVo$MemberPrice`类集合转化为`json`，再通过`json`转化为`SkuReductionTo$MemberPrice`类集合，最后再赋值给`skuReductionTo`类的`memberPrice`字段，然后进行处理
+
+(不过没必要使用这种方法来回转，很影响性能，这里只提供一种思路)
+
+```java
+//5.4)、sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+SkuReductionTo skuReductionTo = new SkuReductionTo();
+BeanUtils.copyProperties(sku,skuReductionTo);
+skuReductionTo.setSkuId(skuId);
+System.out.println(skuReductionTo.getMemberPrice());
+
+String s = JSON.toJSONString(sku.getMemberPrice());
+List<SkuReductionTo.MemberPrice> memberPriceList = JSON.parseArray(s, SkuReductionTo.MemberPrice.class);
+skuReductionTo.setMemberPrice(memberPriceList);
+Optional<SkuReductionTo.MemberPrice> firstMemberPrice = skuReductionTo.getMemberPrice().stream()
+        .filter(memberPrice -> memberPrice.getPrice().compareTo(BigDecimal.ZERO) > 0)
+        .findFirst();
+
+//满几件打几折、满多少减多少、会员价格，如果有一项有数据才调用远程服务
+if (skuReductionTo.getFullCount()>0
+        || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0
+        || firstMemberPrice.isPresent()){
+    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+    if (r1.getCode()!=0){
+        log.error("远程保存sku优惠信息失败");
+    }
+}
+```
+
+![image-20220613162718750](image/4.6.9.6.4.2.1.png)
+
+调试可以看到`skuReductionTo`类的`memberPrice`字段已经变为正确的`SkuReductionTo$MemberPrice`集合
+
+![image-20220613164406730](image/4.6.9.6.4.2.2.png)
+
+###### 方法三
+
+可以将新建一个`pubic`修饰的`MemberPrice`类，并删除`SpuSaveVo`类和`SkuReductionTo`类的`MemberPrice`内部类，
+
+让`SpuSaveVo`类和`SkuReductionTo`类都使用新建的`MemberPrice`类，这样也不会有异常类
+
+#### 7、重新测试
+
+##### 1、清空数据
+
+打开刚刚注释的远程调用，使其可以远程调用
+
+![image-20220613171446817](image/4.6.9.7.1.1.png)
+
+清空`gulimall_pms`数据库中`pms_product_attr_value`表的数据
+
+![image-20220613200905318](image/4.6.9.7.1.2.png)
+
+截断`gulimall_pms`数据库中`pms_product_attr_value`表的数据(其实可以不用清空，直接截断)
+
+清空表只会删除表中的数据，插入时如果不指定`id`的话，`id`还是会继续向后递增；
+
+而截断表不仅会删除表中的数据，`id`也会重新从`1`开始
+
+![image-20220613200938323](image/4.6.9.7.1.3.png)
+
+需要`清空`并`截断`如下表(可以不用清空，直接截断)，**可以先备份这两个数据库，防止删错了**
+
+**`gulimall_pms`数据库**
+
+1. pms_product_attr_value
+2. pms_sku_images
+3. pms_sku_info
+4. pms_sku_sale_attr_value
+5. pms_spu_images
+6. pms_spu_info
+7. pms_spu_info_desc
+
+**`gulimall_sms`数据库**
+
+1. sms_member_price
+2. sms_sku_full_reduction
+3. sms_sku_ladder
+4. sms_spu_bounds
+
+<img src="image/4.6.9.7.1.4.png" alt="image-20220613173419233" style="zoom:67%;" />
+
+
+
+<img src="image/4.6.9.7.1.5.png" alt="image-20220613173527547" style="zoom:67%;" />
+
+
+
+点击`gulimall_pms`数据库，右键选择`转储 SQL 文件` ，然后选择`结构和数据...`，以复制`gulimall_pms`数据库，如果误删了可以恢复数据
+
+![image-20220613203942743](image/4.6.9.7.1.6.png)
+
+同理，点击`gulimall_sms`数据库，右键选择`转储 SQL 文件` ，然后选择`结构和数据...`，以复制`gulimall_sms`数据库，如果误删了可以恢复数据(还可以复制其他数据库`结构和数据...`，防止误删除其他数据库中的数据了)
+
+![image-20220613204017921](image/4.6.9.7.1.7.png)
+
+##### 2、重启模块
+
+重启`GulimallProductApplication`模块
+
+![image-20220613204112485](image/4.6.9.7.2.1.png)
+
+重启`GulimallCouponApplication`数据库
+
+![image-20220613204145602](image/4.6.9.7.2.2.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类的`saveSpuInfo`方法里，对所有操作数据库的代码都打断点(包括远程调用代码)，总共9处断点
+
+<img src="image/4.6.9.7.2.3.png" alt="image-20220613211118601" style="zoom:50%;" />
+
+##### 3、发送请求
+
+打开保存的苹果的请求，从`spuadd.vue?c0e3:697 ~~~~~`后面的第一个`{`开始复制，一直复制到最后
+
+![image-20220613204932016](image/4.6.9.7.3.1.png)
+
+打开`Postman`
+
+1. 输入"http://localhost:88/api/product/spuinfo/save"
+2. 请求方式选择"POST"
+3. 点击`Body`
+4. 点击`raw`
+5. 选择`JSON`
+6. 粘贴刚刚复制的JSON
+7. 点击`Send`
+
+![image-20220613204726065](image/4.6.9.7.3.2.png)
+
+##### 4、查看数据
+
+###### 1、保存spu基本信息 pms_spu_info
+
+点击调试的`Step Over(步过)`按钮，执行`this.saveBaseSpuInfo(spuInfoEntity);`这段代码
+
+![image-20220613211238135](image/4.6.9.7.4.1.1.png)
+
+在`navicat`软件里点击`gulimall_pms`数据库，右键选择`新建查询`
+
+📝 以下`sql`为该`新建查询`用到的所有`sql`语句
+
+```mysql
+set session transaction isolation level read uncommitted;
+select * from pms_spu_info;
+select * from pms_spu_info_desc;
+select * from pms_spu_images;
+select * from pms_product_attr_value;
+select * from pms_sku_info;
+select * from pms_sku_images;
+select * from pms_sku_sale_attr_value;
+```
+
+![image-20220613225416756](image/4.6.9.7.4.1.2.png)
+
+输入以下`sql`，设置当前会话的隔离级别为`读未提交`,并查询`gulimall_pms`数据库里,`pms_spu_info`表中的数据
+
+```mysql
+set session transaction isolation level read uncommitted;
+select * from pms_spu_info;
+```
+
+![image-20220613224818155](image/4.6.9.7.4.1.3.png)
+
+###### 2、保存Spu的描述 pms_spu_info_desc
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);`这段代码
+
+![image-20220613223914215](image/4.6.9.7.4.2.1.png)
+
+在`gulimall_pms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from pms_spu_info_desc;
+```
+
+![image-20220613224920966](image/4.6.9.7.4.2.2.png)
+
+###### 3、保存spu的图片集 pms_spu_images
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`spuImagesService.saveImages(spuInfoEntity.getId(), images);`这行代码
+
+![image-20220613224052953](image/4.6.9.7.4.3.1.png)
+
+在`gulimall_pms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from pms_spu_images;
+```
+
+![image-20220613225025623](image/4.6.9.7.4.3.2.png)
+
+###### 4、保存spu的规格参数；pms_product_attr_value
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`productAttrValueService.saveProductAttr(productAttrValueEntities);`这行代码
+
+![image-20220613224503399](image/4.6.9.7.4.4.1.png)
+
+在`gulimall_pms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from pms_product_attr_value;
+```
+
+![image-20220613224716339](image/4.6.9.7.4.4.2.png)
+
+###### 5、远程保存spu的积分信息; gulimall_sms->sms_spu_bounds
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`R r = couponFeignService.saveSpuBounds(spuBoundTo);`这行代码
+
+由于该方法要进行远程调用，所以这这行代码要执行的久一点
+
+![image-20220613225213723](image/4.6.9.7.4.5.0.1.png)
+
+在`navicat`软件里点击`gulimall_sms`数据库，右键选择`新建查询`
+
+📝 以下`sql`为该`新建查询`用到的所有`sql`语句
+
+```mysql
+set session transaction isolation level read uncommitted;
+select * from sms_spu_bounds;
+select * from sms_sku_ladder;
+select * from sms_sku_full_reduction;
+select * from sms_member_price;
+```
+
+![image-20220613225452678](image/4.6.9.7.4.5.0.2.png)
+
+输入以下`sql`，设置当前会话的隔离级别为`读未提交`,并查询`gulimall_sms`数据库里,`sms_spu_bounds`表中的数据
+
+```mysql
+set session transaction isolation level read uncommitted;
+select * from sms_spu_bounds;
+```
+
+![image-20220613225559481](image/4.6.9.7.4.5.0.3.png)
+
+###### 5.1、sku的基本信息; pms_sku_info
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`skuInfoService.saveSkuInfo(skuInfoEntity);`这行代码
+
+![image-20220613225814817](image/4.6.9.7.4.5.1.1.png)
+
+在`gulimall_pms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+(不小心把`select * from pms_product_attr_value;`这行代码删了)
+
+```mysql
+select * from pms_sku_info;
+```
+
+![image-20220613225728853](image/4.6.9.7.4.5.1.2.png)
+
+###### 5.2、sku的图片信息; pms_sku_images
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`skuImagesService.saveBatch(skuImagesEntities);`这行代码
+
+![image-20220613230444086](image/4.6.9.7.4.5.2.1.png)
+
+在`gulimall_pms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from pms_sku_images;
+```
+
+可以看到这时没有`img_url`为`null`的数据了(`img_url`为`null`的数据都被过滤掉了，不会保存到数据库了)
+
+![image-20220613230557481](image/4.6.9.7.4.5.2.2.png)
+
+###### 5.3、sku的销售属性信息: pms_sku_sale_attr_value
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);`这行代码
+
+![image-20220613230754102](image/4.6.9.7.4.5.3.1.png)
+
+在`gulimall_pms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from pms_sku_sale_attr_value;
+```
+
+![image-20220613230855981](image/4.6.9.7.4.5.3.2.png)
+
+###### 5.4、远程保存sku的优惠、满减、打折等信息；gulimall_sms->sms_sku_ladder\sms_sku_full_reduction\sms_ member_price
+
+点击`Resume Program`按钮，执行到下一个断点停止(不执行该断点)，然后点击调试的`Step Over(步过)`按钮，执行`R r1 = couponFeignService.saveSkuReduction(skuReductionTo);`这行代码
+
+![image-20220613231325398](image/4.6.9.7.4.5.4.1.png)
+
+在`gulimall-coupon`模块的`com.atguigu.gulimall.coupon.service.impl.SkuFullReductionServiceImpl`类的`saveSkuReduction`方法里设置了`有打折信息才保存`、`有满减信息才保存`、`有会员优惠信息才保存`
+
+![image-20220613231505771](image/4.6.9.7.4.5.4.2.png)
+
+在`gulimall_sms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from sms_sku_ladder;
+```
+
+可以看到没有`打折信息`为空的数据
+
+![image-20220613231951960](image/4.6.9.7.4.5.4.3.png)
+
+在`gulimall_sms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from sms_sku_full_reduction;
+```
+
+可以看到没有`满减信息`为空的数据
+
+![image-20220613232056519](image/4.6.9.7.4.5.4.4.png)
+
+在`gulimall_sms`数据库的`新建查询`里添加`sql`语句，并选中刚刚添加到`sql`语句，点击`运行已选择的`,即可查看刚刚保存的数据
+
+```mysql
+select * from sms_member_price;
+```
+
+可以看到没有`会员优惠信息`为空的数据
+
+![image-20220613232324450](image/4.6.9.7.4.5.4.5.png)
+
+##### 5、截断表，重新发送数据
+
+清空并截断表(其实可以不清空，直接截断)，删除`gulimall_pms`数据库`pms_product_attr_value`表里面的数据(含有大量垃圾数据)
+
+同理清空并截断(其实可以不清空，直接截断)以下所有表
+
+**`gulimall_pms`数据库**
+
+1. pms_product_attr_value
+2. pms_sku_images
+3. pms_sku_info
+4. pms_sku_sale_attr_value
+5. pms_spu_images
+6. pms_spu_info
+7. pms_spu_info_desc
+
+**`gulimall_sms`数据库**
+
+1. sms_member_price
+2. sms_sku_full_reduction
+3. sms_sku_ladder
+4. sms_spu_bounds
+
+![image-20220613233757008](image/4.6.9.7.5.1.png)
+
+![image-20220613233828662](image/4.6.9.7.5.2.png)
+
+重新向后端发送`华为手机`和`苹果手机`商品的`json`数据
+
+![image-20220619174732338](image/4.6.9.7.5.3.png)
+
+![image-20220613233312152](image/4.6.9.7.5.4.png)
+
+##### 6、附录
+
+###### 1、`gulimall_pms`数据库的`新建查询`里的所有`sql`语句
+
+```mysql
+set session transaction isolation level read uncommitted;
+select * from pms_spu_info;
+select * from pms_spu_info_desc;
+select * from pms_spu_images;
+select * from pms_product_attr_value;
+select * from pms_sku_info;
+select * from pms_sku_images;
+select * from pms_sku_sale_attr_value;
+```
+
+###### 2、`gulimall_sms`数据库的`新建查询`里的所有`sql`语句
+
+```mysql
+set session transaction isolation level read uncommitted;
+select * from sms_spu_bounds;
+select * from sms_sku_ladder;
+select * from sms_sku_full_reduction;
+select * from sms_member_price;
+```
+
+## 4.7、商品服务-API-商品管理
+
+### 4.7.1、SPU检索
+
+#### 1、查看请求
+
+在`商品系统`->`商品维护`->`spu管理`里，`分类`选择`手机/手机通讯/手机`，`品牌`选择`华为`,`状态`选择`上架`,
+
+按`f12`选择`Network`，清空`Network`里的数据，然后点击`查询`
+
+然后查看请求url为 
+
+[http:://localhost:88/api/product/spuinfo/list?t=1655170424813&status=1&key=&brandId=1&catelogId=225&page=1&limit=10]()
+
+![image-20220614093602135](image/4.7.1.1.1.png)
+
+点击`Payload`，查看发送的`json`数据
+
+![image-20220614093637205](image/4.7.1.1.2.png)
+
+接口文档在`商品系统/18、spu检索`里 :  https://easydoc.net/s/78237135/ZUqEdvA4/9LISLvy7
+
+![image-20220614093404399](image/4.7.1.1.3.png)
+
+#### 2、修改`list`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.controller.SpuInfoController`类的`list`方法
+
+```java
+/**
+ * 列表
+ */
+@RequestMapping("/list")
+public R list(@RequestParam Map<String, Object> params) {
+    PageUtils page = spuInfoService.queryPageByCondition(params);
+
+    return R.ok().put("page", page);
+}
+```
+
+![image-20220614094259175](image/4.7.1.2.png)
+
+#### 3、添加`queryPageByCondition`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SpuInfoService`接口里添加`queryPageByCondition`抽象方法
+
+```java
+PageUtils queryPageByCondition(Map<String, Object> params);
+```
+
+![image-20220614094320514](image/4.7.1.3.png)
+
+#### 4、实现`queryPageByCondition`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SpuInfoServiceImpl`类里实现未实现的`queryPageByCondition`抽象方法
+
+```java
+/**
+ * 根据条件分页查询
+ * {
+ *    page: 1,//当前页码
+ *    limit: 10,//每页记录数
+ *    sidx: 'id',//排序字段
+ *    order: 'asc/desc',//排序方式
+ *    key: '华为',//检索关键字
+ *    catelogId: 6,//三级分类id
+ *    brandId: 1,//品牌id
+ *    status: 0,//商品状态
+ * }
+ * @param params
+ * @return
+ */
+@Override
+public PageUtils queryPageByCondition(Map<String, Object> params) {
+    LambdaQueryWrapper<SpuInfoEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    //根据"key"，精确匹配商品id 或 模糊查询spu_name
+    String key = (String) params.get("key");
+    lambdaQueryWrapper.and(StringUtils.hasLength(key),wrapper->{
+        wrapper.eq(SpuInfoEntity::getId,key).or().like(SpuInfoEntity::getSpuName,key);
+    });
+    //根据status精确匹配状态
+    String status = (String) params.get("status");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(status),SpuInfoEntity::getPublishStatus,status);
+    //根据brandId精确匹配品牌id
+    String brandId = (String) params.get("brandId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(brandId),SpuInfoEntity::getBrandId,brandId);
+    //根据catelogId精确匹配所属分类id（注意：前端发来的是catelogId,数据库写的是catalogId）
+    String catelogId = (String) params.get("catelogId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(catelogId),SpuInfoEntity::getCatalogId,catelogId);
+
+    IPage<SpuInfoEntity> page = this.page(
+            new Query<SpuInfoEntity>().getPage(params),
+            lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220614112141228](image/4.7.1.4.png)
+
+#### 5、测试
+
+重启`gulimall-product`模块，打开前端页面进行测试
+
+##### 测试一
+
+打开`商品系统`->`商品维护`->`spu管理`,修改`状态`为`上架`，点击`查询`，可以看到没有数据
+
+![image-20220614112300493](image/4.7.1.5.1.1.png)
+
+查看`GulimallProductApplication`模块的控制台输出的`sql`语句，可以看到`sql`语句正常
+
+```mysql
+SELECT COUNT(1) FROM pms_spu_info WHERE (publish_status = ? AND brand_id = ? AND catalog_id = ?) 
+```
+
+![image-20220614112931073](image/4.7.1.5.1.2.png)
+
+##### 测试二
+
+打开`商品系统`->`商品维护`->`spu管理`,修改`状态`为`新建`，点击`查询`，可以看到一条数据
+
+![image-20220614112329904](image/4.7.1.5.2.1.png)
+
+查看`GulimallProductApplication`模块的控制台输出的`sql`语句，可以看到`sql`语句正常
+
+```mysql
+SELECT COUNT(1) FROM pms_spu_info WHERE (brand_id = ? AND catalog_id = ?) 
+SELECT id,spu_description,spu_name,catalog_id,create_time,brand_id,weight,update_time,publish_status FROM pms_spu_info WHERE (brand_id = ? AND catalog_id = ?) LIMIT ?,? 
+```
+
+![image-20220614113208157](image/4.7.1.5.2.2.png)
+
+测试三
+
+打开`商品系统`->`商品维护`->`spu管理`，`检索`的输入框中输入`1`，点击`查询`
+
+![image-20220614112545011](image/4.7.1.5.3.1.png)
+
+查看`GulimallProductApplication`模块的控制台输出的`sql`语句，可以看到`sql`语句正常
+
+```mysql
+SELECT COUNT(1) FROM pms_spu_info WHERE (((id = ? OR spu_name LIKE ?)) AND brand_id = ? AND catalog_id = ?) 
+
+SELECT id,spu_description,spu_name,catalog_id,create_time,brand_id,weight,update_time,publish_status FROM pms_spu_info WHERE (( (id = ? OR spu_name LIKE ?) ) AND brand_id = ? AND catalog_id = ?) LIMIT ?,? 
+```
+
+![image-20220614113252034](image/4.7.1.5.3.2.png)
+
+#### 6、状态异常问题
+
+如果`状态`为`新建`时，`status`为`1`则是前端和数据库的状态码没有对应起来
+
+查看`src\views\modules\product\spuinfo.vue`文件的以下代码，这里指定了`新建`、`已上架`、`已下架`状态分别为`0`、`1`、`2`
+
+```vue
+<el-table-column prop="publishStatus" header-align="center" align="center" label="上架状态">
+  <template slot-scope="scope">
+    <el-tag v-if="scope.row.publishStatus == 0">新建</el-tag>
+    <el-tag v-if="scope.row.publishStatus == 1">已上架</el-tag>
+    <el-tag v-if="scope.row.publishStatus == 2">已下架</el-tag>
+  </template>
+</el-table-column>
+```
+
+![image-20220614114116404](image/4.7.1.6.1.png)
+
+检索条件在`src\views\modules\product\spu.vue`文件里，可以看到`spu.vue`文件引用了`Spuinfo`文件
+
+
+![image-20220614113806046](image/4.7.1.6.2.png)
+
+
+修改`spu.vue`文件里的`状态`里的不同状态对应的值，`新建`、`已上架`、`已下架`状态分别为`0`、`1`、`2`
+
+```vue
+<el-form-item label="状态">
+  <el-select style="width:160px" v-model="dataForm.status" clearable>
+    <el-option label="新建" :value="0"></el-option>
+    <el-option label="上架" :value="1"></el-option>
+    <el-option label="下架" :value="2"></el-option>
+  </el-select>
+</el-form-item>
+```
+
+![image-20220614113850905](image/4.7.1.6.3.png)
+
+
+#### 7、修改时间格式和时区
+
+老师的时间`格式`不符合中国人习惯
+
+![image-20220619200710866](image/4.7.1.7.1.png)
+
+而我的项目`时区`不对
+
+![image-20220614115448525](image/4.7.1.7.2.png)
+
+修改`gulimall-product`模块的`src/main/resources/application.yml`配置文件，设置时间显示的格式
+
+```yaml
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH-mm-ss
+```
+
+![image-20220614114631103](image/4.7.1.7.3.png)
+
+时区最好也设置一下
+
+```yaml
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH-mm-ss
+    time-zone: GMT+8
+```
+
+![image-20220614114810747](image/4.7.1.7.4.png)
+
+
+
+### 4.7.2、SKU检索
+
+#### 1、查看接口
+
+在`商品系统/商品维护/商品管理`里点击查询，查看请求
+
+url： http://localhost:88/api/product/skuinfo/list?t=1655193479594&page=1&limit=10&key=&catelogId=0&brandId=0
+
+![image-20220614155909254](image/4.7.2.1.1.png)
+
+接口文档在`商品系统/21、sku检索`里：https://easydoc.net/s/78237135/ZUqEdvA4/ucirLq1D
+
+![image-20220614115218657](image/4.7.2.1.2.png)
+
+#### 2、修改`list`方法
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.controller.SkuInfoController`模块的`list`方法
+
+![image-20220614115720234](image/4.7.2.2.png)
+
+#### 3、添加`queryPageByCondition`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.SkuInfoService`接口里添加`queryPageByCondition`抽象方法
+
+```java
+PageUtils queryPageByCondition(Map<String, Object> params);
+```
+
+![image-20220614115816925](image/4.7.2.3.png)
+
+#### 4、实现`queryPageByCondition`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.SkuInfoServiceImpl`类里实现未实现的`queryPageByCondition`抽象方法
+
+```java
+/**
+ * 根据条件分页查询
+ * {
+ * page: 1,//当前页码
+ * limit: 10,//每页记录数
+ * sidx: 'id',//排序字段
+ * order: 'asc/desc',//排序方式
+ * key: '华为',//检索关键字
+ * catelogId: 0,
+ * brandId: 0,
+ * min: 0,
+ * max: 0
+ * }
+ *
+ * @param params
+ * @return
+ */
+@Override
+public PageUtils queryPageByCondition(Map<String, Object> params) {
+    LambdaQueryWrapper<SkuInfoEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    //根据"key"，精确匹配商品id 或 模糊查询spu_name
+    String key = (String) params.get("key");
+    lambdaQueryWrapper.and(StringUtils.hasLength(key)  && !"0".equalsIgnoreCase(key), wrapper -> {
+        wrapper.eq(SkuInfoEntity::getSkuId, key).or().like(SkuInfoEntity::getSkuName, key);
+    });
+
+    //根据catelogId精确匹配所属分类id（注意：前端发来的是catelogId,数据库写的是catalogId）
+    String catelogId = (String) params.get("catelogId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(catelogId) && !"0".equalsIgnoreCase(catelogId), SkuInfoEntity::getCatalogId, catelogId);
+
+    //根据brandId精确匹配品牌id
+    String brandId = (String) params.get("brandId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(brandId) && !"0".equalsIgnoreCase(brandId), SkuInfoEntity::getBrandId, brandId);
+
+    // price >= min
+    String min = (String) params.get("min");
+    if (StringUtils.hasLength(min)) {
+        try {
+            BigDecimal mimBigDecimal = new BigDecimal(min);
+            lambdaQueryWrapper.ge(mimBigDecimal.compareTo(BigDecimal.ZERO)>0, SkuInfoEntity::getPrice, min);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // price <= max
+    String max = (String) params.get("max");
+    if (StringUtils.hasLength(max)) {
+        try {
+            BigDecimal maxBigDecimal = new BigDecimal(max);
+            lambdaQueryWrapper.le( maxBigDecimal.compareTo(BigDecimal.ZERO)>0, SkuInfoEntity::getPrice, max);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    IPage<SkuInfoEntity> page = this.page(
+            new Query<SkuInfoEntity>().getPage(params),
+            lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220614174410390](image/4.7.2.4.png)
+
+#### 5、测试
+
+重启`gulimall-product`模块，打开`商品系统/商品维护/商品管理`,可以看到`价格`的两个输入框没输入时都为`0`
+
+![image-20220619220828891](image/4.7.2.5.1.png)
+
+手动把`价格`的第二个输入框(最大值)的`0`删了；打开控制台，点击`vue`，最左边选择`APP 1`，
+
+中间依次选择`Root`->`APP`->`Main`->`MainContent`->`ElTabs`->`ElPane`->`ElCard`->`Manager`,
+
+可以看到当价格的输入框没有数据时，值为`undefined`
+
+![image-20220614155157775](image/4.7.2.6.1.png)
+
+打卡`Vs Code`，点击`搜索框`(或使用快捷键`ctrl+shift+F`)，输入`价格`，然后点击`enter`,
+
+选择`spu.vue`里的这个把`data`->`return`->`dataForm`->`price`里的`min`和`max`值都改为`undefined`
+
+```javascript
+data() {
+  return {
+    catPathSub: null,
+    brandIdSub: null,
+    dataForm: {
+      key: "",
+      brandId: 0,
+      catelogId: 0,
+      price: {
+        min: undefined,
+        max: undefined
+      }
+    },
+    dataList: [],
+    pageIndex: 1,
+    pageSize: 10,
+    totalPage: 0,
+    dataListLoading: false,
+    dataListSelections: [],
+    addOrUpdateVisible: false,
+    catelogPath: []
+  };
+},
+```
+
+![image-20220619222303036](image/4.7.2.6.2.png)
+
+修改后查看页面，可以看到`价格`的两个输入框没输入时都没有`0`了，就不显示数据了
+
+![image-20220614155349645](image/4.7.2.6.3.png)
+
+这样修改后，没有设置的在发送请求时就不会就不会带上这个字段了
+
+![image-20220614155607613](image/4.7.2.6.4.png)
+
+## 4.8、仓库服务-API-仓库管理
+
+`仓库服务-API-仓库管理`对应于`gulimall_wms`数据库
+
+![image-20220614160337441](image/4.8.0.1.png)
+
+`仓库服务-API-仓库管理`对应于`gulimall-ware`模块
+
+![image-20220614160421031](image/4.8.0.2.png)
+
+### 4.8.1、整合ware服务
+
+#### 1、配置注册中心地址
+
+在`gulimall-ware`模块的`src/main/resources/application.yml`配置文件里，添加`配置注册中心地址`和`应用名`
+
+```yaml
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: gulimall-ware
+```
+
+![image-20220614160600771](image/4.8.1.1.png)
+
+#### 2、开启服务发现
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.GulimallWareApplication`启动类上添加`@EnableDiscoveryClient`服务发现注解
+
+```java
+@EnableDiscoveryClient
+```
+
+![image-20220614160709664](image/4.8.1.2.png)
+
+#### 3、指定要扫描的`Mapper`文件所在的包
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.GulimallWareApplication`启动类上添加`@MapperScan("com.atguigu.gulimall.ware.dao")`注解，并指定要扫描的`Mapper`文件所在的包
+
+```java
+@MapperScan("com.atguigu.gulimall.ware.dao")
+```
+
+![image-20220614160821054](image/4.8.1.3.png)
+
+#### 4、开启事务管理
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.GulimallWareApplication`启动类上添加`@EnableTransactionManagement`注解，用于开启`事务管理`功能
+
+```java
+@EnableTransactionManagement
+```
+
+![image-20220614160924438](image/4.8.1.4.png)
+
+### 4.8.2、运行gulimall-ware`模块
+
+#### 1、将`gulimall-ware`模块添加到`Compond`里
+
+点击`Unnamed`，选择`Edit Configurations...`
+
+![image-20220614161220452](image/4.8.2.1.png)
+
+点击右侧的`+`号，在弹出的选择框中选择`GulimallWareApplication`
+
+![image-20220614161055713](image/4.8.2.2.png)
+
+可以看到，已经添加到名称为`Unnamed`的`compond`里了
+
+![image-20220614161149410](image/4.8.2.3.png)
+
+#### 2、启动`gulimall-ware`模块
+
+点击`IDEA`底部的`Services`，选择`GulimallWareApplication`,然后点击`Run`运行按钮
+
+![image-20220614161339771](image/4.8.2.4.png)
+
+可以看到`GulimallWareApplication`的控制台报错了,这里报错是因为加了`配置中心`的依赖，但是没有配置`配置中心地址`、`命名空间`等，这里可以先不用管
+
+![image-20220614161420866](image/4.8.2.5.png)
+
+打开`nacos`的前端页面，点击`服务管理`里的`服务列表`，可以看到`gulimall-ware`已经注册的`注册中心`里了
+
+![image-20220614161506499](image/4.8.2.6.png)
+
+### 4.8.3、仓库管理打不开
+
+点击`库存系统`里的`仓库管理`，可以看到一直刷新不出来数据，打开控制台，点击失败的那个`list`的请求，右侧选择`Preview`,可以看到`path`的值为`/renren-fast/ware/wareinfo/list`，这表明网关路由给了`renren-fast`模块，而不是`gulimall-ware`模块
+
+![image-20220614161724134](image/4.8.3.1.png)
+
+在`gulimall-gateway`模块的`src/main/resources/application.yml`配置文件里添加配置，配置负载均衡到`gulimall-ware`模块的路径匹配规则(注意写到`admin_route`前面)
+
+```yaml
+- id: ware_route
+  uri: lb://gulimall-ware
+  predicates:
+    - Path=/api/ware/**
+  filters:
+    #http://localhost:88/api/ware/wareinfo/list 变为 http://localhost:11000/ware/wareinfo/list
+    - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+```
+
+![image-20220614162009550](C:/Users/无名氏/AppData/Roaming/Typora/typora-user-images/image-20220614162009550.png)
+
+重启`gulimall-ware`模块，刷新前端页面，可以看到请求已经成功了
+
+![image-20220614162150162](image/4.8.3.3.png)
+
+### 4.8.4、添加测试数据
+
+#### 1、添加一条测试数据
+
+在`库存系统`里的`仓库维护`里，点击`新建`，新建一条数据；`仓库名`为`1号仓库`，`仓库地址`为`北京`，`区域编码`为`124`
+
+![image-20220614162259394](image/4.8.4.1.1.png)
+
+可以看到已经添加成功了
+
+![image-20220614162329695](image/4.8.4.1.2.png)
+
+#### 2、修改该测试数据的字段
+
+在`库存系统`里的`仓库维护`里，点击刚刚添加的数据右边的`修改`按钮，把`仓库地址`修改为`北京xx`
+
+![image-20220614162409669](image/4.8.4.2.1.png)
+
+可以看到已经修改成功了
+
+![image-20220614162440788](image/4.8.4.2.2.png)
+
+#### 3、再添加一条测试数据
+
+![image-20220614162532455](image/4.8.4.3.png)
+
+### 4.8.5、添加仓库维护查询功能
+
+#### 1、查看接口
+
+先打开控制台，点击`Network`，清空数据，然后点击`库存系统`里的`仓库维护`里的查询按钮，查看发送请求url
+
+url：http://localhost:88/api/ware/wareinfo/list?t=1655195182345&page=1&limit=10&key=
+
+![image-20220614162709471](image/4.8.5.1.png)
+
+#### 2、修改`queryPage`方法
+
+修改`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.WareInfoServiceImpl`类的`queryPage`方法
+
+```java
+@Override
+public PageUtils queryPage(Map<String, Object> params) {
+    LambdaQueryWrapper<WareInfoEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+    String key = (String) params.get("key");
+    if (StringUtils.hasLength(key)){
+        lambdaQueryWrapper.eq(WareInfoEntity::getId,key)
+                .or().like(WareInfoEntity::getName,key)
+                .or().like(WareInfoEntity::getAddress,key)
+                .or().like(WareInfoEntity::getAreacode,key);
+    }
+
+    IPage<WareInfoEntity> page = this.page(
+            new Query<WareInfoEntity>().getPage(params),
+            lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220614163435122](image/4.8.5.2.png)
+
+#### 3、修改日志级别为`debug`
+
+在`gulimall-ware`模块的`src/main/resources/application.yml`配置文件里添加配置，修改`com.atguigu`包及其子包的输出日志的级别为`debug`级别
+
+```yaml
+logging:
+  level:
+    com.atguigu: debug
+```
+
+![image-20220614163644567](image/4.8.5.3.png)
+
+#### 4、查看`sql`语句
+
+重启`gulimall-ware`模块，再次点击`库存系统`里的`仓库维护`里的查询按钮
+
+![image-20220614163824115](image/4.8.5.4.1.png)
+
+查看`GulimallWareApplication`模块的控制台输出的`sql`语句，可以看到`sql`语句正常
+
+```mysql
+SELECT id,address,name,areacode FROM wms_ware_info WHERE (id = ? OR name LIKE ? OR address LIKE ? OR areacode LIKE ?) 
+```
+
+![image-20220614163937587](image/4.8.5.4.2.png)
+
+#### 5、分页还有问题
+
+复制`gulimall-product`模块的`com.atguigu.gulimall.product.config.MyBatisConfig`类文件
+
+![image-20220615210545460](image/4.8.5.5.1.png)
+
+粘贴到`gulimall-ware`模块的`com.atguigu.gulimall.ware.config`包下
+
+![image-20220615210644264](image/4.8.5.5.2.png)
+
+剪切`gulimall-ware`模块的`com.atguigu.gulimall.ware.GulimallWareApplication`启动类的`开启事务管理注解`和`Mapper包扫描注解`
+
+```java
+@EnableTransactionManagement
+@MapperScan("com.atguigu.gulimall.ware.dao")
+```
+
+![image-20220615210741669](image/4.8.5.5.3.png)
+
+将刚刚粘贴的代码，替换到`gulimall-ware`模块的`com.atguigu.gulimall.ware.config.MyBatisConfig`的
+
+```java
+@EnableTransactionManagement
+@MapperScan("com.atguigu.gulimall.product.dao")
+```
+
+将其改为
+
+```java
+@EnableTransactionManagement
+@MapperScan("com.atguigu.gulimall.ware.dao")
+```
+
+![image-20220615210757239](image/4.8.5.5.4.png)
+
+完整代码
+
+```java
+package com.atguigu.gulimall.product.config;
+
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+/**
+ * @author 无名氏
+ * @date 2022/5/10
+ * @Description:
+ * @EnableTransactionManagement ：开启事务功能
+ */
+@Configuration
+@EnableTransactionManagement
+@MapperScan("com.atguigu.gulimall.product.dao")
+public class MyBatisConfig {
+
+    /**
+     * 引入分页插件
+     * @return
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor(){
+        PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+        //设置请求的页面大于最大页后操作，true调回到首页，false 继续请求 默认false
+        paginationInterceptor.setOverflow(false);
+        //设置最大单页限制数量，默认500条，-1 不受限制
+        paginationInterceptor.setLimit(1000);
+
+        return paginationInterceptor;
+    }
+}
+```
+
+#### 6、重新测试
+
+重启`gulimall-ware`模块，刷新前端界面
+
+##### 1、重新点击查询
+
+![image-20220619234648667](image/4.8.5.6.1.png)
+
+##### 2、查看`sql`语句
+
+查看`GulimallWareApplication`模块的控制台输出的`sql`语句，可以看到已近带上分页信息了
+
+```mysql
+SELECT COUNT(1) FROM wms_ware_info WHERE (id = ? OR name LIKE ? OR address LIKE ? OR areacode LIKE ?) 
+
+SELECT id,address,name,areacode FROM wms_ware_info WHERE (id = ? OR name LIKE ? OR address LIKE ? OR areacode LIKE ?) LIMIT ?,? 
+```
+
+![image-20220619235039841](image/4.8.5.6.2.png)
+
+### 4.8.6、商品库存
+
+#### 1、查看接口
+
+先打开控制台，点击`Network`，清空数据，然后点击`库存系统/商品库存`，`仓库`选择`1号仓库`,`skuId`输入`1`，点击查询，可以看到请求的url为：http://localhost:88/api/ware/waresku/list?t=1655196148943&page=1&limit=10&skuId=1&wareId=1
+
+![image-20220614164256829](image/4.8.6.1.1.png)
+
+接口文档在`库存系统/02、查询商品库存`里: https://easydoc.net/s/78237135/ZUqEdvA4/hwXrEXBZ
+
+![image-20220614164553204](image/4.8.6.1.2.png)
+
+#### 2、修改`queryPage`方法
+
+修改`gulimall-ware`模块里的`com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl`类的`queryPage`方法
+
+```java
+/**
+ * {
+ *    page: 1,//当前页码
+ *    limit: 10,//每页记录数
+ *    sidx: 'id',//排序字段
+ *    order: 'asc/desc',//排序方式
+ *    wareId: 123,//仓库id
+ *    skuId: 123//商品id
+ * }
+ * @param params
+ * @return
+ */
+@Override
+public PageUtils queryPage(Map<String, Object> params) {
+
+    LambdaQueryWrapper<WareSkuEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+    String skuId = (String) params.get("skuId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(skuId),WareSkuEntity::getSkuId,skuId);
+
+    String wareId = (String) params.get("wareId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(wareId),WareSkuEntity::getWareId,wareId);
+
+    IPage<WareSkuEntity> page = this.page(
+            new Query<WareSkuEntity>().getPage(params),
+            lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220614165103674](image/4.8.6.2.png)
+
+#### 3、重新发送请求
+
+重启`gulimall-ware`模块，刷新前端页面；打开控制台，点击`Network`，清空数据，然后点击`库存系统/商品库存`里的`查询`
+
+url：http://localhost:88/api/ware/waresku/list?t=1655196600891&page=1&limit=10&skuId=1&wareId=1
+
+![image-20220614165026503](image/4.8.6.3.1.png)
+
+查看`GulimallWareApplication`模块的控制台打印的`sql`语句
+
+```mysql
+SELECT id,sku_name,ware_id,stock_locked,stock,sku_id FROM wms_ware_sku WHERE (sku_id = ? AND ware_id = ?)
+```
+
+![image-20220614165215365](image/4.8.6.3.2.png)
+
+#### 4、新增商品库存
+
+点击`库存系统/商品库存`里的`新增`按钮，新增一个商品库存
+
+`sku_id`输入`1`，`仓库`选择`1号仓库`，`库存数`输入`10`，`sku_name`选择`华为`，`锁定库存`输入`0`，然后点击确定
+
+![image-20220614165300900](image/4.8.6.4.1.png)
+
+可以看到已经新增成功了
+
+![image-20220614165328584](image/4.8.6.4.2.png)
+
+#### 5、修改商品库存
+
+点击刚刚添加的那行数据的`修改`按钮，把`库存数`修改为`100`
+
+![image-20220614165400506](image/4.8.6.5.1.png)
+
+可以看到已经修改成功了
+
+![image-20220614165425437](image/4.8.6.5.2.png)
+
+#### 6、`商品管理`跳转到`库存管理`携带`skuId`
+
+选择`商品系统/商品维护/商品管理`，点击一条数据的`更多`按钮，再`更多`里面选择`库存管理`
+
+![image-20220614165640587](image/4.8.6.6.1.png)
+
+可以看到跳转到`库存管理`时已自动携带刚刚选择的那个`商品管理`的那条数据的`skuId`
+
+![image-20220614165720231](image/4.8.6.6.2.png)
+
+#### 7、`采购需求`添加数据
+
+在`库存系统/采购单维护/采购需求`里点击`新增`，`采购商品id`输入`3`，`采购数量`输入`2`，`仓库`选择`1号仓库`，然后点击确定
+
+![image-20220614165934717](image/4.8.6.7.1.png)
+
+在`库存系统/采购单维护/采购需求`里点击`新增`，`采购商品id`输入`1`，`采购数量`输入`10`，`仓库`选择`1号仓库`，然后点击确定
+
+![image-20220614170034342](image/4.8.6.7.2.png)
+
+#### 8、合并整单
+
+选中表头中`id`左侧的可选按钮，以全选所有采购需求，然后点击`批量操作`，在`批量操作`里选择`合并整单`，稍后完成这个功能
+
+![image-20220614170203075](image/4.8.6.8.png)
+
+### 4.8.7、查询采购需求
+
+#### 1、查看接口
+
+先打开控制台，点击`Network`，清空数据，然后点击`库存系统/采购单维护/采购需求`，在采购需求里，`仓库`选择`1号仓库`，`状态`选择`已分配`，点击查询，可以看到请求的url为
+
+http://localhost:88/api/ware/purchasedetail/list?t=1655197388337&page=1&limit=10&key=&status=1&wareId=1
+
+![image-20220614170329492](image/4.8.7.1.1.png)
+
+接口文档在`库存系统/03.查询采购需求`里:  https://easydoc.net/s/78237135/ZUqEdvA4/Ss4zsV7R
+
+![image-20220614170424163](image/4.8.7.1.2.png)
+
+#### 2、修改`queryPage`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseDetailServiceImpl`类里修改`queryPage`方法
+
+```java
+/**
+ * {
+ *    page: 1,//当前页码
+ *    limit: 10,//每页记录数
+ *    sidx: 'id',//排序字段
+ *    order: 'asc/desc',//排序方式
+ *    key: '华为',//检索关键字
+ *    status: 0,//状态
+ *    wareId: 1,//仓库id
+ * }
+ * @param params
+ * @return
+ */
+@Override
+public PageUtils queryPage(Map<String, Object> params) {
+
+    LambdaQueryWrapper<PurchaseDetailEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+    String key = (String) params.get("key");
+        lambdaQueryWrapper.and(StringUtils.hasLength(key),wrapper -> {
+            wrapper.eq(PurchaseDetailEntity::getSkuId, key).or().eq(PurchaseDetailEntity::getPurchaseId, key);
+        });
+
+    String status = (String) params.get("status");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(status),PurchaseDetailEntity::getStatus,status);
+
+    String wareId = (String) params.get("wareId");
+    lambdaQueryWrapper.eq(StringUtils.hasLength(wareId),PurchaseDetailEntity::getWareId,wareId);
+
+    IPage<PurchaseDetailEntity> page = this.page(
+            new Query<PurchaseDetailEntity>().getPage(params),
+            lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220614183804323](image/4.8.7.2.png)
+
+#### 3、测试
+
+重启`gulimall-ware`模块，点击`库存系统/采购单维护/采购需求`，在采购需求里，`仓库`选择`1号仓库`，`状态`选择`已分配`，点击查询
+
+![image-20220614184255818](image/4.8.7.3.1.png)
+
+查看`GulimallWareApplication`模块的控制台打印的`sql`语句
+
+```mysql
+SELECT id,ware_id,purchase_id,sku_price,sku_num,sku_id,status FROM wms_purchase_detail WHERE (( (sku_id = ? OR purchase_id = ?) ) AND status = ? AND ware_id = ?)
+```
+
+![image-20220614184415655](image/4.8.7.3.2.png)
+
+### 4.8.8、合并采购需求(1.查询`采购单`)
+
+#### 1、采购简要流程
+
+![image-20220614184722625](image/4.8.8.1.png)
+
+#### 2、新增采购单
+
+在`库存系统/采购单维护/采购单`里，点击`新增`，`优先级`输入`1`，然后点击确定
+
+![image-20220614184928961](image/4.8.8.2.png)
+
+#### 3、查询`采购单`接口
+
+先打开控制台，点击`Network`，清空数据；选中表头中`id`左侧的可选按钮，以全选所有采购需求，然后点击`批量操作`，在`批量操作`里选择`合并整单`
+
+![image-20220614185015067](image/4.8.8.3.1.png)
+
+在`合并到整单`的对话框中需要查询`新建`或`已分配`的`采购单`，可以看到url为
+
+http://localhost:88/api/ware/purchase/unreceive/list?t=1655203843040
+
+![image-20220614185105320](image/4.8.8.3.2.png)
+
+`新建`或`已分配`的`采购单`在`库存系统/采购单维护/采购单`里的`状态`中可以看到
+
+![image-20220614185229357](image/4.8.8.3.3.png)
+
+接口文档在`库存系统/05、查询未领取的采购单`里：https://easydoc.net/s/78237135/ZUqEdvA4/hI12DNrH
+
+![image-20220614185453482](image/4.8.8.3.4.png)
+
+#### 4、添加`unreceiveList`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.controller.PurchaseController`里添加`unreceiveList`方法
+
+```java
+/**
+ * 分页查询未领取的采购单
+ */
+@RequestMapping("/unreceive/list")
+public R unreceiveList(@RequestParam Map<String, Object> params){
+    PageUtils page = purchaseService.queryPageUnreceivePurchase(params);
+
+    return R.ok().put("page", page);
+}
+```
+
+![image-20220614190152959](image/4.8.8.4.png)
+
+#### 5、添加`queryPageUnreceivePurchase`抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.PurchaseService`接口里添加`queryPageUnreceivePurchase`抽象方法
+
+```java
+PageUtils queryPageUnreceivePurchase(Map<String, Object> params);
+```
+
+![image-20220614190254861](image/4.8.8.5.png)
+
+#### 6、实现`queryPageUnreceivePurchase`抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`里实现未实现的`queryPageUnreceivePurchase`抽象方法
+
+```java
+@Override
+public PageUtils queryPageUnreceivePurchase(Map<String, Object> params) {
+
+    LambdaQueryWrapper<PurchaseEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    //查询状态为0(新建) 或 1(已分配) 的采购单
+    lambdaQueryWrapper.eq(PurchaseEntity::getStatus,0).or().eq(PurchaseEntity::getStatus,1);
+
+    IPage<PurchaseEntity> page = this.page(
+            new Query<PurchaseEntity>().getPage(params),
+            lambdaQueryWrapper
+    );
+
+    return new PageUtils(page);
+}
+```
+
+![image-20220614190912851](image/4.8.8.6.png)
+
+#### 7、测试
+
+点击以前创建`库存系统/采购单维护/采购单`里的`采购单id`为`1`的`操作`里的`分配`按钮，在弹出的`分配采购人员`里选择`admin`，然后点击确定，即可分配采购人员
+
+![image-20220614191038467](image/4.8.8.7.1.png)
+
+在`库存系统/采购单维护/采购需求`里，选中表头中`id`左侧的可选按钮，以全选所有采购需求，然后点击`批量操作`，在`批量操作`里选择`合并整单`
+
+![image-20220614191329442](image/4.8.8.7.2.png)
+
+然后就可以看到以前创建的`库存系统/采购单维护/采购单`里的采购单状态为`新建`或`已分配`的`采购单`，如果分配了采购人员，就可以在下拉列表中的`采购单id`的右边显示对应的分配的`采购人员姓名`和`采购人员电话`
+
+![image-20220614191349478](image/4.8.8.7.3.png)
+
+#### 8、修改分配的采购人员
+
+在`系统管理/管理员列表`里新建管理员；`用户名`选择`leifengyang`，`密码`输入`123456`，`确认密码`里输入`123456`，`邮箱`输入`aaa@qq.com`，`手机号`输入`12345678912`，`状态`默认`正常`不用管，然后点击`确定`
+
+![image-20220614191547642](image/4.8.8.8.1.png)
+
+然后点击`库存系统/采购单维护/采购单`里的上次创建的`采购单id`为`1`的那行数据的`操作`里的`分配`按钮，在弹出的`分配采购人员`里就可以看到刚刚`添加管理员`里添加的管理员了，这些管理员就是可以分配的采购人员
+
+选择刚刚创建的`leifengyang`，然后点击`确定`按钮
+
+![image-20220614191715258](image/4.8.8.8.2.png)
+
+这样上次创建的`采购单id`为`1`的那行数据的`采购人名`就变成了`leifengyang`，联系电话就变为了`12345678912`
+
+![image-20220614191740042](image/4.8.8.8.3.png)
+
+选中表头中`id`左侧的可选按钮，以全选所有采购需求，然后点击`批量操作`，在`批量操作`里选择`合并整单`，然后就可以看到`采购单id`为`1`的`采购人员姓名`已经修改为`leifengyang`了，联系电话已经被修改为`12345678912`了
+
+![image-20220614191939490](image/4.8.8.8.4.png)
+
+### 4.8.9、合并采购需求(2.完成合并)
+
+#### 1、查看接口
+
+##### 1、选择想要合并的采购单id
+
+选择`1 leifengyang: 12345678912`后 ，先打开控制台，点击`Network`，清空数据，然后点击确定
+
+可以看到请求的url为： http://localhost:88/api/ware/purchase/merge
+
+![image-20220614192020545](image/4.8.9.1.1.1.png)
+
+发送到`json`数据为`{purchaseId: 1, items: {1, 2}}`
+
+![image-20220614192448552](image/4.8.9.1.1.2.png)
+
+接口文档在`库存系统/04、合并采购需求`里：https://easydoc.net/s/78237135/ZUqEdvA4/cUlv9QvK
+
+![image-20220614192149087](image/4.8.9.1.1.3.png)
+
+##### 2、不选择想要合并的采购单id
+
+在`合并到整单`里可以不选择想要合并的采购单，直接点击确定
+
+![image-20220614192556641](image/4.8.9.1.2.1.png)
+
+在弹出的`提示`对话框里点击`确定`
+
+![image-20220614192615039](image/4.8.9.1.2.2.png)
+
+这时提交的`json`数据，没有`purchaseId`(采购单id)，只有`item`,这时需要自动创建一个新的采购单
+
+![image-20220614192702323](image/4.8.9.1.2.3.png)
+
+#### 2、新建`MergeVo`类
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware`包下，新建`vo`文件夹，在刚刚新建的`com.atguigu.gulimall.ware.vo`文件夹里新建`MergeVo`类
+
+```java
+package com.atguigu.gulimall.ware.vo;
+
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/14
+ * @Description:
+ */
+@Data
+public class MergeVo {
+
+    /**
+     * 采购单id
+     */
+    private Long purchaseId;
+    /**
+     * 要合并的采购项集合
+     */
+    private List<Long> items;
+}
+```
+
+![image-20220614193510395](image/4.8.9.2.png)
+
+#### 3、添加`merge`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.controller.PurchaseController`类里添加`merge`方法
+
+```java
+/**
+ * 合并采购需求
+ * @param mergeVo
+ * @return
+ */
+@PostMapping("/merge")
+public R merge(@RequestBody MergeVo mergeVo){
+    purchaseService.mergePurchase(mergeVo);
+    return R.ok();
+}
+```
+
+![image-20220614193952336](image/4.8.9.3.png)
+
+#### 4、添加`mergePurchase`抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.PurchaseService`接口里添加`mergePurchase`抽象方法
+
+```java
+void mergePurchase(MergeVo mergeVo);
+```
+
+![image-20220614194027812](image/4.8.9.4.png)
+
+#### 5、调整常量类的代码结构
+
+在`gulimall-common`模块的`com.atguigu.common.constant`包下新建`product`文件夹,把`ProductConstant`枚举类移动到`product`文件夹下
+
+![image-20220614200450052](image/4.8.9.5.1.png)
+
+选中`ProductConstant`枚举类，右键选择`Refactor`(重构)，然后选择`Rename...`
+
+![image-20220614200633959](image/4.8.9.5.2.png)
+
+在弹出的框内，修改名字为`AttrEnum`，然后点击`Refactor`
+
+![image-20220614200617454](image/4.8.9.5.3.png)
+
+#### 6、新建采购商品枚举类
+
+在`gulimall-common`模块的`com.atguigu.common.constant`包下新建`ware`文件夹，在`com.atguigu.common.constant.ware`文件夹下新建`PurchaseStatusEnum`(采购商品的采购单完成状态)枚举类
+
+```java
+package com.atguigu.common.constant.ware;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/14
+ * @Description:
+ */
+public enum PurchaseStatusEnum {
+    /**
+     * 刚新建状态
+     */
+    CREATED(0,"新建"),
+    /**
+     * 已分配给采购员
+     */
+    ASSIGNED(1,"已分配"),
+    /**
+     * 采购员已领取
+     */
+    RECEIVE(2,"已领取"),
+    /**
+     * 采购员已完成采购
+     */
+    FINISHED(3,"已完成"),
+    /**
+     * 采购异常
+     */
+    HASERROR(4,"有异常");
+
+    private int status;
+    private String msg;
+
+    PurchaseStatusEnum(int status, String msg) {
+        this.status = status;
+        this.msg = msg;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+}
+```
+
+![image-20220614202825301](image/4.8.9.6.1.png)
+
+在`gulimall-common`模块的`com.atguigu.common.constant.ware`包下新建`PurchaseStatusEnum`(采购单具体采购的商品的完成状态)枚举类
+
+```java
+package com.atguigu.common.constant.ware;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/14
+ * @Description:
+ */
+public enum PurchaseDetailStatusEnum {
+    /**
+     * 刚新建状态
+     */
+    CREATED(0,"新建"),
+    /**
+     * 已分配给采购员
+     */
+    ASSIGNED(1,"已分配"),
+    /**
+     * 采购员正在采购
+     */
+    BUYING(2,"正在采购"),
+    /**
+     * 采购员已完成采购
+     */
+    FINISHED(3,"已完成"),
+    /**
+     * 采购员采购失败
+     */
+    HASERROR(4,"采购失败");
+
+    private int status;
+    private String msg;
+
+    PurchaseDetailStatusEnum(int status, String msg) {
+        this.status = status;
+        this.msg = msg;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+}
+```
+
+![image-20220614203245139](image/4.8.9.6.2.png)
+
+#### 7、实现`mergePurchase`抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类里修改空的`mergePurchase`方法
+
+```java
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void mergePurchase(MergeVo mergeVo) {
+    Long purchaseId = mergeVo.getPurchaseId();
+    if (purchaseId == null){
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        purchaseEntity.setStatus(PurchaseStatusEnum.CREATED.getStatus());
+        this.save(purchaseEntity);
+        purchaseId = purchaseEntity.getId();
+    }
+
+    List<Long> items = mergeVo.getItems();
+    Long finalPurchaseId = purchaseId;
+    List<PurchaseDetailEntity> purchaseDetailEntities = items.stream().map(item -> {
+        PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+        purchaseDetailEntity.setId(item);
+        purchaseDetailEntity.setPurchaseId(finalPurchaseId);
+        purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.ASSIGNED.getStatus());
+        return purchaseDetailEntity;
+    }).collect(Collectors.toList());
+
+    purchaseDetailService.updateBatchById(purchaseDetailEntities);
+}
+```
+
+![image-20220614204427993](image/4.8.9.7.png)
+
+#### 8、在`PurchaseEntity`类添加注解
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.entity.PurchaseEntity`类里的`createTime`字段上添加`@TableField(fill = FieldFill.INSERT)`注解，当在`插入`时向该字段插入当前系统时间；在`updateTime`字段上添加`@TableField(fill = FieldFill.INSERT_UPDATE)`注解，当在`插入`或`更新`时向该字段插入或更新为当前系统时间
+
+```java
+package com.atguigu.gulimall.ware.entity;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * 采购信息
+ * 
+ * @author 无名氏
+ * @email 2185180175@qq.com
+ * @date 2022-04-18 22:22:59
+ */
+@Data
+@TableName("wms_purchase")
+public class PurchaseEntity implements Serializable {
+   private static final long serialVersionUID = 1L;
+
+   /**
+    * 
+    */
+   @TableId
+   private Long id;
+   /**
+    * 
+    */
+   private Long assigneeId;
+   /**
+    * 
+    */
+   private String assigneeName;
+   /**
+    * 
+    */
+   private String phone;
+   /**
+    * 
+    */
+   private Integer priority;
+   /**
+    * 
+    */
+   private Integer status;
+   /**
+    * 
+    */
+   private Long wareId;
+   /**
+    * 
+    */
+   private BigDecimal amount;
+   /**
+    * 
+    */
+   @TableField(fill = FieldFill.INSERT)
+   private Date createTime;
+   /**
+    * 
+    */
+   @TableField(fill = FieldFill.INSERT_UPDATE)
+   private Date updateTime;
+
+}
+```
+
+![image-20220614204518437](image/4.8.9.8.png)
+
+#### 9、设置`时间格式`和`时区`
+
+在`gulimall-ware`模块的`src/main/resources/application.yml`配置文件里设置`时间格式`和`时区`
+
+```yaml
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH-mm-ss
+    time-zone: GMT+8
+```
+
+![image-20220614205149464](image/4.8.9.9.png)
+
+#### 10、修改`mergePurchase`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类里修改`mergePurchase`方法
+
+```java
+@Autowired
+PurchaseDetailService purchaseDetailService;
+
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void mergePurchase(MergeVo mergeVo) {
+    Long purchaseId = mergeVo.getPurchaseId();
+    if (purchaseId == null){
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        purchaseEntity.setStatus(PurchaseStatusEnum.CREATED.getStatus());
+        //自动更新PurchaseEntity的更新时间
+        this.save(purchaseEntity);
+        purchaseId = purchaseEntity.getId();
+    }else {
+        //更新PurchaseEntity(采购单)的更新时间
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        purchaseEntity.setId(purchaseId);
+        purchaseEntity.setUpdateTime(new Date());
+        this.updateById(purchaseEntity);
+    }
+
+    List<Long> items = mergeVo.getItems();
+    Long finalPurchaseId = purchaseId;
+    List<PurchaseDetailEntity> purchaseDetailEntities = items.stream().map(item -> {
+        PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+        purchaseDetailEntity.setId(item);
+        purchaseDetailEntity.setPurchaseId(finalPurchaseId);
+        purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.ASSIGNED.getStatus());
+        return purchaseDetailEntity;
+    }).collect(Collectors.toList());
+
+    //合并采购需求，分派到指定采购单
+    purchaseDetailService.updateBatchById(purchaseDetailEntities);
+}
+```
+
+![image-20220614210320804](image/4.8.9.10.png)
+
+#### 11、测试一
+
+重启`gulimall-ware`模块,点击`库存系统/采购单维护/采购需求`，选中表头中`id`左侧的可选按钮，以全选所有采购需求，然后点击`批量操作`，在`批量操作`里选择`合并整单`,然后选择`1 leifengyang: 12345678912`后 ，点击确定
+
+![image-20220614210524845](image/4.8.9.11.1.png)
+
+可以看到，刚刚全选的两个`采购需求`的`采购单id`和`状态`都已经更新了
+
+![image-20220614210635314](image/4.8.9.11.2.png)
+
+点击``库存系统/采购单维护/采购`单已经更新了，设置时区后，更新的时间也是系统时间了
+
+![image-20220614211030868](image/4.8.9.11.3.png)
+
+#### 12、测试二
+
+在`库存系统/采购单维护/采购需求`里，点击`新增`，在`采购商品id`里输入`2`，`采购数量`输入`20`，`仓库`选择`2号仓库`，然后点击确定
+
+![image-20220614211131709](image/4.8.9.12.1.png)
+
+在`库存系统/采购单维护/采购需求`里，点击`新建`,在`新增`对话框里，`采购商品id`输入`2`，`采购数量`输入`20`，`仓库`选择`2号仓库`
+
+然后选中刚刚创建的`id`为`3`的采购需求的左侧按钮，然后点击`批量操作`，在`批量操作`里选择`合并整单`
+
+![image-20220614211230326](image/4.8.9.12.2.png)
+
+在`合并到整单`里可以不选择想要合并的采购单，直接点击确定
+
+![image-20220614211309852](image/4.8.9.12.3.png)
+
+在弹出的`提示`对话框里点击`确定`
+
+![image-20220614211325353](image/4.8.9.12.4.png)
+
+可以看到在`库存系统/采购单维护/采购需求`里，刚刚创建的`id`为`3`的`采购需求`的`状态`已变为`已分配`
+
+![image-20220614211354619](image/4.8.9.12.5.png)
+
+在`库存系统/采购单维护/采购单`里，可以看到已自动创建了一个`采购单`，这个采购单的`状态`为`新建`
+
+![image-20220614211426208](image/4.8.9.12.6.png)
+
+点击这个`采购单`的`操作`里的`分配`按钮，在`分配采购人员`的对话框中选择`admin`，然后点击`确定`
+
+![image-20220614211502224](image/4.8.9.12.7.png)
+
+#### 13、修改没有自动创建时间的bug
+
+可以看到刚刚自动创建的那个`采购单`的`创建时间`和`更新时间`没有自动创建
+
+![image-20220614211426208](image/4.8.9.13.1.png)
+
+调试后，发现`create_time`和`update_time`传入的参数都为`null`
+
+```mysql
+INSERT INTO wms_ purchase ( create_time，update_time，status ) VALUES ( ?， ? ，? )
+```
+
+![image-20220614211753133](image/4.8.9.13.2.png)
+
+原因是没有设置`mybatisPlus`的属性自动填充配置
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware`包里新建`config`文件夹，
+
+复制`gulimall-product`模块的`com.atguigu.gulimall.product.config.MyMetaObjectHandler`类，粘贴到`gulimall-ware`模块的`com.atguigu.gulimall.ware.config`包里
+
+```java
+package com.atguigu.gulimall.ware.config;
+
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Date;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/14
+ * @Description:
+ */
+@Slf4j
+@Configuration
+public class MyMetaObjectHandler implements MetaObjectHandler {
+    @Override
+    public void insertFill(MetaObject metaObject) {
+        log.info("start insert fill...");
+        this.setFieldValByName("createTime", new Date(), metaObject);
+        this.setFieldValByName("updateTime", new Date(), metaObject);
+    }
+
+    @Override
+    public void updateFill(MetaObject metaObject) {
+        log.info("start update fill...");
+        this.setFieldValByName("updateTime", new Date(), metaObject);
+    }
+}
+```
+
+![image-20220614212341199](image/4.8.9.13.3.png)
+
+#### 14、重新测试
+
+重启`gulimall-ware`模块，刷新前端界面，在`库存系统/采购单维护/采购单`里，点击`新增`，在弹出的`新增`对话框里的`优先级`里输入`3`，然后点击`确定`
+
+![image-20220614212524728](image/4.8.9.14.1.png)
+
+可以看到`create_time`和`update_time`都已经成功插入进去了
+
+![image-20220614212551163](image/4.8.9.14.2.png)
+
+### 4.8.10、领取采购单
+
+#### 1、查看接口
+
+`领取采购单`为采购员使用app领取，不属于后台管理系统，所以可以使用`Postman`模拟采购员`领取采购单`
+
+接口文档在`库存系统/06、领取采购单`里: https://easydoc.net/s/78237135/ZUqEdvA4/vXMBBgw1
+
+![image-20220614213006277](image/4.8.10.1.1.png)
+
+在`Postman`里新建一个请求，url输入`http://localhost:88/api/ware/purchase/received`,请求方式选择`POST`，然后按`ctrl+s`保存
+
+![image-20220614213232724](image/4.8.10.1.2.png)
+
+在弹出的`SAVE REQUEST`对话框里，`Request name`里输入`领取采购单`，然后点击下面的`Create a collection`
+
+![image-20220614213431165](image/4.8.10.1.3.png)
+
+在`SAVE REQUEST`对话框里的`Save to`里输入`采购人员app`，点击右侧的`Create`按钮
+
+![image-20220614213539031](image/4.8.10.1.4.png)
+
+然后点击`Save`按钮
+
+![image-20220614213552521](image/4.8.10.1.5.png)
+
+在刚刚新建的请求中，点击`Body`、然后点击`raw`，在`GraphQL`右侧的下拉列表中选择`JSON`，然后在下方输入框中输入`[3,4]`，最后点击`Send`(输入`[3,4]`表示要领取id为`3`和`4`的采购单)
+
+![image-20220615104015989](image/4.8.10.1.6.png)
+
+#### 2、创建`received`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.controller.PurchaseController`类中创建`received`方法
+
+```java
+/**
+ * 采购员领取采购单
+ * @param purchaseIds 采购单id
+ * @return
+ */
+@PostMapping("/received")
+public R received(@RequestBody List<Long> purchaseIds){
+    purchaseService.received(purchaseIds);
+    return R.ok();
+}
+```
+
+![image-20220615083311741](image/4.8.10.2.png)
+
+#### 3、新建`received`抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.PurchaseService`接口里新建`received`抽象方法
+
+```java
+void received(List<Long> purchaseIds);
+```
+
+![image-20220615083427579](image/4.8.10.3.png)
+
+#### 4、实现`received`抽象方法
+
+需要完成的效果为：
+
+1、首先需要修改刚刚领取的所有采购单状态，把采购单状态修改为`已领取`
+
+(这里我把`采购单id`为3的采购单分配给`admin`用户了，点击`采购单id`为3的右侧的分配，选择`admin`即可)
+
+![image-20220615083759255](image/4.8.10.4.1.png)
+
+2、这些采购单对应的所有采购需求都要改为`正在采购`
+
+(我先把id为3的采购需求的`采购单id`修改为3了，选中该数据左侧的按钮，点击`批量操作`，在`批量操作`里选择`合并整单`,在弹出的`分配采购人员`里选择`admin`，然后点击`确定`按钮)
+
+![image-20220615083915584](image/4.8.10.4.2.png)
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类里实现未实现的`received`抽象方法
+
+在`streat`的`map`那，IDEA提示建议使用`peek`来代替`map`；`java.util.Stream.peek()`主要用于支持调试。如果流管道不包含终端操作，则不会使用任何元素，并且根本不会调用peek()操作。所以最好不要使用`peek`
+
+```java
+/**
+ * 采购员领取采购单
+ *
+ * @param purchaseIds 采购单id
+ */
+@Override
+public void received(List<Long> purchaseIds) {
+    //1、确认当前采购单的id是"新建"或者是"已分配"状态
+    LambdaQueryWrapper<PurchaseEntity> purchaseQueryWrapper = new LambdaQueryWrapper<>();
+    purchaseQueryWrapper.and(wrapper -> {
+        wrapper.eq(PurchaseEntity::getStatus, PurchaseStatusEnum.CREATED.getStatus())
+                .or().eq(PurchaseEntity::getStatus, PurchaseStatusEnum.ASSIGNED.getStatus());
+    }).in(PurchaseEntity::getId, purchaseIds);
+    List<PurchaseEntity> purchaseEntities = this.list(purchaseQueryWrapper);
+
+    //2、改变采购单状态(已使用注解在更新字段时自动更新updateTime)
+    List<PurchaseEntity> newPurchaseEntities = purchaseEntities.stream().map(purchaseEntity -> {
+        purchaseEntity.setStatus(PurchaseStatusEnum.RECEIVE.getStatus());
+        return purchaseEntity;
+    }).collect(Collectors.toList());
+    this.updateBatchById(newPurchaseEntities);
+
+    //3、改变采购项状态
+    PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+    purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.BUYING.getStatus());
+    purchaseDetailService.updatePurchaseDetailBatchByPurchaseId(purchaseDetailEntity,newPurchaseEntities);
+}
+```
+
+![image-20220615095031917](image/4.8.10.4.3.png)
+
+#### 5、新建批量修改采购需求抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.PurchaseDetailService`接口里新建`updatePurchaseDetailBatchByPurchaseId`抽象方法
+
+```java
+void updatePurchaseDetailBatchByPurchaseId(PurchaseDetailEntity purchaseDetailEntity, List<PurchaseEntity> purchaseEntities);
+```
+
+![image-20220615100049272](image/4.8.10.5.png)
+
+#### 6、实现批量修改采购需求抽象方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseDetailServiceImpl`类里实现未实现的`updatePurchaseDetailBatchByPurchaseId`抽象方法
+
+![image-20220615100252009](image/4.8.10.6.png)
+
+#### 7、给这些具体方法添加事务注解
+
+给`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类的`received`方法添加事务注解，并指定有异常就回滚事务
+
+```java
+@Transactional(rollbackFor = Exception.class)
+```
+
+![image-20220615100748683](image/4.8.10.7.1.png)
+
+给`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseDetailServiceImpl`类的`updatePurchaseDetailBatchByPurchaseId`方法添加事务注解，并指定有异常就回滚事务
+
+```java
+@Transactional(rollbackFor = Exception.class)
+```
+
+![image-20220615100803171](image/4.8.10.7.2.png)
+
+#### 8、测试
+
+给`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类的`received`方法里的第一条语句打断点，然后点击`IDEA`底部的`Service`按钮，选择`GulimallWareApplication`，右键选择`Return in Debug Mode`，以`debug`方式重新启动`GulimallWareApplication`模块
+
+![image-20220615100934480](image/4.8.10.8.1.png)
+
+将`gulimall_wms`数据库中的`wms_purchase`表中修改`id`为`3`的`status`为`2`
+
+![image-20220615104336853](image/4.8.10.8.2.png)
+
+刷新前端页面，可以看到在`库存系统/采购单维护/采购单`里，`id`为`3`的`采购需求`的`状态`已变为`已领取`
+
+![image-20220615104512089](image/4.8.10.8.3.png)
+
+打开`Postman`，发送领取采购单的请求
+
+![image-20220615104045438](image/4.8.10.8.4.png)
+
+切换到`IDEA`，可以看到已经接收到`purchase_id`为`3`和`4`的两条数据了
+
+![image-20220615104124184](image/4.8.10.8.5.png)
+
+继续向下执行，直到`确认当前采购单的id是"新建"或者是"已分配"状态`完成，到`改变采购单状态(已使用注解在更新字段时自动更新updateTime)`停止，可以看到刚刚修改的`id`为`3`的状态为`已领取`的那条数据已经被过滤掉了，只剩下`id`为`4`的状态为`新建`的那条数据了
+
+![image-20220615104627577](image/4.8.10.8.6.png)
+
+选择`GulimallWareApplication`模块的控制台，此时的`sql`语句也正确
+
+```mysql
+SELECT id, amount , ware_id, create_time, phone, assignee_name , update_time, priority, assignee_id, status FROM wms_purchase WHERE ( (status = ? OR status = ?) ) AND id IN (?,?)
+```
+
+![image-20220615104801580](image/4.8.10.8.7.png)
+
+继续向下执行，直到映射结束，停在`this.updateBatchById(newPurchaseEntities);`方法上，可以看到此时的`newPurchaseEntities`的`status`已修改为`2`
+
+![image-20220615104859953](image/4.8.10.8.8.png)
+
+继续向下执行，执行完`this.updateBatchById(newPurchaseEntities);`方法，查看`GulimallWareApplication`模块的控制台，此时的`sql`语句也正确
+
+```mysql
+UPDATE wms_purchase SET create_time=?, phone=?, assignee_name=?，update_time=?，priority=?, status=? WHERE id=?
+```
+
+![image-20220615105044203](image/4.8.10.8.9.png)
+
+继续向下执行，直到`改变采购项状态`所有代码都执行完，可以看到`PurchaseDetailEntity`的`status`为`2`
+
+![image-20220615105320878](image/4.8.10.8.10.png)
+
+查看`GulimallWareApplication`模块的控制台，此时的`sql`语句也正确
+
+```mysql
+UPDATE wms_purchase_detail SET status=? WHERE (purchase_id IN (?))
+```
+
+![image-20220615105420470](image/4.8.10.8.11.png)
+
+#### 9、添加待办事项
+
+在`库存系统/采购单维护/采购需求`里，选中表头中`id`左侧的可选按钮，以全选所有采购需求，然后点击`批量操作`，在`批量操作`里选择`合并整单`，在`合并到整单`的下拉列表里选择`1 leifengyang 12345678912`，然后点击确定
+
+![image-20220615105740827](image/4.8.10.9.1.png)
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类里的`mergePurchase`里添加待办事项，后面完成`确认采购单状态是0，1才可以合并`功能
+
+```java
+//TODO 确认采购单状态是0，1才可以合并
+```
+
+![image-20220615110011514](image/4.8.10.9.2.png)
+
+可以看到在领取到采购单后，这些被领取的`采购单`，并没有修改`采购人id`，`采购人名`、`联系方式`，这个功能目前由于没有登录，所以目前实现不了
+
+![image-20220615155836991](image/4.8.10.9.3.png)
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类里的`received`方法里添加待办事项，后面完成`设置采购人id，采购人名、联系方式`功能
+
+```java
+//TODO 设置采购人id，采购人名、联系方式
+```
+
+![image-20220615160034810](image/4.8.10.9.4.png)
+
+### 4.8.11、完成采购
+
+#### 1、查看接口
+
+`完成采购`为采购员使用app领取，不属于后台管理系统，所以可以使用`Postman`模拟采购员`完成采购`
+
+接口文档在`库存系统/07、完成采购`里： https://easydoc.net/s/78237135/ZUqEdvA4/cTQHGXbK
+
+![image-20220615155034336](image/4.8.11.1.1.png)
+
+在`库存系统/采购单维护/采购需求`里，`id`为`3`的采购需求的`采购单id`为`3`
+
+![image-20220615160507927](image/4.8.11.1.2.png)
+
+在`gulimall_wms`数据库的`wms_purchase_detail`表里将`id`为`3`的`purchase_id`修改为`4`
+
+![image-20220615160630004](image/4.8.11.1.3.png)
+
+再新增一条数据,`id`输入`4`，`purchase_id`输入`4`，`sku_id`输入`4`，`sku_num`输入`30`，`ware_id`输入`2`，`status`输入`2`，然后点击下面的`√`
+
+![image-20220615160917672](image/4.8.11.1.4.png)
+
+发送的请求中`id`对应`库存系统/采购单维护/采购需求`里的`id`，`items`里的`itemId`对应`库存系统/采购单维护/采购需求`里的`采购单id`，即为完成某个采购单的部分或全部`采购项(采购需求)`
+
+请求的url为: http://localhost:88/api/ware/purchase/done ，请求方式为`POST`
+
+```json
+{
+   "id": 4,
+   "items": [
+       {"itemId":3,"status":3,"reason":""},
+       {"itemId":4,"status":4,"reason":"无货"}
+    ]
+}
+```
+
+![image-20220615162226790](image/4.8.11.1.5.png)
+
+#### 2、新建`PurchaseDoneVo`类
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.vo`包里新建`PurchaseDoneVo`类
+
+```java
+package com.atguigu.gulimall.ware.vo;
+
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * @author 无名氏
+ * @date 2022/6/15
+ * @Description: 采购完成
+ *
+ * {
+ *    "id": 4,
+ *    "items": [
+ *        {"itemId":3,"status":3,"reason":""},
+ *        {"itemId":4,"status":4,"reason":"无货"}
+ *     ]
+ * }
+ */
+@Data
+public class PurchaseDoneVo {
+
+    /**
+     * 采购单id
+     */
+    @NotNull
+    private Long  id;
+    private List<PurchaseItemDone> items;
+
+    /**
+     * 采购项
+     */
+    @Data
+    public class PurchaseItemDone{
+        /**
+         * 采购项id
+         */
+        private Long itemId;
+        /**
+         * 采购状态(3:采购完成 ; 4:采购失败)
+         */
+        private Integer status;
+        /**
+         * 失败原因
+         */
+        private String reason;
+    }
+
+}
+```
+
+![image-20220615163320567](image/4.8.11.2.png)
+
+#### 3、新建`finish`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.controller.PurchaseController`类里新建`finish`方法
+
+```java
+/**
+ * 采购员完成采购
+ * /ware/purchase/done
+ * @param purchaseDoneVo
+ * @return
+ */
+@PostMapping("/done")
+public R finish(@RequestBody PurchaseDoneVo purchaseDoneVo){
+    purchaseService.donePurchase(purchaseDoneVo);
+    return R.ok();
+}
+```
+
+![image-20220615163521858](image/4.8.11.3.png)
+
+#### 4、新建`donePurchase`抽象接口
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.PurchaseService`接口里新建`donePurchase`抽象接口
+
+![image-20220615163603585](image/4.8.11.4.png)
+
+#### 5、实现`donePurchase`抽象接口
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类里实现未实现的`donePurchase`抽象方法
+
+```java
+@Autowired
+WareSkuService wareSkuService;
+
+/**
+ * 采购员完成采购
+ * @param purchaseDoneVo
+ */
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void donePurchase(PurchaseDoneVo purchaseDoneVo) {
+
+    AtomicBoolean flag = new AtomicBoolean(true);
+    //1、改变采购项状态
+    List<PurchaseDetailEntity> purchaseDetailEntities = purchaseDoneVo.getItems().stream().map(purchaseItemDone -> {
+        PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+        if (purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.HASERROR.getStatus()) {
+            flag.set(false);
+            purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.HASERROR.getStatus());
+        } else if (purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.BUYING.getStatus()){
+            purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.FINISHED.getStatus());
+        }
+        purchaseDetailEntity.setId(purchaseItemDone.getItemId());
+        return purchaseDetailEntity;
+    }).collect(Collectors.toList());
+    purchaseDetailService.updateBatchById(purchaseDetailEntities);
+
+    //2、改变采购单状态
+    Long purchaseId = purchaseDoneVo.getId();
+    PurchaseEntity purchaseEntity = new PurchaseEntity();
+    purchaseEntity.setId(purchaseId);
+    Integer status = flag.get()?PurchaseStatusEnum.FINISHED.getStatus() : PurchaseStatusEnum.HASERROR.getStatus();
+    purchaseEntity.setStatus(status);
+    this.updateById(purchaseEntity);
+
+    //3、将成功采购的进行入库
+    List<Long> purchaseDetailIds = purchaseDoneVo.getItems().stream().filter(purchaseItemDone -> {
+        return purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.BUYING.getStatus();
+    }).map(PurchaseDoneVo.PurchaseItemDone::getItemId).collect(Collectors.toList());
+    Collection<PurchaseDetailEntity> purchaseDetailList = purchaseDetailService.listByIds(purchaseDetailIds);
+
+    wareSkuService.addOrUpdateStockBatchByskuIdAndwareId(purchaseDetailList);
+}
+```
+
+![image-20220615200305836](image/4.8.11.5.png)
+
+#### 6、新建添加或更新库存抽象接口
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.WareSkuService`接口里新建`addOrUpdateStockBatchByskuIdAndwareId`抽象接口
+
+```java
+void addOrUpdateStockBatchByskuIdAndwareId(Collection<PurchaseDetailEntity> purchaseDetailList);
+```
+
+![image-20220615200456324](image/4.8.11.6.png)
+
+#### 7、实现添加或更新库存抽象接口
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl`类里实现未实现的`addOrUpdateStockBatchByskuIdAndwareId`抽象方法
+
+```java
+@Autowired
+WareSkuDao wareSkuDao;
+
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void addOrUpdateStockBatchByskuIdAndwareId(Collection<PurchaseDetailEntity> purchaseDetailList) {
+    purchaseDetailList.forEach(this::addOrUpdateStockByskuIdAndwareId);
+}
+
+@Transactional(rollbackFor = Exception.class)
+public void addOrUpdateStockByskuIdAndwareId(PurchaseDetailEntity purchaseDetailEntity) {
+    WareSkuEntity wareSkuEntity = new WareSkuEntity();
+    wareSkuEntity.setSkuId(purchaseDetailEntity.getSkuId());
+    wareSkuEntity.setWareId(purchaseDetailEntity.getWareId());
+
+    LambdaQueryWrapper<WareSkuEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(WareSkuEntity::getSkuId,purchaseDetailEntity.getSkuId())
+            .eq(WareSkuEntity::getWareId,purchaseDetailEntity.getWareId());
+    WareSkuEntity query = wareSkuDao.selectOne(lambdaQueryWrapper);
+    if (query==null){
+            wareSkuEntity.setStock(purchaseDetailEntity.getSkuNum());
+            wareSkuDao.insert(wareSkuEntity);
+    }else {
+        wareSkuEntity.setId(query.getId());
+        wareSkuEntity.setStock(query.getStock()+purchaseDetailEntity.getSkuNum());
+        wareSkuDao.updateById(wareSkuEntity);
+    }
+}
+```
+
+![image-20220615204549277](image/4.8.11.7.png)
+
+#### 8、测试
+
+重启`gulimall-ware`模块，打开`Postman`
+
+选择请求的url为: http://localhost:88/api/ware/purchase/done的对话框，按`ctrl+S`快捷键保存，在弹出的`SAVE REQUEST`对话框里，`Request name`里输入`完成采购`，点击`Save to`里的`采购人员app`，把`完成采购`放到`采购人员app`里面，然后点击`Save`
+
+![GIF 2022-6-15 23-10-02](image/4.8.11.8.1.gif)
+
+点击`Send`后，显示报了`400`的错误
+
+![image-20220615231715243](image/4.8.11.8.2.png)
+
+查看`GulimallWareApplication`模块的控制台，可以发现已经报错了
+
+```
+Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot construct instance of `com.atguigu.gulimall.ware.vo.PurchaseDoneVo$PurchaseItemDone` (although at least one Creator exists): can only instantiate non-static inner class by using default, no-argument
+
+已解决 [org.springframework.http.converter.HttpMessageNotReadableException：JSON 解析错误：无法构造 `com.atguigu.gulimall.ware.vo.PurchaseDoneVo$PurchaseItemDone` 的实例（尽管至少存在一个 Creator）：只能实例化非静态 使用默认的无参数的内部类
+```
+
+![image-20220615231358244](image/4.8.11.8.3.png)
+
+把`gulimall-ware`模块的`com.atguigu.gulimall.ware.vo.PurchaseDoneVo`类的`PurchaseItemDone`内部类上添加`static`关键字
+
+![image-20220615231750046](image/4.8.11.8.4.png)
+
+重启`gulimall-ware`模块，打开`Postman`，再次发送请求，这次报了`500`的错误
+
+![image-20220615233005159](image/4.8.11.8.5.png)
+
+查看`GulimallWareApplication`模块的控制台，查看`sql`语句可以看到执行`update`操作时只有更新条件，却没有更新的字段
+
+```mysql
+UPDATE wms_ purchase_ detail WHERE id=?
+```
+
+![image-20220615233148420](image/4.8.11.8.6.png)
+
+调试发现，`purchaseDetailEntities`中`id`为`3`的数据的`status`为`null`，整条数据只有`id`
+
+![image-20220615233304771](image/4.8.11.8.7.png)
+
+在该`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类的`donePurchase`方法里添加过滤条件,只有`purchaseDetailEntity.getStatus()!=null`的数据才保留
+
+```java
+//1、改变采购项状态
+List<PurchaseDetailEntity> purchaseDetailEntities = purchaseDoneVo.getItems().stream().map(purchaseItemDone -> {
+    PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+    if (purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.HASERROR.getStatus()) {
+        flag.set(false);
+        purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.HASERROR.getStatus());
+    } else if (purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.FINISHED.getStatus()){
+        purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.FINISHED.getStatus());
+    }
+    purchaseDetailEntity.setId(purchaseItemDone.getItemId());
+    return purchaseDetailEntity;
+}).filter(purchaseDetailEntity->{
+    return purchaseDetailEntity.getStatus()!=null;
+}).collect(Collectors.toList());
+purchaseDetailService.updateBatchById(purchaseDetailEntities);
+```
+
+![image-20220615233734194](image/4.8.11.8.8.png)
+
+重启`gulimall-ware`模块，再次发送请求又报错了，再次调试
+
+查看`GulimallWareApplication`模块的控制台，查看`sql`语句,可以看到在`in()`里面没有传递数据
+
+```mysql
+SELECT id,ware_id, purchase_id, sku_price, sku_num,sku_id, status FROM wms_purchase_detail WHERE id IN ( )
+```
+
+![image-20220615234429118](image/4.8.11.8.9.png)
+
+在该`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.PurchaseServiceImpl`类的`donePurchase`方法里，修改`purchaseItemDone.getStatus()`与`PurchaseDetailStatusEnum.FINISHED.getStatus();`相比，并判断`purchaseDetailIds`不为空才添加或更新库存
+
+![image-20220615234255037](image/4.8.11.8.10.png)
+
+完整代码
+
+```java
+package com.atguigu.gulimall.ware.service.impl;
+
+import com.atguigu.common.constant.ware.PurchaseDetailStatusEnum;
+import com.atguigu.common.constant.ware.PurchaseStatusEnum;
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.ware.dao.PurchaseDao;
+import com.atguigu.gulimall.ware.entity.PurchaseDetailEntity;
+import com.atguigu.gulimall.ware.entity.PurchaseEntity;
+import com.atguigu.gulimall.ware.service.PurchaseDetailService;
+import com.atguigu.gulimall.ware.service.PurchaseService;
+import com.atguigu.gulimall.ware.service.WareSkuService;
+import com.atguigu.gulimall.ware.vo.MergeVo;
+import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
+
+@Service("purchaseService")
+public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity> implements PurchaseService {
+
+    @Autowired
+    PurchaseDetailService purchaseDetailService;
+    @Autowired
+    WareSkuService wareSkuService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<PurchaseEntity> page = this.page(
+                new Query<PurchaseEntity>().getPage(params),
+                new QueryWrapper<PurchaseEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils queryPageUnreceivePurchase(Map<String, Object> params) {
+
+        LambdaQueryWrapper<PurchaseEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询状态为0(新建) 或 1(已分配) 的采购单
+        lambdaQueryWrapper.eq(PurchaseEntity::getStatus, 0).or().eq(PurchaseEntity::getStatus, 1);
+
+        IPage<PurchaseEntity> page = this.page(
+                new Query<PurchaseEntity>().getPage(params),
+                lambdaQueryWrapper
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void mergePurchase(MergeVo mergeVo) {
+        Long purchaseId = mergeVo.getPurchaseId();
+        if (purchaseId == null) {
+            PurchaseEntity purchaseEntity = new PurchaseEntity();
+            purchaseEntity.setStatus(PurchaseStatusEnum.CREATED.getStatus());
+            //自动更新PurchaseEntity的更新时间
+            this.save(purchaseEntity);
+            purchaseId = purchaseEntity.getId();
+            //TODO 确认采购单状态是0，1才可以合并
+        } else {
+            //更新PurchaseEntity(采购单)的更新时间
+            PurchaseEntity purchaseEntity = new PurchaseEntity();
+            purchaseEntity.setId(purchaseId);
+            purchaseEntity.setUpdateTime(new Date());
+            this.updateById(purchaseEntity);
+        }
+
+        List<Long> items = mergeVo.getItems();
+        Long finalPurchaseId = purchaseId;
+        List<PurchaseDetailEntity> purchaseDetailEntities = items.stream().map(item -> {
+            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+            purchaseDetailEntity.setId(item);
+            purchaseDetailEntity.setPurchaseId(finalPurchaseId);
+            purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.ASSIGNED.getStatus());
+            return purchaseDetailEntity;
+        }).collect(Collectors.toList());
+
+        //合并采购需求，分派到指定采购单
+        purchaseDetailService.updateBatchById(purchaseDetailEntities);
+    }
+
+    /**
+     * 采购员领取采购单
+     *
+     * @param purchaseIds 采购单id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void received(List<Long> purchaseIds) {
+        //1、确认当前采购单的id是"新建"或者是"已分配"状态
+        LambdaQueryWrapper<PurchaseEntity> purchaseQueryWrapper = new LambdaQueryWrapper<>();
+        purchaseQueryWrapper.and(wrapper -> {
+            wrapper.eq(PurchaseEntity::getStatus, PurchaseStatusEnum.CREATED.getStatus())
+                    .or().eq(PurchaseEntity::getStatus, PurchaseStatusEnum.ASSIGNED.getStatus());
+        }).in(PurchaseEntity::getId, purchaseIds);
+        List<PurchaseEntity> purchaseEntities = this.list(purchaseQueryWrapper);
+
+        //2、改变采购单状态(已使用注解在更新字段时自动更新updateTime)
+        //TODO 设置采购人id，采购人名、联系方式
+        List<PurchaseEntity> newPurchaseEntities = purchaseEntities.stream().map(purchaseEntity -> {
+            purchaseEntity.setStatus(PurchaseStatusEnum.RECEIVE.getStatus());
+            return purchaseEntity;
+        }).collect(Collectors.toList());
+        this.updateBatchById(newPurchaseEntities);
+
+        //3、改变采购项状态
+        PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+        purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.BUYING.getStatus());
+        purchaseDetailService.updatePurchaseDetailBatchByPurchaseId(purchaseDetailEntity,newPurchaseEntities);
+    }
+
+    /**
+     * 采购员完成采购
+     * @param purchaseDoneVo
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void donePurchase(PurchaseDoneVo purchaseDoneVo) {
+
+        AtomicBoolean flag = new AtomicBoolean(true);
+        //1、改变采购项状态
+        List<PurchaseDetailEntity> purchaseDetailEntities = purchaseDoneVo.getItems().stream().map(purchaseItemDone -> {
+            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+            if (purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.HASERROR.getStatus()) {
+                flag.set(false);
+                purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.HASERROR.getStatus());
+            } else if (purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.FINISHED.getStatus()){
+                purchaseDetailEntity.setStatus(PurchaseDetailStatusEnum.FINISHED.getStatus());
+            }
+            purchaseDetailEntity.setId(purchaseItemDone.getItemId());
+            return purchaseDetailEntity;
+        }).filter(purchaseDetailEntity->{
+            return purchaseDetailEntity.getStatus()!=null;
+        }).collect(Collectors.toList());
+        purchaseDetailService.updateBatchById(purchaseDetailEntities);
+
+        //2、改变采购单状态
+        Long purchaseId = purchaseDoneVo.getId();
+        PurchaseEntity purchaseEntity = new PurchaseEntity();
+        purchaseEntity.setId(purchaseId);
+        Integer status = flag.get()?PurchaseStatusEnum.FINISHED.getStatus() : PurchaseStatusEnum.HASERROR.getStatus();
+        purchaseEntity.setStatus(status);
+        this.updateById(purchaseEntity);
+
+        //3、将成功采购的进行入库
+        List<Long> purchaseDetailIds = purchaseDoneVo.getItems().stream().filter(purchaseItemDone -> {
+            return purchaseItemDone.getStatus() == PurchaseDetailStatusEnum.FINISHED.getStatus();
+        }).map(PurchaseDoneVo.PurchaseItemDone::getItemId).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(purchaseDetailIds)) {
+            Collection<PurchaseDetailEntity> purchaseDetailList = purchaseDetailService.listByIds(purchaseDetailIds);
+            wareSkuService.addOrUpdateStockBatchByskuIdAndwareId(purchaseDetailList);
+        }
+    }
+
+}
+```
+
+#### 9、重新测试一
+
+重启`gulimall-ware`模块，再次发送请求，可以看到这次成功了
+
+![image-20220615234546911](image/4.8.11.9.1.png)
+
+在`库存系统/采购单维护/采购单`里，`采购单id`为`4`的`状态`已正确变为`有异常`
+
+![image-20220615234624963](image/4.8.11.9.2.png)
+
+在`库存系统/采购单维护/采购需求`里，`id`为`3`的`状态`已正确变为`已完成`，`id`为`4`的`状态`已正确变为`采购失败`
+
+![image-20220615234706291](image/4.8.11.9.3.png)
+
+#### 10、重新测试二
+
+在`库存系统/采购单维护/采购需求`里，点击`新建`，在`采购商品id`里输入`2`，`采购数量`里输入`10`，`仓库`里选择`1号仓库`，然后点击确定
+
+![image-20220615234821431](image/4.8.11.10.1.png)
+
+在`库存系统/采购单维护/采购需求`里，点击`新建`，在`采购商品id`里输入`3`，`采购数量`里输入`15`，`仓库`里选择`1号仓库`，然后点击确定
+
+![image-20220615234903216](image/4.8.11.10.2.png)
+
+在`库存系统/采购单维护/采购需求`里，点击`新建`，在`采购商品id`里输入`4`，`采购数量`里输入`5`，`仓库`里选择`1号仓库`，然后点击确定
+
+![image-20220615234940017](image/4.8.11.10.3.png)
+
+在`库存系统/采购单维护/采购需求`里选择刚刚新建的`采购单id`为`5`、`6`、`7`的三个采购单，然后点击`批量操作`，在`批量操作`里选择`合并整单`；在`合并到整单`里不选择想要合并的采购单，直接点击确定，在弹出的`提示`对话框里点击`确定`
+
+在`库存系统/采购单维护/采购单`里，点击刚刚自动创建的`采购单`的右侧`修改`按钮,在弹出的`合并到整单`的对话框中的下拉列表中选择`admin`,然后点击确定
+
+![GIF 2022-6-15 23-51-32](image/4.8.11.10.4.gif)
+
+使用`Postma`发送`领取采购单`，在`json`的输入框里输入刚刚自动创建的采购单的id：`[5]`，然后点击`Send`
+
+![image-20220615235334954](image/4.8.11.10.5.png)
+
+可以看到在`库存系统/采购单维护/采购单`里，`采购单id`为`5`的状态已经变为`已领取`了
+
+![image-20220615235441128](image/4.8.11.10.6.png)
+
+点击`库存系统/采购单维护/采购需求`，可以看到刚刚新建的`采购单id`为`5`、`6`、`7`的三个采购单的状态已全部变为`正在采购`了
+
+![image-20220615235505421](image/4.8.11.10.7.png)
+
+使用`Postma`发送`完成采购`，在`json`的输入框里输入以下`json`，然后点击`Send`
+
+发送的请求中`id`对应`库存系统/采购单维护/采购需求`里的`id`，`items`里的`itemId`对应`库存系统/采购单维护/采购需求`里的`采购单id`，即为完成某个采购单的部分或全部`采购项(采购需求)`
+
+这里将`采购单id`为`5`的所有`采购项(采购需求)`的状态都变为`3`，表示全部采购成功
+
+```json
+{
+   "id": 5,
+   "items": [
+       {"itemId":5,"status":3,"reason":""},
+       {"itemId":6,"status":3,"reason":""},
+       {"itemId":7,"status":3,"reason":""}
+    ]
+}
+```
+
+![image-20220616000426342](image/4.8.11.10.8.png)
+
+可以看到在`库存系统/采购单维护/采购单`里，`采购单id`为`5`的状态已经变为`已完成`了
+
+![image-20220616002409091](image/4.8.11.10.9.png)
+
+点击`库存系统/采购单维护/采购需求`，可以看到刚刚新建的`采购单id`为`5`、`6`、`7`的三个采购单的状态已全部变为`已完成`了
+
+![image-20220616002426774](image/4.8.11.10.10.png)
+
+### 4.8.12、远程调用`gulimall-product`模块
+
+#### 1、查出`sku_name`
+
+想查出`库存系统/商品库存`里，每条数据的`sku_name`的值
+
+![image-20220618181715170](image/4.8.12.1.png)
+
+#### 2、查看远程提供的服务接口
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl`类的`addOrUpdateStockByskuIdAndwareId`方法里添加代办事项，稍后完成`远程查询sku的名字`这个功能
+
+![image-20220616233031996](image/4.8.12.2.1.png)
+
+此时想要调用`gulimall-product`模块的`com.atguigu.gulimall.product.controller.SkuInfoController`类的`info`这个方法
+
+![image-20220616233341069](image/4.8.12.2.2.png)
+
+#### 3、新建`CouponFeignService`接口
+
+在`gulimall-ware`模块里`com.atguigu.gulimall.ware`包下新建`feign`文件夹，在这个文件夹里新建`CouponFeignService`接口
+
+![image-20220616233614305](image/4.8.12.3.1.png)
+
+添加上一些注释
+
+```java
+package com.atguigu.gulimall.ware.feign;
+
+import com.atguigu.common.utils.R;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @author  无名氏
+ * @date  2022/6/16
+ * @Description:
+ */
+@FeignClient("gulimall-gateway")
+public interface ProductFeignService {
+
+    /**
+     * 1)、让所有请求过网关;
+     *    1、@FeignClient( "gulimall-gateway"):给gulimall-gateway所在的机器发请求
+     *    2、/api/product/skuinfo/info/{skuId}
+     * 2)、直接让后台指定服务处理
+     *    1、@FeignClient( "gulimall-gateway")
+     *    2、/product/skuinfo/info/{skuId}
+     * @param skuId
+     * @return
+     */
+    @RequestMapping("/api/product/skuinfo/info/{skuId}")
+    public R info(@PathVariable("skuId") Long skuId);
+}
+```
+
+![image-20220616233927770](image/4.8.12.3.2.png)
+
+#### 4、修改`添加或更新库存`方法
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl`类里修改`addOrUpdateStockByskuIdAndwareId`方法
+
+```java
+@Autowired
+ProductFeignService productFeignService;
+
+@Transactional(rollbackFor = Exception.class)
+public void addOrUpdateStockByskuIdAndwareId(PurchaseDetailEntity purchaseDetailEntity) {
+    WareSkuEntity wareSkuEntity = new WareSkuEntity();
+    wareSkuEntity.setSkuId(purchaseDetailEntity.getSkuId());
+    wareSkuEntity.setWareId(purchaseDetailEntity.getWareId());
+
+    LambdaQueryWrapper<WareSkuEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(WareSkuEntity::getSkuId, purchaseDetailEntity.getSkuId())
+            .eq(WareSkuEntity::getWareId, purchaseDetailEntity.getWareId());
+    WareSkuEntity query = wareSkuDao.selectOne(lambdaQueryWrapper);
+    if (query == null) {
+        wareSkuEntity.setStockLocked(0);
+        //远程查询sku的名字；如果失败，整个事务不回滚
+        //1、 自己catch异常
+        //TODO 还可以用什么办法让异常出现以后不回滚?高级
+        try {
+            R info = productFeignService.info(wareSkuEntity.getSkuId());
+            if (info.getCode() == 0){
+                Map<String, Object> skuInfo = (Map<String, Object>) info.get("skuInfo");
+                wareSkuEntity.setSkuName((String) skuInfo.get("skuName"));
+            }
+        } catch (Exception e) {
+
+        }
+        wareSkuEntity.setStock(purchaseDetailEntity.getSkuNum());
+        wareSkuDao.insert(wareSkuEntity);
+    } else {
+        wareSkuEntity.setId(query.getId());
+        wareSkuEntity.setStock(query.getStock() + purchaseDetailEntity.getSkuNum());
+        wareSkuDao.updateById(wareSkuEntity);
+    }
+}
+```
+
+![image-20220616235351460](image/4.8.12.4.png)
+
+最后经过优化，改成了这样
+
+```java
+@Autowired
+ProductFeignService productFeignService;
+
+@Transactional(rollbackFor = Exception.class)
+public void addOrUpdateStockByskuIdAndwareId(PurchaseDetailEntity purchaseDetailEntity) {
+    WareSkuEntity wareSkuEntity = new WareSkuEntity();
+    wareSkuEntity.setSkuId(purchaseDetailEntity.getSkuId());
+    wareSkuEntity.setWareId(purchaseDetailEntity.getWareId());
+
+    LambdaQueryWrapper<WareSkuEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(WareSkuEntity::getSkuId, purchaseDetailEntity.getSkuId())
+            .eq(WareSkuEntity::getWareId, purchaseDetailEntity.getWareId());
+    WareSkuEntity query = wareSkuDao.selectOne(lambdaQueryWrapper);
+    if (query==null || query.getSkuName()==null){
+        //远程查询sku的名字；如果失败，整个事务不回滚
+        //1、 自己catch异常
+        //TODO 还可以用什么办法让异常出现以后不回滚?高级
+        try {
+            R info = productFeignService.info(wareSkuEntity.getSkuId());
+            if (info.getCode() == 0){
+                Map<String, Object> skuInfo = (Map<String, Object>) info.get("skuInfo");
+                wareSkuEntity.setSkuName((String) skuInfo.get("skuName"));
+            }
+        } catch (Exception e) {
+        }
+    }
+    if (query == null) {
+        wareSkuEntity.setStockLocked(0);
+        wareSkuEntity.setStock(purchaseDetailEntity.getSkuNum());
+        wareSkuDao.insert(wareSkuEntity);
+    } else {
+        wareSkuEntity.setId(query.getId());
+        wareSkuEntity.setStock(query.getStock() + purchaseDetailEntity.getSkuNum());
+        wareSkuDao.updateById(wareSkuEntity);
+    }
+}
+```
+
+#### 5、解决`IDEA`报红
+
+可以看到在`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl`类里注入的`productFeignService`对象报红，这个报红属于`IDEA`的问题，是`IDEA`检测到无法注入所以报红
+
+![image-20220618175013156](image/4.8.12.5.1.png)
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.feign.ProductFeignService`接口上添加`@Service`注解
+
+![image-20220618175103940](image/4.8.12.5.2.png)
+
+这样`gulimall-ware`模块的`com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl`类里注入的`productFeignService`对象就不报红了
+
+![image-20220618224651290](image/4.8.12.5.3.png)
+
+#### 6、启动`gulimall-ware`模块失败
+
+重启`gulimall-ware`模块时，控制台报错
+
+```
+ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'purchaseController': Unsatisfied dependency expressed through field 'purchaseService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'purchaseService': Unsatisfied dependency expressed through field 'wareSkuService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'wareSkuService': Unsatisfied dependency expressed through field 'productFeignService'; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.atguigu.gulimall.ware.feign.ProductFeignService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+
+ConfigServletWebServerApplicationContext：上下文初始化期间遇到异常 - 取消刷新尝试：org.springframework.beans.factory.UnsatisfiedDependencyException：创建名称为“purchaseController”的bean时出错：通过字段“purchaseService”表示不满足的依赖关系；嵌套异常是 org.springframework.beans.factory.UnsatisfiedDependencyException：创建名称为“purchaseService”的 bean 时出错：通过字段“wareSkuService”表示的依赖关系不满足；嵌套异常是 org.springframework.beans.factory.UnsatisfiedDependencyException：创建名为 'wareSkuService' 的 bean 时出错：通过字段 'productFeignService' 表达的依赖关系不满足；嵌套异常是 org.springframework.beans.factory.NoSuchBeanDefinitionException：没有“com.atguigu.gulimall.ware.feign.ProductFeignService”类型的合格 bean 可用：预计至少有 1 个有资格作为自动装配候选者的 bean。依赖注解：{@org.springframework.beans.factory.annotation.Autowired(required=true)}
+```
+
+` 'com.atguigu.gulimall.ware.feign.ProductFeignService' that could not be found`这句话说得很清楚了，就是`ProductFeignService`这个接口没有找到(准确的说是它的实现类没有找到，不能成功注入，`Spring`中不能注入接口)
+
+```
+Field productFeignService in com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl required a bean of type 'com.atguigu.gulimall.ware.feign.ProductFeignService' that could not be found.
+
+com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl 中的字段 productFeignService 需要类型为“com.atguigu.gulimall.ware.feign.ProductFeignService”的 bean。但是没有找到
+```
+
+![image-20220618174435966](image/4.8.12.6.png)
+
+完整报错信息
+
+```
+2022-06-18 17:43:29.843  WARN 18808 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'purchaseController': Unsatisfied dependency expressed through field 'purchaseService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'purchaseService': Unsatisfied dependency expressed through field 'wareSkuService'; nested exception is org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'wareSkuService': Unsatisfied dependency expressed through field 'productFeignService'; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.atguigu.gulimall.ware.feign.ProductFeignService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+2022-06-18 17:43:29.845  INFO 18808 --- [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2022-06-18 17:43:29.856  INFO 18808 --- [           main] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2022-06-18 17:43:29.944 ERROR 18808 --- [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field productFeignService in com.atguigu.gulimall.ware.service.impl.WareSkuServiceImpl required a bean of type 'com.atguigu.gulimall.ware.feign.ProductFeignService' that could not be found.
+
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+
+
+Action:
+
+Consider defining a bean of type 'com.atguigu.gulimall.ware.feign.ProductFeignService' in your configuration.
+```
+
+#### 7、开启远程调用
+
+在`gulimall-ware`模块的`com.atguigu.gulimall.ware.GulimallWareApplication`启动类上添加注解，以开启远程调用
+
+```java
+@EnableFeignClients(basePackages = "com.atguigu.gulimall.ware.feign")
+```
+
+![image-20220618224737308](image/4.8.12.7.png)
+
+#### 8、重新测试
+
+重启`gulimall-ware`模块，刷新前端页面
+
+在`库存系统/采购单维护/采购需求`里，点击`新建`，在`采购商品id`里输入`7`，`采购数量`里输入`7`，`仓库`里选择`1号仓库`，然后点击确定，
+
+选中刚刚新建的`id`为`8`的采购需求按钮，然后点击`批量操作`，在`批量操作`里选择`合并整单`；在`合并到整单`里不选择想要合并的采购单，直接点击确定，在弹出的`提示`对话框里点击`确定`
+
+![GIF 2022-6-18 22-03-49](image/4.8.12.8.1.gif)
+
+在`库存系统/采购单维护/采购单`里，点击刚刚自动创建的`采购单`的右侧`分配`按钮,在弹出的`分配采购人员`的对话框中的下拉列表中选择`admin`,然后点击确定
+
+![GIF 2022-6-18 22-05-31](image/4.8.12.8.2.gif)
+
+打开`Postman`，在`领取采购单`的`json`输入框里输入`[6]`，点击`Send`
+
+在`完成采购`的`json`输入框里输入如下`json`，点击`Send`
+
+```json
+{
+   "id": 6,
+   "items": [
+       {"itemId":8,"status":3,"reason":""}
+    ]
+}
+```
+
+![GIF 2022-6-18 22-06-55](image/4.8.12.8.3.png)
+
+可以看到，此时可以看到已经成功插入`sku_name`字段了
+
+![image-20220618224951824](image/4.8.12.8.4.png)
+
+## 4.9、商品服务-API-商品管理
+
+#### 1、无法访问
+
+点击`商品系统/商品维护/spu管理`，随便点击一条数据的右边的`规格`按钮，可以看到报了`400`的异常
+
+![GIF 2022-6-18 22-57-00](image/4.9.1.1.gif)
+
+可以在选中`gulimall_admin`数据库，右键选择`新建查询`，输入以下`sql`，手动创建一个路由的路径
+
+```mysql
+INSERT INTO sys_menu (menu_id, parent_id, name, url, perms, type, icon, order_num) VALUES (76, 37, '规格维护', 'product/attrupdate', '', 2, 'log', 0);
+```
+
+![GIF 2022-6-18 22-59-57](image/4.9.1.2.gif)
+
+点击`商品系统/商品维护/spu管理`，再随便点击一条数据的右边的`规格`按钮，可以看到已经可以正常显示出来`规格维护`了
+
+![GIF 2022-6-18 23-01-32](image/4.9.1.3.png)
+
+如果还是无法访问，可以在`navicat`里选择`gulimall_admin`数据库中的`sys_menu`表，在里面把刚刚插入`name`为规格维护的那条数据的`type`把`2`改成`1`就可以了
+
+![image-20220618232306790](image/4.9.1.4.png)
+
+如果还是无法访问，可以打开`VS Code`，在`src\router\index.js`文件里的`mainRoutes`里的`children`里添加一条路径
+
+```json
+{ path: '/product-attrupdate', component: _import('modules/product/attrupdate'), name: 'attr-update', meta: { title: '规格维护', isTab: true } }
+```
+
+![image-20220618232119164](image/4.9.1.5.png)
+
+#### 2、查看接口
+
+接口文档在`商品系统/22、获取spu规格`里：https://easydoc.net/s/78237135/ZUqEdvA4/GhhJhkg7
+
+![image-20220616235801916](image/4.9.2.png)
+
+#### 3、添加`baseAttrlistforspu`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrController`类里添加`baseAttrlistforspu`方法
+
+```java
+/**
+ * /product/attr/base/listforspu/{spuId}
+ * @param spuId
+ * @return
+ */
+@GetMapping("/base/listforspu/{spuId}")
+public R baseAttrlistforspu(@PathVariable("spuId") Long spuId){
+
+    List<ProductAttrValueEntity> data = productAttrValueService.baseAttrlistforspu(spuId);
+    return R.ok().put("data",data);
+}
+```
+
+![image-20220618234506140](image/4.9.3.png)
+
+#### 4、添加`baseAttrlistforspu`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.ProductAttrValueService`类里添加`baseAttrlistforspu`抽象方法
+
+```java
+List<ProductAttrValueEntity> baseAttrlistforspu(Long spuId);
+```
+
+![image-20220618233809045](image/4.9.4.png)
+
+#### 5、实现`baseAttrlistforspu`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里实现未实现的`baseAttrlistforspu`抽象方法
+
+```java
+@Override
+public List<ProductAttrValueEntity> baseAttrlistforspu(Long spuId) {
+    LambdaQueryWrapper<ProductAttrValueEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(ProductAttrValueEntity::getSpuId,spuId);
+    return this.baseMapper.selectList(lambdaQueryWrapper);
+}
+```
+
+![image-20220618234037898](image/4.9.5.png)
+
+#### 6、无法回显数据
+
+重启`gulimall-product`模块，如果前端无法回显数据，可以修改`src\views\modules\product\spuinfo.vue`里的`attrUpdateShow`方法的名为`query`的`catalogId`为`row.catalogId`
+
+```javascript
+attrUpdateShow(row) {
+  console.log(row);
+  this.$router.push({
+    path: "/product-attrupdate",
+    query: { spuId: row.id, catalogId: row.catalogId }
+  });
+},
+```
+
+> 数据库中 与商品spu sku有关的两张表 pms_spu_info 和 pms_sku_info中关于商品分类的字段catelog_id在建表时都打成了catalog_id，如果要矫正那么除了修改数据库，对应由工具生成的实体类Entity，controller,service和mapper中的字段配置都要改。此外，表的catelog_id没有错误。点击“规格”报404是因为在规格点击后，前端不会做路由跳转，需要参照评论回复中的小伙伴的方法在前端src/router/index.js中添加对应配置(你们找一找把)。这个“spu管理”界面对应vue的spuinfo.vue，他在跳转时会把选中行的id和分类id都封装进去做跳转，承接开头，找到spuinfo.vue的101行，把 【query: {spuId: row.id, catelogId: row.catelogId}】中的row.catelogId改成row.catalogId即可，因为是从pms_spu_info表中来的catalog_id字段去和pms_attr_group中欧冠的catelog_id字段做逻辑上的关联查询的。字段不对应查不出结果就只剩下一个确认修改，其他组件也不会渲染出来。
+
+![image-20220618235131788](image/4.9.6.1.png)
+
+如果遇到多选无法回显问题可以在`src\views\modules\product\attrupdate.vue`文件的`showBaseAttrs`方法里加一个判断
+
+```javascript
+if (v.length == 1 && attr.valueType == 0) {
+          v = v[0] + "";
+        }
+```
+
+另外当属性分组中，有的分组没有任何属性时候，也会报Cannot read property 'forEach' of null。 因为该分组的attrs会查出null值。
+
+可以修改为以下代码
+
+```javascript
+//先对表单的baseAttrs进行初始化
+data.data.forEach((item) => {
+  let attrArray = [];
+  if (item.attrs != null) {
+    item.attrs.forEach((attr) => {
+      let v = "";
+      if (_this.spuAttrsMap["" + attr.attrId]) {
+        v = _this.spuAttrsMap["" + attr.attrId].attrValue.split(";");
+        if (v.length == 1 && attr.valueType == 0) {
+          v = v[0] + "";
+        }
+      }
+      attrArray.push({
+        attrId: attr.attrId,
+        attrName: attr.attrName,
+        attrValues: v,
+        showDesc: _this.spuAttrsMap["" + attr.attrId]
+          ? _this.spuAttrsMap["" + attr.attrId].quickShow
+          : attr.showDesc,
+      });
+    });
+  }
+  this.dataResp.baseAttrs.push(attrArray);
+});
+this.dataResp.attrGroups = data.data;
+```
+
+![image-20220619000414268](image/4.9.6.2.png)
+
+#### 7、查看接口
+
+点击`商品系统/商品维护/spu管理`，随便点击一条数据的右边的`规格`按钮，先打开控制台，点击`Network`，清空数据，然后点击`确认修改`查看接口为： http://localhost:88/api/product/attr/update/1
+
+![image-20220619001237932](image/4.9.7.1.png)
+
+ 接口文档在`商品系统/23、修改商品规格`里： https://easydoc.net/s/78237135/ZUqEdvA4/GhnJ0L85
+
+![image-20220619083101912](image/4.9.7.2.png)
+
+#### 8、新建`updateSpuAttr`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrController`类里新建`updateSpuAttr`方法
+
+```java
+/**
+ * 根据spuid修改规格参数
+ */
+@PostMapping("/update/{spuId}")
+public R updateSpuAttr(@PathVariable("spuId") Long spuId,@RequestBody List<ProductAttrValueEntity> productAttrValueEntities) {
+    productAttrValueService.updateSpuAttr(spuId,productAttrValueEntities);
+
+    return R.ok();
+}
+```
+
+![image-20220619083218353](image/4.9.8.png)
+
+#### 9、新建`updateSpuAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.ProductAttrValueService`接口里新建`updateSpuAttr`抽象方法
+
+![image-20220619083256215](image/4.9.9.png)
+
+#### 10、实现`updateSpuAttr`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.ProductAttrValueServiceImpl`类里实现未实现的`updateSpuAttr`抽象方法
+
+```java
+@Transactional(rollbackFor = Exception.class)
+@Override
+public void updateSpuAttr(Long spuId, List<ProductAttrValueEntity> productAttrValueEntities) {
+    LambdaQueryWrapper<ProductAttrValueEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(ProductAttrValueEntity::getSpuId,spuId);
+    this.baseMapper.delete(lambdaQueryWrapper);
+
+
+    List<ProductAttrValueEntity> collect = productAttrValueEntities.stream().map(productAttrValueEntity -> {
+        productAttrValueEntity.setSpuId(spuId);
+        return productAttrValueEntity;
+    }).collect(Collectors.toList());
+    this.saveBatch(collect);
+}
+```
+
+![image-20220619084026551](image/4.9.10.png)
+
+#### 11、测试
+
+选择`商品系统/商品维护/spu管理`，点击`id`为`1`的那条数据的右边的`规格`按钮，将`基本信息`中的`机身颜色`修改为`黑色`，然后点击确认修改，在弹出的`提示`对话框中点击`确定`,再次从`spu管理`里进入该页面，可以发现并没有修改成功
+
+![GIF 2022-6-19 8-48-41](image/4.9.11.1.gif)
+
+查看`GulimallProductApplication`控制台，可以看到已经报错了
+
+```
+No primary or default constructor found for interface java.util.List
+未找到接口 java.util.List 的主构造函数或默认构造函数
+```
+
+![image-20220619085027587](image/4.9.11.2.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.controller.AttrController`类的`updateSpuAttr`方法的`List<ProductAttrValueEntity> productAttrValueEntities`这个参数左边添加`@RequestBody`注解，指明该数据在请求体里面
+
+![image-20220619085149599](image/4.9.11.3.png)
+
+重启`gulimall-product`模块，刷新前端页面
+
+再次选择`商品系统/商品维护/spu管理`，点击`id`为`1`的那条数据的右边的`规格`按钮，将`基本信息`中的`机身颜色`修改为`黑色`，然后点击确认修改，在弹出的`提示`对话框中点击`确定`,再次从`spu管理`里进入该页面，可以发现已经修改成功了
+
+![GIF 2022-6-19 8-52-52](image/4.9.11.4.gif)
+
+## 4.10、分布式基础篇总结
+
+**1**、分布式基础概念
+
+  •微服务、注册中心、配置中心、远程调用、Feign、网关
+
+**2**、基础开发
+
+  •SpringBoot2.0、SpringCloud、Mybatis-Plus、Vue组件化、阿里云对象存储
+
+**3**、环境
+
+  •Vagrant、Linux、Docker、MySQL、Redis、逆向工程&人人开源
+
+**4**、开发规范
+
+  •数据校验JSR303、全局异常处理、全局统一返回、全局跨域处理
+
+  •枚举状态、业务状态码、VO与TO与PO划分、逻辑删除
+
+  •Lombok：@Data、@Slf4j 

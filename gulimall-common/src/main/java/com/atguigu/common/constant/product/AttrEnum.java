@@ -1,11 +1,11 @@
-package com.atguigu.common.constant;
+package com.atguigu.common.constant.product;
 
 /**
  * @author 无名氏
  * @date 2022/5/17
  * @Description:
  */
-public enum ProductConstant {
+public enum AttrEnum {
     /**
      * 基本属性
      */
@@ -18,7 +18,7 @@ public enum ProductConstant {
     private int code;
     private String msg;
 
-    ProductConstant(int code, String msg) {
+    AttrEnum(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

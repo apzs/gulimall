@@ -1,6 +1,6 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import com.atguigu.common.constant.ProductConstant;
+import com.atguigu.common.constant.product.AttrEnum;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
@@ -62,7 +62,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         //1、保存基本数据
         this.save(attrEntity);
         //2、如果是基本属性,则还要保存关联关系
-        if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()!=null) {
+        if (attr.getAttrType() == AttrEnum.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()!=null) {
             AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
             attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
             //调用this.save(attrEntity);方法后，会将数据库生成的attrId封装到AttrEntity里面
@@ -77,8 +77,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         //判断是"基本属性"还是"销售属性"
         lambdaQueryWrapper.eq(AttrEntity::getAttrType,
                 "base".equalsIgnoreCase(attrType) ?
-                        ProductConstant.ATTR_TYPE_BASE.getCode() :
-                        ProductConstant.ATTR_TYPES_SALE.getCode());
+                        AttrEnum.ATTR_TYPE_BASE.getCode() :
+                        AttrEnum.ATTR_TYPES_SALE.getCode());
         if (categoryId != 0) {
             //如果有categoryId，则查该categoryId的数据
             lambdaQueryWrapper.eq(AttrEntity::getCatelogId, categoryId);
@@ -135,7 +135,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         BeanUtils.copyProperties(attrEntity, attrRespVo);
 
         //如果是基本属性，需要设置分组信息
-        if (attrEntity.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode()) {
+        if (attrEntity.getAttrType() == AttrEnum.ATTR_TYPE_BASE.getCode()) {
             LambdaQueryWrapper<AttrAttrgroupRelationEntity> attrAttrgroupRelationQueryWrapper = new LambdaQueryWrapper<>();
             attrAttrgroupRelationQueryWrapper.eq(AttrAttrgroupRelationEntity::getAttrId, attrId);
             //根据attrId到attrAttrgroupRelation关联关系表里查attrGroupId
@@ -167,7 +167,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         this.updateById(attrEntity);
 
         //如果是基本属性，就更新或添加关联关系
-        if (attr.getAttrType() == ProductConstant.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()!=null) {
+        if (attr.getAttrType() == AttrEnum.ATTR_TYPE_BASE.getCode() && attr.getAttrGroupId()!=null) {
             AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
             attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
 
@@ -250,7 +250,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         List<Long> otherAttrGroupIds = otherGroups.stream().map(AttrGroupEntity::getAttrGroupId).collect(Collectors.toList());
         LambdaQueryWrapper<AttrEntity> attrQueryWrapper = new LambdaQueryWrapper<>();
         attrQueryWrapper.eq(AttrEntity::getCatelogId, catelogId);
-        attrQueryWrapper.eq(AttrEntity::getAttrType,ProductConstant.ATTR_TYPE_BASE.getCode());
+        attrQueryWrapper.eq(AttrEntity::getAttrType, AttrEnum.ATTR_TYPE_BASE.getCode());
         //2.2)、如果有其他分组，则查询这些分组关联的属性
         //otherAttrGroupIds!=null && 有些多余
         if (otherAttrGroupIds!=null && otherAttrGroupIds.size()>0) {

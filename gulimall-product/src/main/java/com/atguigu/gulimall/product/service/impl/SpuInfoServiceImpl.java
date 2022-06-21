@@ -10,6 +10,7 @@ import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.atguigu.gulimall.product.vo.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -145,9 +148,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     skuImagesEntity.setImgUrl(img.getImgUrl());
                     skuImagesEntity.setDefaultImg(img.getDefaultImg());
                     return skuImagesEntity;
+                }).filter(entry->{
+                    //如果图片的url为空，就过滤掉
+                    return StringUtils.hasLength(entry.getImgUrl());
                 }).collect(Collectors.toList());
                 skuImagesService.saveBatch(skuImagesEntities);
-
+                //TODO 没有图片；路径的无需保存
                 //5.3)、sku的销售属性信息: pms_sku_sale_attr_value
                 List<SpuSaveVo.Attr> attrs = sku.getAttr();
                 List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrs.stream().map(attr -> {
@@ -162,9 +168,20 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 SkuReductionTo skuReductionTo = new SkuReductionTo();
                 BeanUtils.copyProperties(sku,skuReductionTo);
                 skuReductionTo.setSkuId(skuId);
-                R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
-                if (r1.getCode()!=0){
-                    log.error("远程保存sku优惠信息失败");
+                System.out.println(skuReductionTo.getMemberPrice());
+
+                Optional<SpuSaveVo.MemberPrice> firstMemberPrice = sku.getMemberPrice().stream()
+                        .filter(memberPrice -> memberPrice.getPrice().compareTo(BigDecimal.ZERO) > 0)
+                        .findFirst();
+
+                //满几件打几折、满多少减多少、会员价格，如果有一项有数据才调用远程服务
+                if (skuReductionTo.getFullCount()>0
+                        || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0
+                        || firstMemberPrice.isPresent()){
+                    R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
+                    if (r1.getCode()!=0){
+                        log.error("远程保存sku优惠信息失败");
+                    }
                 }
             });
         }
@@ -176,6 +193,48 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     public void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {
         this.baseMapper.insert(spuInfoEntity);
     }
+
+    /**
+     * 根据条件分页查询
+     * {
+     *    page: 1,//当前页码
+     *    limit: 10,//每页记录数
+     *    sidx: 'id',//排序字段
+     *    order: 'asc/desc',//排序方式
+     *    key: '华为',//检索关键字
+     *    catelogId: 6,//三级分类id
+     *    brandId: 1,//品牌id
+     *    status: 0,//商品状态
+     * }
+     * @param params
+     * @return
+     */
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        LambdaQueryWrapper<SpuInfoEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //根据"key"，精确匹配商品id 或 模糊查询spu_name
+        String key = (String) params.get("key");
+        lambdaQueryWrapper.and(StringUtils.hasLength(key) && !"0".equalsIgnoreCase(key),wrapper->{
+            wrapper.eq(SpuInfoEntity::getId,key).or().like(SpuInfoEntity::getSpuName,key);
+        });
+        //根据status精确匹配状态
+        String status = (String) params.get("status");
+        lambdaQueryWrapper.eq(StringUtils.hasLength(status) && !"0".equalsIgnoreCase(status),SpuInfoEntity::getPublishStatus,status);
+        //根据brandId精确匹配品牌id
+        String brandId = (String) params.get("brandId");
+        lambdaQueryWrapper.eq(StringUtils.hasLength(brandId) && !"0".equalsIgnoreCase(brandId),SpuInfoEntity::getBrandId,brandId);
+        //根据catelogId精确匹配所属分类id（注意：前端发来的是catelogId,数据库写的是catalogId）
+        String catelogId = (String) params.get("catelogId");
+        lambdaQueryWrapper.eq(StringUtils.hasLength(catelogId) && !"0".equalsIgnoreCase(catelogId),SpuInfoEntity::getCatalogId,catelogId);
+
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                lambdaQueryWrapper
+        );
+
+        return new PageUtils(page);
+    }
+
 
 
 }
