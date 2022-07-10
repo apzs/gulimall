@@ -8,6 +8,7 @@ import com.atguigu.gulimall.ware.entity.PurchaseDetailEntity;
 import com.atguigu.gulimall.ware.entity.WareSkuEntity;
 import com.atguigu.gulimall.ware.feign.ProductFeignService;
 import com.atguigu.gulimall.ware.service.WareSkuService;
+import com.atguigu.common.to.SkuHasStockTo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("wareSkuService")
@@ -100,5 +103,19 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         }
     }
 
+    @Override
+    public List<SkuHasStockTo> getSkuHasStock(List<Long> skuIds) {
+        List<SkuHasStockTo> collect = skuIds.stream().map(skuId -> {
+            SkuHasStockTo vo = new SkuHasStockTo();
+            //SELECT SUM (stock) FROM、 wms ware skui WHERE sku id=1
+            Long count = this.baseMapper.getSkuStock(skuId);
+
+            vo.setSkuId(skuId);
+            vo.setHasStock(count != null && count > 0);
+            return vo;
+        }).collect(Collectors.toList());
+
+        return collect;
+    }
 
 }

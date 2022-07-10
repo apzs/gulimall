@@ -13,5 +13,10 @@
         <result property="stockLocked" column="stock_locked"/>
     </resultMap>
 
+    <!--   库存数 = 剩余库存 - 已被锁定的件数(已生成订单但未付款，已下单等)    -->
+    <select id="getSkuStock" resultType="java.lang.Long">
+        select sum(stock-stock_locked) from gulimall_wms.wms_ware_sku where sku_id=#{skuId}
+    </select>
+
 
 </mapper>

@@ -1,11 +1,13 @@
 package com.atguigu.gulimall.ware.service;
 
 import com.atguigu.gulimall.ware.entity.PurchaseDetailEntity;
+import com.atguigu.common.to.SkuHasStockTo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.ware.entity.WareSkuEntity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,5 +23,8 @@ public interface WareSkuService extends IService<WareSkuEntity> {
 
 
     void addOrUpdateStockBatchByskuIdAndwareId(Collection<PurchaseDetailEntity> purchaseDetailList);
+
+    List<SkuHasStockTo> getSkuHasStock(List<Long> skuIds);
+
 }
 

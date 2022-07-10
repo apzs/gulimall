@@ -1,12 +1,9 @@
 package com.atguigu.gulimall.ware.dao;
 
-import com.atguigu.gulimall.ware.entity.PurchaseDetailEntity;
 import com.atguigu.gulimall.ware.entity.WareSkuEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
-
-import java.util.Collection;
 
 /**
  * 商品库存
@@ -19,7 +16,10 @@ import java.util.Collection;
 @Repository
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
 
-    void addStock(Collection<PurchaseDetailEntity> purchaseDetailList);
+    //void addStock(Collection<PurchaseDetailEntity> purchaseDetailList);
     //void addStock(@Param("skuId") Long skuId, @Param("wareId") Long wareId, @Param("skuNum") Integer skuNum);
+
+    Long getSkuStock(Long skuId);
+
 
 }
