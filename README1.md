@@ -5542,7 +5542,7 @@ vue init webpack vue-demo
 npm ls -g
 ```
 
-![image-20220425230733942](C:/Users/无名氏/AppData/Roaming/Typora/typora-user-images/image-20220425230733942.png)
+![image-20220425230733942](image/3.3.9.3.11.png)
 
 :pushpin:查看已安装的包
 
@@ -5552,7 +5552,7 @@ npm ls -g --depth 0
 
 只会查到安装的包，并不会查到包的依赖。
 
-![image-20220425231419361](C:/Users/无名氏/AppData/Roaming/Typora/typora-user-images/image-20220425231419361.png)
+![image-20220425231419361](image/3.3.9.3.12.png)
 
 ##### 4、启动 vue 项目；
 
@@ -26842,7 +26842,7 @@ spring:
     - RewritePath=/api/(?<segment>/?.*),/$\{segment}
 ```
 
-![image-20220614162009550](C:/Users/无名氏/AppData/Roaming/Typora/typora-user-images/image-20220614162009550.png)
+![image-20220614162009550](image/4.8.3.2.png)
 
 重启`gulimall-ware`模块，刷新前端页面，可以看到请求已经成功了
 

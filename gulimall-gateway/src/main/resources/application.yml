@@ -15,7 +15,7 @@ spring:
         - id: product_route
           uri: lb://gulimall-product
           predicates:
-            - Path=/api/product/**
+            - Path=/api/product/**,/hello
           filters:
             # (?<segment>/?.*) 和 $\{segment} 为固定写法
             #http://localhost:88/api/product/category/list/tree 变为 http://localhost:10000/product/category/list/tree
@@ -53,6 +53,11 @@ spring:
             # (?<segment>/?.*) 和 $\{segment} 为固定写法
             #路径重写,将请求由 http://localhost:88/api/captcha.jpg 变为 http://localhost:8080/renren-fast/captcha.jpg
             - RewritePath=/api/(?<segment>/?.*),/renren-fast/$\{segment}
+
+        - id: gulimall_host_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=**.gulimall.com
 logging:
   level:
     root: debug

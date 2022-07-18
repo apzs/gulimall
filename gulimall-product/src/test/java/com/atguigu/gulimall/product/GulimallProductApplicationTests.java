@@ -11,14 +11,18 @@ import com.atguigu.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
@@ -140,6 +144,26 @@ public class GulimallProductApplicationTests {
 		System.out.println(localDateTime2);
 		System.out.println(str2);
 
+	}
+
+
+	@Autowired
+	StringRedisTemplate stringRedisTemplate;
+	@Test
+	public void stringRedisTemplateTest(){
+		ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+		//保存
+		ops.set("hello","world"+ UUID.randomUUID());
+		//查询
+		String hello = ops.get("hello");
+		System.out.println("之前保存的数据是："+ hello);
+	}
+
+	@Autowired
+	RedissonClient redissonClient;
+	@Test
+	public void redissonTest(){
+		System.out.println(redissonClient);
 	}
 
 }

@@ -9490,3 +9490,5445 @@ public RS<List<SkuHasStockTo>> getSkuHasStock(@RequestBody List<Long> skuIds) {
 
 ![GIF 2022-7-9 22-52-19](image/5.2.10.6.gif)
 
+## 5.3、商城业务-首页&nginx
+
+### 5.3.1、打开首页
+
+#### 1、引入依赖
+
+##### 1、引入`thymeleaf`依赖
+
+在`gulimall-product`模块的`pom.xml`文件里引入`thymeleaf`依赖
+
+```xml
+<!--模板引擎：thymeleaf-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    <version>2.1.5.RELEASE</version>
+</dependency>
+```
+
+![image-20220709230519121](image/5.3.1.1.1.png)
+
+##### 2、引入`devtools`依赖
+
+在`gulimall-product`模块的`pom.xml`文件里引入`devtools`依赖，该依赖可以在不重启服务的情况下动态刷新静态资源
+
+```java
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <version>2.1.5.RELEASE</version>
+    <optional>true</optional>
+</dependency>
+```
+
+![image-20220710213439204](image/5.3.1.1.2.1.png)
+
+点击`Build` -> `Build Project` 或按快捷键`Ctrl+F9`，可以刷新`gulimall-product`项目的静态文件
+
+(刷新java代码会有一些问题，修改代码后建议重新运行项目)
+
+![image-20220713152927981](image/5.3.1.1.2.2.png)
+
+点击`Build` -> `Recompile "index.html'` 或按快捷键`Ctrl+ Shift+F9`，可以刷新当前静态文件
+
+![image-20220713152941970](image/5.3.1.1.2.3.png)
+
+##### 3、去掉版本后报错
+
+去掉`thymeleaf`依赖和`devtools`依赖的`<version>2.1.5.RELEASE</version>`后保存
+
+```
+Failed to read artifact descriptor for org.springframework.boot:spring-boot-starter-thymeleaf:jar:2.1.8.RELEASE
+
+无法读取 org.springframework.boot:spring-boot-starter-thymeleaf:jar:2.1.8.RELEASE 的工件描述符
+```
+
+![image-20220710213937773](image/5.3.1.1.3.png)
+
+##### 4、`clean`&`install`
+
+###### 1、点击`clean`
+
+点击`IDEA`右侧的`Maven`，选择`gulimall-product`，点击`Lifecycle`(生命周期)，点击`clean`删除由项目编译创建的target文件夹
+
+![image-20220710214543669](image/5.3.1.1.4.1.png)
+
+###### 2、点击`install`
+
+点击`IDEA`右侧的`Maven`，选择`gulimall-product`，点击`Lifecycle`(生命周期)，点击`install`
+
+将当前项目jar包安装（放置）至Maven的本地仓库中。供其他项目使用
+
+此时报了一个错
+
+```
+Error:(5,32) java: 程序包com.atguigu.common.valid不存在
+```
+
+![image-20220710214556143](image/5.3.1.1.4.2.png)
+
+###### 3、查看依赖
+
+点击`IDEA`右侧的`Maven`，选择`gulimall-product`，点击`Dependencies`，可以看到`com.atquiqu.qulimall:qulimall-common:0.0.1-SNAPSHOT`报红了，所有找不到`com.atguigu.common.valid`包
+
+![image-20220710214807199](image/5.3.1.1.4.3.png)
+
+###### 4、重新加载
+
+点击`IDEA`右侧的`Maven`，点击刷新按钮`Reload All Maven Projects`重新加载所有`maven`项目
+
+![image-20220710214849781](image/5.3.1.1.4.4.png)
+
+###### 5、再次点击`install`
+
+点击`IDEA`右侧的`Maven`，选择`gulimall-product`，点击`Lifecycle`(生命周期)，点击`install`
+
+又报了同样的错误
+
+```
+Error:(6,32) java: 程序包com.atguigu.common.valid不存在
+```
+
+![image-20220710215013118](image/5.3.1.1.4.5.png)
+
+###### 6、`clean`&`install`common模块
+
+如果安装的有`Maven Helper`插件，可以选择`Project`里的`gulimall-common`模块，然后右键选择`Run Maven` -> `clean install`
+
+![image-20220710215207383](image/5.3.1.1.4.6.1.png)
+
+该插件如下图所示
+
+![image-20220710221643210](image/5.3.1.1.4.6.2.png)
+
+或者点击`IDEA`右侧的`Maven`，选择`gulimall-common`，点击`Lifecycle`(生命周期)，点击`clean`删除由项目编译创建的target文件夹
+
+点击`install`将当前项目jar包安装（放置）至Maven的本地仓库中。供其他项目使用
+
+这样也可以
+
+![image-20220710222049450](image/5.3.1.1.4.6.3.png)
+
+###### 7、再次点击`install`
+
+点击`IDEA`右侧的`Maven`，选择`gulimall-product`，点击`Lifecycle`(生命周期)，点击`install`，这样就成功了
+
+![image-20220710215122624](image/5.3.1.1.4.7.png)
+
+###### 8、`Dependencies`报红
+
+`ponx.ml`不报错了，`install`也成功了，但点击`IDEA`右侧的`Maven`可以看到`gulimall-product`模块的`Dependencies`里的`org.springframework. boot:spring-boot-starter-thymeleaf:2.1 .8.RELEASE`和`org.springframework.boot:spring-boot-devtools:2.1.8.RELEASE`还是报红
+
+![image-20220710215305153](image/5.3.1.1.4.8.png)
+
+##### 5、清除缓存
+
+点击`File`  -> `invalidate caches/restart...` 清除缓存并重新打开项目
+
+当`maven`项目依赖问题怎么都解决不了的时候，这种方式时最有效的
+
+(还有一种方式是手动安装`maven`依赖)
+
+![image-20220710220126569](image/5.3.1.1.5.png)
+
+#### 2、导入资源
+
+在`gulimall-product`模块的`src/main/resources`目录下新建`static`文件夹和`templates`文件夹
+
+把`2.分布式高级篇（微服务架构篇）\资料源码\代码\html\首页资源`里的`index`文件夹及其子文件复制到`gulimall-product`模块的`src/main/resources/static`目录里
+
+把`2.分布式高级篇（微服务架构篇）\资料源码\代码\html\首页资源`里的`index.html`复制到`gulimall-product`模块的`src/main/resources/templates`目录里
+
+![image-20220710204122840](image/5.3.1.2.1.png)
+
+![image-20220709230436074](image/5.3.1.2.2.png)
+
+#### 3、关闭thymeleaf的缓存
+
+在`gulimall-product`模块的`src/main/resources/application.yml`配置文件里添加配置，关闭thymeleaf的缓存
+
+```yaml
+spring:
+  thymeleaf:
+    #关闭thymeleaf的缓存
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+```
+
+![image-20220710204407021](image/5.3.1.3.png)
+
+#### 4、查看前端页面
+
+直接通过浏览器访问： http://localhost:10000/
+
+![image-20220710212123458](image/5.3.1.4.png)
+
+### 5.3.2、查询所有一级分类
+
+#### 1、新建`IndexController`类
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product`包下新建`web`文件夹，在`web`文件夹里新建`IndexController`类
+
+```java
+package com.atguigu.gulimall.product.web;
+
+import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+/**
+ * @author 无名氏
+ * @date 2022/7/10
+ * @Description:
+ */
+@Controller
+public class IndexController {
+
+    @Autowired
+    CategoryService categoryService;
+
+    @GetMapping(value = {"/","index.html"})
+    public String indexPage(Model model){
+        //查出所有的一级分类
+        List<CategoryEntity> categoryEntities = categoryService.getLevel1Categories();
+        model.addAttribute("categories",categoryEntities);
+        //classpath:/templates/  + index +   .html
+        return "index";
+    }
+}
+```
+
+![image-20220710210549773](image/5.3.2.1.png)
+
+#### 2、新建`getLevel1Categories`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.CategoryService`接口里新建`getLevel1Categories`抽象方法
+
+```java
+List<CategoryEntity> getLevel1Categories();
+```
+
+![image-20220710210605517](image/5.3.2.2.png)
+
+#### 3、实现`getLevel1Categories`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里实现`getLevel1Categories`抽象方法
+
+```java
+@Override
+public List<CategoryEntity> getLevel1Categories() {
+    LambdaQueryWrapper<CategoryEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(CategoryEntity::getParentCid,0);
+    lambdaQueryWrapper.select(CategoryEntity::getCatId,CategoryEntity::getName);
+    List<CategoryEntity> categoryEntities = this.baseMapper.selectList(lambdaQueryWrapper);
+    return categoryEntities;
+}
+```
+
+![image-20220710225914651](image/5.3.2.3.png)
+
+#### 4、修改`ndex.html`文件
+
+##### 1、修改`ndex.html`文件
+
+修改`gulimall-product`模块的`src/main/resources/templates/index.html`文件
+
+![image-20220710230624609](image/5.3.2.4.1.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="index/css/swiper-3.4.2.min.css">
+  <link rel="stylesheet" href="index/css/GL.css">
+  <script src="index/js/jquery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="index/js/swiper-3.4.2.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="index/js/swiper-3.4.2.min.js"></script>
+
+</head>
+
+<body>
+  <div class="top_find">
+    <div class="top_find_son">
+      <img src="index/img/top_find_logo.png" alt="">
+      <div class="input_find">
+        <input type="text" placeholder="卸妆水" />
+        <span style="background: url(../static/index/img/img_12.png) 0 -1px;"></span>
+        <a href="#"><img src="index/img/img_09.png" /></a>
+      </div>
+    </div>
+  </div>
+  <ul class="left_floor">
+    <li class="left_floor_xiang">享品质</li>
+    <li class="left_floor_fu">服饰美妆</li>
+    <li class="left_floor_jia">家电手机</li>
+    <li class="left_floor_dian">电脑数码</li>
+    <li class="left_floor_3C">3C运动</li>
+    <li class="left_floor_ai">爱吃</li>
+    <li class="left_floor_mu">母婴家居</li>
+    <li class="left_floor_tu">图书汽车</li>
+    <li class="left_floor_you">游戏金融</li>
+    <li class="left_floor_lv">旅行健康</li>
+    <li class="left_floor_hai">还没逛够</li>
+    <li class="left_floor_ding">顶部</li>
+  </ul>
+  <header>
+    <div class="head">
+      <a href="#"><img src="index/img/img_01.png" /></a>
+      <p>X</p>
+    </div>
+    <!--头部-->
+    <div class="header_head">
+      <div class="header_head_box">
+        <a href="#" class="img"><img src="index/img/logo.jpg" /></a>
+        <b class="header_head_p">
+                  <a href="#">
+                     <img src="index/img/img_05.png" style="border-radius: 50%;"/>
+                     <!--<span class="glyphicon glyphicon-map-marker"></span>-->
+                      北京</a>
+                  <div class="header_head_p_cs">
+                     <a href="#" style="background: #C81623;color: #fff;">北京</a>
+                     <a href="#">上海</a>
+                     <a href="#">天津</a>
+                     <a href="#">重庆</a>
+                     <a href="#">河北</a>
+                     <a href="#">山西</a>
+                     <a href="#">河南</a>
+                     <a href="#">辽宁</a>
+                     <a href="#">吉林</a>
+                     <a href="#">黑龙江</a>
+                     <a href="#">内蒙古</a>
+                     <a href="#">江苏</a>
+                     <a href="#">山东</a>
+                     <a href="#">安徽</a>
+                     <a href="#">浙江</a>
+                     <a href="#">福建</a>
+                     <a href="#">湖北</a>
+                     <a href="#">湖南</a>
+                     <a href="#">广东</a>
+                     <a href="#">广西</a>
+                     <a href="#">江西</a>
+                     <a href="#">四川</a>
+                     <a href="#">海南</a>
+                     <a href="#">贵州</a>
+                     <a href="#">云南</a>
+                     <a href="#">西藏</a>
+                     <a href="#">陕西</a>
+                     <a href="#">甘肃</a>
+                     <a href="#">青海</a>
+                     <a href="#">宁夏</a>
+                     <a href="#">新疆</a>
+                     <a href="#">港澳</a>
+                     <a href="#">台湾</a>
+                     <a href="#">钓鱼岛</a>
+                     <a href="#">海外</a>
+                  </div>
+               </b>
+        <ul>
+          <li>
+            <a href="/登录页面\index.html">你好，请登录</a>
+          </li>
+          <li>
+            <a href="/注册页面\index.html" class="li_2">免费注册</a>
+          </li>
+          <span>|</span>
+          <li>
+            <a href="#">我的订单</a>
+          </li>
+
+
+        </ul>
+      </div>
+    </div>
+    <!--搜索导航-->
+    <div class="header_sous">
+      <div class="header_form">
+        <input id="searchText" type="text" placeholder="" />
+        <span style="background: url(../static/index/img/img_12.png) 0 -1px;"></span>
+        <!--<button><i class="glyphicon"></i></button>-->
+        <a href="#" ><img src="index/img/img_09.png" onclick="search()" /></a>
+      </div>
+      <div class="header_ico">
+        <div class="header_gw">
+          <img src="index/img/img_15.png" />
+          <span><a href="/购物车\One_JDshop.html">我的购物车</a></span>
+          <span>0</span>
+        </div>
+        <div class="header_ko">
+          <p>购物车中还没有商品，赶紧选购吧！</p>
+        </div>
+      </div>
+      <div class="header_form_nav">
+        <ul>
+          <li>
+            <a href="#" class="aaaaa">满999减300</a>
+          </li>
+          <li>
+            <a href="#">金立S11</a>
+          </li>
+          <li>
+            <a href="#">农用物资</a>
+          </li>
+          <li>
+            <a href="#">保暖特惠</a>
+          </li>
+          <li>
+            <a href="#">洗衣机节</a>
+          </li>
+          <li>
+            <a href="#">七度空间卫生巾</a>
+          </li>
+          <li>
+            <a href="#">自动波箱油</a>
+          </li>
+          <li>
+            <a href="#">超市</a>
+          </li>
+        </ul>
+      </div>
+      <nav>
+        <ul>
+          <li>
+            <a href="#">秒杀</a>
+          </li>
+          <li>
+            <a href="#">优惠券</a>
+          </li>
+          <li>
+            <a href="#">闪购</a>
+          </li>
+          <li>
+            <a href="#">拍卖</a>
+          </li>
+        </ul>
+        <div class="spacer">|</div>
+        <ul>
+          <li>
+            <a href="#">服饰</a>
+          </li>
+          <li>
+            <a href="#">超市</a>
+          </li>
+          <li>
+            <a href="#">生鲜</a>
+          </li>
+          <li>
+            <a href="#">全球购</a>
+          </li>
+        </ul>
+        <div class="spacer">|</div>
+        <ul>
+          <li>
+            <a href="#">金融</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="right">
+        <a href="#"><img src="index/img/img_21.png" /></a>
+      </div>
+    </div>
+    <!--轮播主体内容-->
+    <div class="header_main">
+      <div class="header_banner">
+        <div class="header_main_left">
+          <ul>
+            <li th:each="category : ${categories}">
+              <a href="#" class="header_main_left_a" th:attr="ctg-data=${category.catId}"><b th:text="${category.name}">家用电器</b></a>
+            </li>
+          </ul>
+        </div>
+        <div class="header_main_center">
+          <div class="swiper-container swiper1">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <a href="#"><img src="index/img/lunbo.png" /></a>
+              </div>
+
+              <div class="swiper-slide">
+                <a href="#"><img src="index/img/lunbo3.png" /></a>
+              </div>
+
+              <div class="swiper-slide">
+                <a href="#"><img src="index/img/lunbo6.png" /></a>
+              </div>
+              <div class="swiper-slide">
+                <a href="#"><img src="index/img/lunbo7.png" /></a>
+              </div>
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next swiper-button-white"></div>
+            <div class="swiper-button-prev swiper-button-white"></div>
+          </div>
+          <div class="header_main_center_b">
+            <a href="#"><img src="index/img/5a13bf0bNe1606e58.jpg" /></a>
+            <a href="#"><img src="index/img/5a154759N5385d5d6.jpg" /></a>
+          </div>
+        </div>
+        <div class="header_main_right">
+          <div class="header_main_right_user">
+            <div class="user_info">
+              <div class="user_info_tou">
+                <a href="#"><img class="" src="index/img/touxiang.png"></a>
+              </div>
+              <div class="user_info_show">
+                <p class="">Hi, 欢迎来到!</p>
+                <p>
+                  <a href="#" class="">登录</a>
+                  <a href="#" class="">注册</a>
+                </p>
+              </div>
+            </div>
+            <div class="user_info_hide">
+              <a href="#">新人福利</a>
+              <a href="#">PLUS会员</a>
+            </div>
+          </div>
+          <div class="header_main_right_new">
+            <div class="header_new">
+              <div class="header_new_t">
+                <p class="active">
+                  <a href="#">促销</a>
+                </p>
+                <p>
+                  <a href="#">公告</a>
+                </p>
+                <a href="#">更多</a>
+              </div>
+              <div class="header_new_connter">
+                <div class="header_new_connter_1">
+                  <ul>
+                    <li>
+                      <a href="#">全民纸巾大作战</a>
+                    </li>
+                    <li>
+                      <a href="#">家具建材满999减300元</a>
+                    </li>
+                    <li>
+                      <a href="#">黑科技冰箱，下单立减千元</a>
+                    </li>
+                    <li>
+                      <a href="#">抢102减101神券！</a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="header_new_connter_1" style="display: none;">
+                  <ul>
+                    <li>
+                      <a href="#">关于召回普利司通（天津）轮胎有限公司2个规格乘用车轮胎的公告</a>
+                    </li>
+                    <li>
+                      <a href="#">物流推出配送员统一外呼电话"95056”</a>
+                    </li>
+                    <li>
+                      <a href="#">天府大件运营中心开仓公告</a>
+                    </li>
+                    <li>
+                      <a href="#">大件物流“送装一体”服务全面升级！</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="header_main_right_ser">
+            <div class="ser_box">
+              <ul>
+                <li class="ser_box_item">
+                  <a href="#">
+                                 <img src="index/img/huafei.png" />
+                                 <span>话费</span>
+                              </a>
+                </li>
+                <li class="ser_box_item">
+                  <a href="#">
+                                 <img src="index/img/jipiao.png" />
+                                 <span>机票</span>
+                              </a>
+                </li>
+                <li class="ser_box_item">
+                  <a href="#">
+                                 <img src="index/img/jiudian.png" />
+                                 <span>酒店</span>
+                              </a>
+                </li>
+                <li class="ser_box_item">
+                  <a href="#">
+                                 <img src="index/img/youxi.png" />
+                                 <span>游戏</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/qiyegou.png" />
+                                 <span>企业购</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/jiayouka.png" />
+                                 <span>加油卡</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/dianyingpiao.png" />
+                                 <span>电影票</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/huochepiao.png" style="height:20px;" />
+                                 <span>火车票</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/zhongchou.png" />
+                                 <span>众筹</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/licai.png" style="height:22px;" />
+                                 <span>理财</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/lipinka.png" style="height:14px;" />
+                                 <span>礼品卡</span>
+                              </a>
+                </li>
+                <li class="ser_box_item1">
+                  <a href="#">
+                                 <img src="index/img/baitiao.png" style="height:20px;" />
+                                 <span>白条</span>
+                              </a>
+                </li>
+              </ul>
+              <div class="ser_box_aaa">
+                <div class="ser_box_aaa_one">
+                  <div class="ser_box_aaa_nav">
+                    <ol>
+                      <li class="active">
+                        <a href="#">话费</a>
+                      </li>
+                      <li>
+                        <a href="#">机票</a>
+                      </li>
+                      <li>
+                        <a href="#">酒店</a>
+                      </li>
+                      <li>
+                        <a href="#">游戏</a>
+                      </li>
+                    </ol>
+                    <div class="ser_ol">
+                      <div class="ser_ol_li">
+                        <ul>
+                          <div class="guanbi">X</div>
+                          <a class="active">话费充值</a>
+                          <a>流量充值</a>
+                          <a>套餐变更</a>
+                          <div class="ser_ol_div">
+                            <p>号码<input type="text" /></p>
+                            <p style="margin: 10px 0;">面值
+                              <select name="">
+                                                   <option value="">100元</option>
+                                                   <option value="">20元</option>
+                                                   <option value="">50元</option>
+                                                   <option value="">10元</option>
+                                                   <option value="">2元</option>
+                                                </select>
+                              <span>￥98.0-￥100.0</span></p>
+                          </div>
+                          <button>快速充值</button>
+                          <p class="p">抢99减50元话费</p>
+                        </ul>
+
+                      </div>
+                      <div class="ser_ol_li">
+                        <ul>
+                          <div class="guanbi">X</div>
+                          <a class="active">国际机票</a>
+                          <a>国际/港澳</a>
+                          <a>特惠活动</a>
+                          <div class="ser_ol_div1">
+                            <p>
+                              <input type="radio" name="a" style="vertical-align:middle;" />单程
+                              <input type="radio" name="a" style="vertical-align:middle;" />往返
+                            </p>
+                            <input type="text" placeholder="出发城市" />
+                            <input type="text" placeholder="到达城市" />
+                            <input type="text" placeholder="日期" />
+                          </div>
+                          <button>机票查询</button>
+                          <span class="p">当季热门特惠机票</span>
+                        </ul>
+                      </div>
+                      <div class="ser_ol_li">
+                        <ul>
+                          <div class="guanbi">X</div>
+                          <a class="active" style="width: 50%;">国内港澳台</a>
+                          <a style="width: 50%;">促销活动</a>
+                          <div class="ser_ol_div1">
+                            <input type="text" placeholder="出发城市" style="margin-top: 10px;" />
+                            <input type="text" placeholder="到达城市" />
+                            <input type="text" placeholder="日期" />
+                            <input type="text" placeholder="酒店 商圈 地标" />
+                          </div>
+                          <button>酒店查询</button>
+                          <span class="p">订酒店到</span>
+                        </ul>
+                      </div>
+                      <div class="ser_ol_li">
+                        <ul>
+                          <div class="guanbi">X</div>
+                          <a class="active">点卡</a>
+                          <a>QQ</a>
+                          <a>页游</a>
+                          <div class="ser_ol_div1">
+                            <input type="text" placeholder="游戏" style="margin-top: 15px;" />
+                            <br />面值
+                            <select name="" style="margin: 8px 0;">
+                                                <option value="">面值</option>
+                                                <option value="">面值</option>
+                                                <option value="">面值</option>
+                                             </select><span style="color: #C81623;">￥0.00</span>
+                            <p>
+                              <input type="radio" name="a" style="width: 15px;vertical-align:middle;" />直充
+                              <input type="radio" name="a" style="width: 15px;vertical-align:middle;" />卡密
+                            </p>
+                          </div>
+                          <button>快速充值</button>
+                          <span class="p">吃鸡就要快人一步</span>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="header_banner1">
+        <a href="#" class="a">
+                  <img src="index/img/5a1e5ce2N034ce344.png" class="aa" />
+               </a>
+        <div class="header_banner1_div">
+          <p>X</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="section_second">
+    <!-- 第一层 -->
+    <div class="section_second_header">
+      <p class="section_second_header_img"></p>
+      <div class="section_second_header_left">
+        <p></p>
+        <span class="">秒杀</span>
+        <span>总有你想不到的低价</span>
+        <span>
+        </span>
+      </div>
+      <div class="section_second_header_right">
+        <p>当前场次</p>
+        <span class="section_second_header_right_hours">00</span>
+        <span class="section_second_header_right_mao">：</span>
+        <span class="section_second_header_right_minutes">00</span>
+        <span class="section_second_header_right_mao">：</span>
+        <span class="section_second_header_right_second">00</span>
+        <p>后结束</p>
+      </div>
+    </div>
+    <div class="section_second_list">
+      <div class="swiper-container swiper_section_second_list_left">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <ul>
+              <li>
+                <img src="index/img/section_second_list_img1.jpg" alt="">
+                <p>花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千克） （日本官方直采） 花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千</p>
+                <span>¥83.9</span><s>¥99.9</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img2.jpg" alt="">
+                <p>华为mate9 4GB+32GB版 月光银 移动联通电信4G手机 双卡</p>
+                <span>¥17.90</span><s>¥29.90</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img3.jpg" alt="">
+                <p>超能 植翠低泡洗衣液（鲜艳亮丽）2kg/袋装（新老包装随机</p>
+                <span>¥20.70</span><s>¥44.90</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img4.jpg" alt="">
+                <p>长城（GreatWall）红酒 特选5年橡木桶解百纳干红葡萄酒 整</p>
+                <span>¥399.00</span><s>¥599.00</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img5.jpg" alt="">
+                <p>惠普(HP)暗影精灵2代Pro 15.6英寸游戏笔记本电脑(i5-7300H</p>
+                <span>¥5999.00</span><s>¥6499.00</s>
+              </li>
+            </ul>
+          </div>
+          <div class="swiper-slide">
+            <ul>
+              <li>
+                <img src="index/img/section_second_list_img6.jpg" alt="">
+                <p>Apple iMac 21.5英寸一体机（2017新款四核Core i5 处理器/8GB内存/1TB/RP555显卡/4K屏 MNDY2CH/A） Apple iMac 21.5英寸一体机（2017新款四核Core i5 处理</p>
+                <span>¥9588.00</span><s>¥10288.00</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img7.jpg" alt="">
+                <p>中柏（Jumper）EZpad 4S Pro 10.6英寸二合一平板电脑（X5 z</p>
+                <span>¥848.00</span><s>¥899.00</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img8.jpg" alt="">
+                <p>飞利浦（PHILIPS）电动牙刷HX6761/03亮白型成人充电式声波震动牙刷粉色 飞利浦（PHILIPS）电动牙刷HX6761/03亮白型成人充电式声波
+                </p>
+                <span>¥379.00</span><s>¥698.00</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img9.jpg" alt="">
+                <p>美的(Midea) 258升 变频智能三门冰箱 一级能效 风冷无霜 中门</p>
+                <span>¥3088.00</span><s>¥3299.00</s>
+              </li>
+              <li>
+                <img src="index/img/section_second_list_img10.jpg" alt="">
+                <p>【第二件减50元】蒙羊 内蒙古羔羊羊肋排 2.4斤</p>
+                <span>¥99.90</span><s>¥199.00</s>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="swiper-button-prev second_list">
+          <p></p>
+        </div>
+        <div class="swiper-button-next second_list">
+          <p></p>
+        </div>
+      </div>
+      <ul class="section_second_list_right">
+        <li>
+          <img src="index/img/section_second_list_right_img.jpg" alt="">
+        </li>
+        <li>
+          <img src="index/img/section_second_list_right_img.png" alt="">
+        </li>
+        <div class="section_second_list_right_button">
+          <p class="section_second_list_right_button_active"></p>
+          <p></p>
+        </div>
+      </ul>
+    </div>
+ 
+ 
+  </div>
+
+
+ 
+</body>
+<script type="text/javascript">
+  function search() {
+      var keyword=$("#searchText").val()
+      window.location.href="http://search.gulimall.com/search.html?keyword="+keyword;
+  }
+
+</script>
+<script type="text/javascript" src="index/js/text.js"></script>
+<script type="text/javascript" src="index/js/header.js"></script>
+<script type="text/javascript" src="index/js/secend.js"></script>
+<script type="text/javascript" src="index/js/zz.js"></script>
+<script type="text/javascript" src="index/jsindex.js"></script>
+<script type="text/javascript" src="index/js/left,top.js"></script>
+<script type="text/javascript" src="index/js/catalogLoader.js"></script>
+</html>
+```
+
+##### 2、使用`thymeleaf`步骤
+
+###### 1、引入命名空间
+
+把
+
+```html
+<html lang="en">
+```
+
+替换为
+
+```html
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+```
+
+![image-20220710231051879](image/5.3.2.4.2.1.1.png)
+
+![image-20220710231517507](image/5.3.2.4.2.1.2.png)
+
+###### 2、使用`th`标签
+
+把
+
+```html
+<ul>
+    <li>
+        <a href="#" class="header_main_left_a" ctg-data="3"><b>家用电器</b></a>
+    </li>
+    <li class="header_li2">
+        <a href="#" class="header_main_left_a" ctg-data="2,4"><b>手机</b> / <b>运营商</b> / <b>数码</b></a>
+    </li>
+    <li class="header_li2">
+        <a href="#" class="header_main_left_a" ctg-data="6"><b>电脑</b> / <b>办公</b></a>
+    </li>
+</ul>
+```
+
+替换为
+
+```html
+<ul>
+  <li th:each="category : ${categories}">
+    <a href="#" class="header_main_left_a" th:attr="ctg-data=${category.catId}"><b th:text="${category.name}">家用电器</b></a>
+  </li>
+</ul>
+```
+
+![image-20220710231249788](image/5.3.2.4.2.2.1.png)
+
+`th:each="category : ${categories}"`  遍历集合`categories`，每次遍历的单个对象命名为`category`
+
+`th:text="${category.name}"`获取`category`对象的`name`属性的值，并相当于`value`属性，替换掉原本标签的内容
+
+![image-20220710231657605](image/5.3.2.4.2.2.2.png)
+
+`th:attr="ctg-data=${category.catId}`自定义`ctg-data`属性，其值为动态获取的`category.catId`
+
+![image-20220710232148285](image/5.3.2.4.2.2.3.png)
+
+#### 5、浏览器访问
+
+浏览器访问：http://localhost:10000
+
+![image-20220710230810485](image/5.3.2.5.png)
+
+### 5.3.3、渲染二级三级分类数据
+
+#### 1、查看数据的结构
+
+##### 1、模拟数据
+
+模拟的数据在`gulimall-product`模块的`src/main/resources/static/index/json/catalog.json`文件里，复制该模拟数据
+
+![image-20220711084836072](image/5.3.3.1.1.png)
+
+##### 2、发送请求的文件
+
+发送请求的文件在`gulimall-product`模块的在`src/main/resources/static/index/js/catalogLoader.js`里面。把第二行的`$.getJSON("index/json/catalog.json",function (data) {`修改为`$.getJSON("index/catalog.json",function (data) {`
+
+![image-20220711085421407](image/5.3.3.1.2.png)
+
+##### 3、格式化后数据的结构
+
+粘贴刚刚复制的模拟数据，粘贴到 www.json.cn 这个网站，查看json的结构
+
+![image-20220711084956532](image/5.3.3.1.3.png)
+
+#### 2、新建`Catelog2Vo`类
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.vo`包下，新建`Catelog2Vo`类
+
+```java
+package com.atguigu.gulimall.product.vo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+/**
+ * @author 无名氏
+ * @date 2022/7/11
+ * @Description: 二级分类vo
+ */
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class Catelog2Vo {
+    /**
+     * 该二级分类对应的一级分类的id
+     */
+    private String catalog1Id;
+    /**
+     * 当前二级分类的id
+     */
+    private String id;
+    /**
+     * 当前二级分类的名字
+     */
+    private String name;
+    /**
+     * 该二级分类对应的所有三级分类
+     */
+    private List<Catelog3Vo> catalog3List;
+
+    /**
+     * 三级分类vo
+     */
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    public static class Catelog3Vo{
+        /**
+         * 该三级分类对应的二级分类
+         */
+        private String catalog2Id;
+        /**
+         * 该三级分类的id
+         */
+        private String id;
+        /**
+         * 该三级分类的名字
+         */
+        private String name;
+    }
+
+}
+```
+
+![image-20220711090742035](image/5.3.3.2.png)
+
+#### 3、添加`getCatalogJson`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.web.IndexController`类里添加`getCatalogJson`方法
+
+```java
+@ResponseBody
+@GetMapping("/index/catalog.json")
+public Map<String,List<Catelog2Vo>> getCatalogJson(){
+    return categoryService.getCatalogJson();
+}
+```
+
+![image-20220711091703531](image/5.3.3.3.png)
+
+#### 4、添加`getCatalogJson`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.CategoryService`接口里添加`getCatalogJson`抽象方法
+
+```java
+/**
+ * 查出所有的分类
+ * @return k为一级分类的id，v为二级分类及其子分类的信息
+ */
+Map<String, List<Catelog2Vo>> getCatalogJson();
+```
+
+![image-20220711091617944](image/5.3.3.4.png)
+
+#### 5、实现`getCatalogJson`抽象方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里实现`getCatalogJson`抽象方法
+
+```java
+@Override
+public Map<String, List<Catelog2Vo>> getCatalogJson() {
+
+    //1、查出所有一级分类
+    List<CategoryEntity> level1Categories = this.getLevel1Categories();
+    Map<String, List<Catelog2Vo>> result = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), l1 -> {
+        //2、该一级分类的所有二级分类
+        LambdaQueryWrapper<CategoryEntity> category2QueryWrapper = new LambdaQueryWrapper<>();
+        category2QueryWrapper.eq(CategoryEntity::getParentCid, l1.getCatId());
+        List<CategoryEntity> category2Entities = this.baseMapper.selectList(category2QueryWrapper);
+        List<Catelog2Vo> catelog2VoList = null;
+        if (category2Entities != null) {
+            catelog2VoList = category2Entities.stream().map(l2 -> {
+                Catelog2Vo catelog2Vo = new Catelog2Vo();
+                catelog2Vo.setCatalog1Id(l1.getCatId().toString());
+                catelog2Vo.setId(l2.getCatId().toString());
+                catelog2Vo.setName(l2.getName());
+                //3、当前二级分类的所有三级分类
+                LambdaQueryWrapper<CategoryEntity> category3QueryWrapper = new LambdaQueryWrapper<>();
+                category3QueryWrapper.eq(CategoryEntity::getParentCid,l2.getCatId());
+                List<CategoryEntity> category3Entities = this.baseMapper.selectList(category3QueryWrapper);
+                List<Catelog2Vo.Catelog3Vo> catelog3VoList = null;
+                if (category3Entities!=null){
+                    catelog3VoList = category3Entities.stream().map(l3 -> {
+                        Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
+                        catelog3Vo.setId(l3.getCatId().toString());
+                        catelog3Vo.setName(l3.getName());
+                        catelog3Vo.setCatalog2Id(l2.getCatId().toString());
+                        return catelog3Vo;
+                    }).collect(Collectors.toList());
+                }
+                catelog2Vo.setCatalog3List(catelog3VoList);
+                return catelog2Vo;
+            }).collect(Collectors.toList());
+        }
+        return catelog2VoList;
+    }));
+    return result;
+}
+```
+
+![image-20220711100836334](image/5.3.3.5.png)
+
+#### 6、测试
+
+重启`GulimallProductApplication`服务，访问： http://localhost:10000/index/catalog.json
+
+![image-20220711100109956](image/5.3.3.6.1.png)
+
+可以看到返回的结构与模拟数据的结构一致
+
+![image-20220711100125256](image/5.3.3.6.2.png)
+
+首页已经显示数据了
+
+![image-20220711101310665](image/5.3.3.6.3.png)
+
+测试以下是不是重数据库中查询来的
+
+修改`gulimall_pms`数据库的`pms_category`表的`name`为`电子书`的字段，修改其为`电子书11`。刷新首页，可以看到已经更新了
+
+![GIF 2022-7-11 10-05-40](image/5.3.3.6.4.gif)
+
+如果没有更新，可以清除浏览器的缓存，再次刷新页面
+
+依次点击 `chrome`浏览器右侧的竖着的三个点 -> 设置 -> 隐私设置和安全性 -> 清除浏览数据 -> 清除数据
+
+![GIF 2022-7-11 10-16-55](image/5.3.3.6.5.gif)
+
+### 5.3.4、nginx反向代理
+
+#### 1、`hsot`文件添加域名
+
+##### 1、可修改`host`文件的方式
+
+可以在`C:\Windows\System32\drivers\etc`目录下的`hosts`文件进行修改
+
+第一次使用`记事本`会无法修改，可以使用`sublime text`或`notepad++`进行修改
+
+![image-20220711104753942](image/5.3.4.1.1.1.png)
+
+也可以使用`SwitchHosts`工具修改
+
+![image-20220711104920953](image/5.3.4.1.1.2.png)
+
+##### 2、使用自定义方案
+
+打开`SwitchHosts`工具
+
+1. 选择`本地方案`
+
+2. 点击`+`号
+
+3. 在弹出的对话框的`本地方案`的`方案名`里输入`gulimall`
+
+4. 点击`OK`
+
+![image-20220711105655475](image/5.3.4.1.2.1.png)
+
+1. 选择本地方案里的`gulimall`
+
+2. 在里面输入`192.168.56.10 gulimall.com`
+
+3. 点击`对勾`即可使用当前方案
+
+![image-20220711105753312](image/5.3.4.1.2.2.png)
+
+##### 3、访问
+
+访问虚拟机： http://gulimall.com:9200/
+
+可以看到访问成功了
+
+![image-20220711110258412](image/5.3.4.1.3.png)
+
+#### 2、查看niginx配置
+
+##### 1、nginx配置的目录结构
+
+![image-20220711151115776](image/5.3.4.2.1.png)
+
+##### 2、查看ngix配置
+
+###### 1、总配置
+
+```bash
+docker ps
+cd /mydata/nginx/
+ls
+cd conf/
+ls
+vi nginx.conf
+```
+
+![image-20220711153127308](image/5.3.4.2.2.1.1.png)
+
+![image-20220711152851338](image/5.3.4.2.2.1.2.png)
+
+###### 2、server块配置
+
+```bash
+cd conf.d/
+ls
+vi default.conf
+```
+
+![image-20220711154239877](image/5.3.4.2.2.2.1.png)
+
+![image-20220711154258555](image/5.3.4.2.2.2.2.png)
+
+#### 3、修改nginx配置
+
+```bash
+cp default.conf gulimall.conf
+ls
+vi gulimall.conf
+```
+
+![image-20220711155146105](image/5.3.4.3.1.png)
+
+配置所有请求都到商品服务
+
+```properties
+server {
+    listen       80;
+    server_name  gulimall.com;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/log/host.access.log  main;
+
+    location / {
+        proxy_pass http://192.168.56.1:10000;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+```
+
+![image-20220711154831136](image/5.3.4.3.2.png)
+
+`server_name`配置的就是通过浏览器访问的请求的`Request Headers`请求头的`nama`属性
+
+![image-20220711155751038](image/5.3.4.3.3.png)
+
+#### 4、重启nginx
+
+```bash
+docker restart nginx
+```
+
+![image-20220711155515047](image/5.3.4.4.png)
+
+#### 5、查看配置是否生效
+
+浏览器访问： http://gulimall.com/
+
+![image-20220711155529343](image/5.3.4.5.png)
+
+### 5.3.5、负载均衡到网关
+
+#### 1、查看文档
+
+收购前网址： https://nginx.org/
+
+收购后网址： https://www.nginx.com/
+
+> The simplest configuration for load balancing with nginx may look like the following:
+
+使用 nginx 进行负载平衡的最简单配置可能如下所示：(添加上游服务器)
+
+```properties
+http {
+    upstream myapp1 {
+        server srv1.example.com;
+        server srv2.example.com;
+        server srv3.example.com;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://myapp1;
+        }
+    }
+}
+```
+
+![GIF 2022-7-11 16-06-13](image/5.3.5.1.png)
+
+#### 2、上游服务器配置
+
+```bash
+cd ../
+ls
+vi nginx.conf
+```
+
+![image-20220711161629988](image/5.3.5.2.1.png)
+
+```properties
+user  nginx;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+    upstream gulimall{
+      server 192.168.56.1:88;
+    }
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
+![image-20220711161508940](image/5.3.5.2.2.png)
+
+#### 3、负载均衡到上游服务器
+
+```bash
+cd conf.d/
+ls
+vi gulimall.conf
+```
+
+![image-20220711162244887](image/5.3.5.3.1.png)
+
+```properties
+server {
+    listen       80;
+    server_name  gulimall.com;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/log/host.access.log  main;
+
+    location / {
+        proxy_pass http://gulimall;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+```
+
+![image-20220711162027759](image/5.3.5.3.2.png)
+
+#### 4、重启nginx
+
+```bash
+docker restart nginx
+```
+
+![image-20220711162423730](image/5.3.5.4.png)
+
+#### 5、浏览器访问首页
+
+浏览器访问首页：http://gulimall.com/
+
+访问失败的原因是`nginx`转给了后端的网关，而网关没有配置
+
+![image-20220711162506688](image/5.3.5.5.png)
+
+#### 6、配置网关
+
+##### 1、官方文档
+
+官方文档：https://spring.io/projects/spring-cloud-gateway/
+
+域名配置文档：https://docs.spring.io/spring-cloud-gateway/docs/2.2.9.RELEASE/reference/html/#the-host-route-predicate-factory
+
+![GIF 2022-7-11 16-33-25](image/5.3.5.6.1.png)
+
+##### 2、配置网关
+
+在`gulimall-gateway`模块的`src/main/resources/application.yml`配置文件中配置
+
+```yaml
+- id: gulimall_host_route
+  uri: lb://gulimall-product
+  predicates:
+    - Host=**.gulimall.com
+```
+
+![image-20220711170519941](image/5.3.5.6.2.png)
+
+#### 7、查看首页是否显示
+
+重启`GulimallGatewayApplication`服务，刷新前端页面
+
+##### 1、浏览器访问
+
+打开 http://gulimall.com/ 页面，可以看到没有访问成功
+
+![image-20220711165903388](image/5.3.5.7.1.png)
+
+##### 2、以`debug`方式启动网关
+
+以`debug`方式重新启动`GulimallGatewayApplication`服务，此时报了一个错
+
+```
+javax.management.InstanceNotFoundException: org.springframework.boot:type=Admin,name=SpringApplication
+```
+
+![image-20220711165952509](image/5.3.5.7.2.png)
+
+##### 3、取消勾选`Enable JMX agent`
+
+点击`Unnamed`，点击`Edit Configurations...`选择`GulimallGatewayApplication`服务，点击`编辑`按钮,在`Configuration`的`Spring boot`里取消勾选`Enable JMX agent`
+
+再次以`debug`方式重新启动`GulimallGatewayApplication`服务
+
+![GIF 2022-7-11 16-58-11](image/5.3.5.7.3.gif)
+
+##### 4、又报了个错
+
+```
+Positive matches:
+-----------------
+
+   ArchaiusAutoConfiguration matched:
+      - @ConditionalOnClass found required classes 'com.netflix.config.ConcurrentCompositeConfiguration', 'org.apache.commons.configuration.ConfigurationBuilder' (OnClassCondition)
+```
+
+![image-20220711170159408](image/5.3.5.7.4.png)
+
+##### 5、向左缩进两格
+
+修改`gulimall-gateway`模块的`src/main/resources/application.yml`配置文件的`id`为`gulimall_host_route`的配置
+
+让其相关配置向左缩进两格
+
+![image-20220711170903534](image/5.3.5.7.5.png)
+
+完整配置：
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: baidu_routs
+          uri: https://www.baidu.com/
+          predicates:
+            - Query=target,baidu
+
+        - id: qq_routs
+          uri: https://www.qq.com/
+          predicates:
+            - Query=target,qq
+
+        - id: product_route
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            # (?<segment>/?.*) 和 $\{segment} 为固定写法
+            #http://localhost:88/api/product/category/list/tree 变为 http://localhost:10000/product/category/list/tree
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
+        - id: third_party_route
+          uri: lb://gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            #http://localhost:88/api/thirdparty/oss/policy 变为 http://localhost:30000/oss/policy
+            - RewritePath=/api/thirdparty/(?<segment>/?.*),/$\{segment}
+
+        - id: member_route
+          uri: lb://gulimall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            #http://localhost:88/api/member/memberlevel/list 变为 http://localhost:8000/member/memberlevel/list
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
+        - id: ware_route
+          uri: lb://gulimall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            #http://localhost:88/api/ware/wareinfo/list 变为 http://localhost:11000/ware/wareinfo/list
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            # (?<segment>/?.*) 和 $\{segment} 为固定写法
+            #路径重写,将请求由 http://localhost:88/api/captcha.jpg 变为 http://localhost:8080/renren-fast/captcha.jpg
+            - RewritePath=/api/(?<segment>/?.*),/renren-fast/$\{segment}
+
+        - id: gulimall_host_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=**.gulimall.com
+logging:
+  level:
+    root: debug
+```
+
+##### 6、路径匹配
+
+重新以`debug`方式重新启动`GulimallGatewayApplication`服务，刷新 http://gulimall.com/ 页面
+
+可以看到匹配了`id`为`gulimall_host_route`的规则，但是还是无法访问
+
+![image-20220711171140290](image/5.3.5.7.6.1.png)
+
+这是因为`nginx`在转发的时候，没有把`Request Headers`里的`Host: gulimall.com`带上
+
+![image-20220711212405663](image/5.3.5.7.6.2.png)
+
+#### 8、nginx添加头信息
+
+```bash
+ls
+vi gulimall.conf
+```
+
+![image-20220711164727203](image/5.3.5.8.1.png)
+
+在`location / {`里添加配置
+
+```properties
+proxy_set_header Host $host;
+```
+
+![image-20220711164409484](image/5.3.5.8.2.png)
+
+#### 9、重启nginx
+
+```
+docker restart nginx
+```
+
+![image-20220711164548923](image/5.3.5.9.png)
+
+#### 10、刷新页面
+
+刷新 http://gulimall.com/ 页面，已经可以正常访问了
+
+![image-20220711213107065](image/5.3.5.10.png)
+
+### 5.3.6、压力测试
+
+> 压力测试考察当前软硬件环境下系统所能承受的最大负荷并帮助找出系统瓶颈所在。压测都
+> 是为了系统在线上的处理能力和稳定性维持在一个标准范围内，做到心中有数。
+
+使用压力测试，我们有希望找到很多种用其他测试方法更难发现的错误。有两种错误类型是:
+**内存泄漏**，**并发与同步**。
+
+有效的压力测试系统将应用以下这些关键条件:**重复**，**并发**，**量级**，**随机变化**。
+
+#### 1、性能指标
+
+- **响应时间**（Response Time: RT）
+
+  响应时间指用户从客户端发起一个请求开始，到客户端接收到从服务器端返回的响应结束，整个过程所耗费的时间。
+
+- **HPS**（Hits Per Second） ：每秒点击次数，单位是次/秒。
+
+- **TPS**（Transaction per Second）：系统每秒处理交易数，单位是笔/秒。
+
+- **QPS**（Query per Second）：系统每秒处理查询次数，单位是次/秒。
+
+  对于互联网业务中，如果某些业务有且仅有一个请求连接，那么 TPS=QPS=HPS，一般情况下用 TPS 来衡量整个业务流程，用 QPS 来衡量接口查询次数，用 HPS 来表示对服务器单击请求。
+
+- 无论 TPS、QPS、HPS,此指标是衡量系统处理能力非常重要的指标，越大越好，根据经验，一般情况下：
+
+  - 金融行业：1000TPS~50000TPS，不包括互联网化的活动
+  - 保险行业：100TPS~100000TPS，不包括互联网化的活动
+  - 制造行业：10TPS~5000TPS
+  - 互联网电子商务：10000TPS~1000000TPS
+  - 互联网中型网站：1000TPS~50000TPS
+  - 互联网小型网站：500TPS~10000TPS
+
+- **最大响应时间**（Max Response Time） 指用户发出请求或者指令到系统做出反应（响应）的最大时间。
+
+- **最少响应时间**（Mininum ResponseTime） 指用户发出请求或者指令到系统做出反应（响应）的最少时间。
+
+- **90%响应时间**（90% Response Time） 是指所有用户的响应时间进行排序，第 90%的响应时间。
+
+- 从外部看，性能测试主要关注如下三个指标
+
+  - 吞吐量：每秒钟系统能够处理的请求数、任务数。
+  - 响应时间：服务处理一个请求或一个任务的耗时。
+
+  - 错误率：一批请求中结果出错的请求所占比例。
+
+#### 2、安装JMeter
+
+官方网址：https://jmeter.apache.org/download_jmeter.cgi
+
+点击`Download`里的`Download Releases`，在`Binaries`里选择[apache-jmeter-5.5.zip](https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip) 即可下载
+
+历史版本下载地址： [Index of /dist/jmeter/binaries (apache.org)](https://archive.apache.org/dist/jmeter/binaries/)
+
+![image-20220711215721546](image/5.3.6.2.1.png)
+
+解压后，在`apache-jmeter-5.2.1\bin`目录下，点击`jmeter.bat`可执行文件即可打开`JMeter`
+
+![image-20220711220237900](image/5.3.6.2.2.png)
+
+中文显示
+
+依次点击`Options` -> `Choose Language` -> `Chinese (Simplified)`
+
+![GIF 2022-7-11 22-05-07](image/5.3.6.2.3.gif)
+
+设置背景色为白色
+
+依次点击`选项` -> `外观` -> `Nimbus` -> `Yes` ，然后重新打开即可
+
+![GIF 2022-7-11 22-09-17](image/5.3.6.2.4.gif)
+
+可以看到再次打开后还是英文显示，这是因为`JMeter`使用界面设置中文下次打开`JMeter`仍然会显示为英文
+
+在`apache-jmeter-5.2.1\bin`目录的`jmeter.properties`配置文件里添加如下配置
+
+```
+language=zh_CN
+```
+
+![image-20220711222534132](image/5.3.6.2.5.png)
+
+#### 3、添加线程组
+
+##### 1、添加取样器
+
+选中`测试计划`，右键依次选择`添加` -> `线程（用户）` -> `线程组`
+
+![GIF 2022-7-11 22-44-23](image/5.3.6.3.1.1.gif)
+
+在`线程属性`里的`线程数`里输入`200`，表示**启动200个线程**
+
+在`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`循环次数`里输入`100`，**表示每个线程循环100次**，共发送200x100 =20000个请求
+
+![image-20220711224938665](image/5.3.6.3.1.2.png)
+
+##### 2、添加`察看结果树`
+
+选中`线程组`，右键依次选择 `添加` -> `监听器` -> `察看结果树`
+
+![GIF 2022-7-11 22-55-24](image/5.3.6.3.2.gif)
+
+##### 3、添加`汇总报告`
+
+选中`线程组`，右键依次选择 `添加` -> `监听器` -> `汇总报告`
+
+![GIF 2022-7-11 22-58-08](image/5.3.6.3.3.gif)
+
+##### 4、添加`汇总图`
+
+选中`线程组`，右键依次选择 `添加` -> `监听器` -> `汇总图`
+
+![GIF 2022-7-11 23-01-11](image/5.3.6.3.4.gif)
+
+##### 5、添加`http请求`
+
+选中`线程组`，右键依次选择 `添加` -> `取样器` -> `http请求`
+
+![GIF 2022-7-11 23-07-08](image/5.3.6.3.5.1.gif)
+
+在`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`www.baidu.com`，`端口号：`输入`80`
+
+![image-20220711230817728](image/5.3.6.3.5.2.png)
+
+#### 4、对百度进行测试
+
+##### 1、执行测试
+
+![GIF 2022-7-11 23-12-14](image/5.3.6.4.1.gif)
+
+##### 2、察看结果树
+
+可以看到都请求成功了
+
+![image-20220711231548203](image/5.3.6.4.2.png)
+
+##### 3、汇总报告
+
+![image-20220711231603497](image/5.3.6.4.3.png)
+
+##### 4、汇总图
+
+![image-20220711231616166](image/5.3.6.4.4.png)
+
+#### 5、对本项目进行测试
+
+##### 1、执行测试
+
+在`http请求`里的`服务器名称或IP:`修改为`gulimall.com`，点击工具栏的`清除全部`按钮，然后点击`启动`按钮
+
+![image-20220712180117360](image/5.3.6.5.1.png)
+
+##### 2、察看结果树
+
+![image-20220712180511761](image/5.3.6.5.2.png)
+
+##### 3、汇总报告
+
+![image-20220712180555607](image/5.3.6.5.3.png)
+
+##### 4、汇总图
+
+![image-20220712180626237](image/5.3.6.5.4.1.png)
+
+想要显示图像，可以在设置中勾选想要显示的`列显示`，点击`显示图表`即可
+
+![GIF 2022-7-12 18-08-50](image/5.3.6.5.4.2.gif)
+
+#### 6、重新测试
+
+##### 1、调大内存
+
+在`GulimallGatewayApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallGatewayApplication`模块的最大内存占用为`100m`
+
+```
+-Xmx500m
+```
+
+![image-20220712182036988](image/5.3.6.6.1.1.png)
+
+在`GulimallProductApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，限制`GulimallProductApplication`模块的最大内存占用为`100m`
+
+```
+-Xmx500m
+```
+
+![image-20220712182102801](image/5.3.6.6.1.2.png)
+
+##### 2、执行测试
+
+点击工具栏的`清除全部`按钮，然后点击`启动`按钮
+
+![image-20220712182422350](image/5.3.6.6.2.png)
+
+##### 3、察看结果树
+
+![image-20220712182544730](image/5.3.6.6.3.png)
+
+##### 4、汇总报告
+
+![image-20220712182603933](image/5.3.6.6.4.png)
+
+##### 5、汇总图
+
+![image-20220712182627440](image/5.3.6.6.5.png)
+
+可以看到除了执行时间，其他性能并没有明显的改善
+
+##### 6、JMeter Address Already in use
+
+###### 1、问题描述
+
+在`windows`系统访问有可能报`Address Already in use`异常（我的没报这个异常）
+
+在`线程组`里的`线程属性`里，将`线程数`修改为`50`，`循环次数`勾选`永远`
+
+![image-20220712184123934](image/5.3.6.6.6.1.1.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `服务器名称或IP:`修改为`127.0.0.1`，`端口号：`修改为`10000`
+
+![image-20220712184336692](image/5.3.6.6.6.1.2.png)
+
+点击工具栏的`清除全部`按钮，然后点击`启动`按钮
+
+![5.3.6.6.6.3](image/5.3.6.6.6.1.3.png)
+
+进行测试
+
+![GIF 2022-7-12 18-33-56](image/5.3.6.6.6.1.4.gif)
+
+有可能出现大量异常请求
+
+![image-20220712184728011](image/5.3.6.6.6.1.5.png)
+
+在`察看结果树`里可以看到报的是`Address Already in use`错误
+
+这是windows 本身提供的端口访问机制的问题。 Windows 提供给 TCP/IP 链接的端口为 1024-5000，并且要四分钟来循环回收他们。就导致 我们在短时间内跑大量的请求时将端口占满了。
+
+![image-20220712183805060](image/5.3.6.6.6.1.6.png)
+
+###### 2、解决方案
+
+1. cmd 中，用 regedit 命令打开注册表 
+
+2. 在 HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters 下， 
+
+   1. 右击 parameters，添加一个新的 DWORD，名字为`MaxUserPort`
+
+   2. 然后双击 MaxUserPort，基数选择十进制，输入数值数据为 `65534`（如果是分布式运 行的话，控制机器和负载机器都需要这样操作哦） 
+   3. 右击 parameters，添加一个新的 DWORD，名字为`TCPTimedWaitDelay`
+   4. 然后双击`TCPTimedWaitDelay`，基数选择十进制，输入数值数据为 `30`
+
+3. 修改配置完毕之后记得重启机器才会生效 
+
+![image-20220712185322027](image/5.3.6.6.6.2.1.png)
+
+![GIF 2022-7-12 18-57-57](image/5.3.6.6.6.2.2.gif)
+
+官方文档：[错误 WSAENOBUFS (10055) - Windows Client | Microsoft Docs](https://docs.microsoft.com/zh-CN/troubleshoot/windows-client/networking/connect-tcp-greater-than-5000-error-wsaenobufs-10055)
+
+<img src="image/5.3.6.6.6.2.3.png" alt="image-20220712190300746" style="zoom:67%;" />
+
+### 5.3.7、性能监控
+
+#### 1、jvm 内存模型
+
+![image-20220712193526455](image/5.3.7.1.1.png)
+
+- 程序计数器 Program Counter Register：
+  - 记录的是正在执行的虚拟机字节码指令的地址，
+  - 此内存区域是唯一一个在 JAVA 虚拟机规范中没有规定任何OutOfMemoryError 的区域
+- 虚拟机：VM Stack
+  - 描述的是 JAVA 方法执行的内存模型，每个方法在执行的时候都会创建一个栈帧，用于存储局部变量表，操作数栈，动态链接，方法接口等信息
+  - 局部变量表存储了编译期可知的各种基本数据类型、对象引用
+  - 线程请求的栈深度不够会报 StackOverflowError 异常
+  - 栈动态扩展的容量不够会报 OutOfMemoryError 异常
+  - 虚拟机栈是线程隔离的，即每个线程都有自己独立的虚拟机栈
+- 本地方法：Native Stack
+  - 本地方法栈类似于虚拟机栈，只不过本地方法栈使用的是本地方法
+- 堆：Heap
+  - 几乎所有的对象实例都在堆上分配内存
+
+![image-20220712193817010](image/5.3.7.1.2.png)
+
+#### 2、堆
+
+所有的对象实例以及数组都要在堆上分配。堆是垃圾收集器管理的主要区域，也被称为“GC 堆”；也是我们优化最多考虑的地方。
+
+堆可以细分为：
+
+- 新生代
+  - Eden 空间
+  - From Survivor 空间
+  - To Survivor 空间
+- 老年代
+- 永久代/元空间
+  - Java8 以前永久代，受 jvm 管理，java8 以后元空间，直接使用物理内存。因此，默认情况下，元空间的大小仅受本地内存限制。
+
+垃圾回收
+
+![image-20220712193955078](image/5.3.7.2.1.png)
+
+从 Java8 开始，HotSpot 已经完全将永久代（Permanent Generation）移除，取而代之的是一个新的区域—元空间（MetaSpace）
+
+![image-20220712194019094](image/5.3.7.2.2.png)
+
+![image-20220712194034323](image/5.3.7.2.3.png)
+
+#### 3、jconsole 与 jvisualvm
+
+Jdk 的两个小工具 jconsole、jvisualvm（升级版的 jconsole）;通过命令行启动，可监控本地和
+
+远程应用。远程应用需要配置
+
+##### 1、jconsole使用
+
+###### 1、打开
+
+打开`cmd`，输入`jconsole`，选择一个服务后即可查看`内存`、`线程`、`类`、`vm`等信息
+
+![GIF 2022-7-12 19-28-56](image/5.3.7.3.1.1.gif)
+
+###### 2、概要
+
+![image-20220712195023839](image/5.3.7.3.1.2.png)
+
+###### 3、内存
+
+![image-20220712195050101](image/5.3.7.3.1.3.png)
+
+###### 4、线程
+
+![image-20220712195130378](image/5.3.7.3.1.4.png)
+
+###### 5、类
+
+![image-20220712195153804](image/5.3.7.3.1.5.png)
+
+###### 6、VM 概要
+
+![image-20220712195233679](image/5.3.7.3.1.6.png)
+
+###### 7、MBean
+
+![image-20220712195314522](image/5.3.7.3.1.7.png)
+
+##### 2、`jvisualvm`使用
+
+###### 1、打开
+
+开`cmd`，输入`jvisualvm`，选择一个服务后即可查看各种信息
+
+![GIF 2022-7-12 19-56-54](image/5.3.7.3.2.1.gif)
+
+###### 2、概要
+
+![image-20220712195808985](image/5.3.7.3.2.2.png)
+
+###### 3、监视
+
+![image-20220712195838543](image/5.3.7.3.2.3.png)
+
+###### 4、线程
+
+![image-20220712195904085](image/5.3.7.3.2.4.png)
+
+###### 5、抽样器
+
+![image-20220712195946392](image/5.3.7.3.2.5.png)
+
+###### 6、Profiler
+
+![image-20220712200011690](image/5.3.7.3.2.6.png)
+
+##### 3、安装`Visual GC`
+
+###### 1、下载插件
+
+点击`工具`，选择`插件`，在`可用插件`里点击`检查最新版本(F)`，然后选中`Visual GC`点击`安装(I)`即可
+
+![GIF 2022-7-12 20-02-45](image/5.3.7.3.3.1.1.gif)
+
+![image-20220712200832207](image/5.3.7.3.3.1.2.png)
+
+###### 2、检查最新版本错误
+
+如果点击`检查最新版本`出现了错误，可以在`cmd`输入以下命令，查看jdk详细版本
+
+```
+java -version
+```
+
+进入该网站：https://visualvm.github.io/pluginscenters.html ，查询该版本对应的更新地址
+
+例如我的java版本为`java version "1.8.0_301"`，后面的小版本为`301`因此对应该网站显示的`JDK 8 Update 131 - 331`
+
+点进去，复制里面显示的url即可(url以`xml.gz`结尾)
+
+```
+https://visualvm.github.io/uc/8u131/updates.xml.gz
+```
+
+![GIF 2022-7-12 20-19-35](image/5.3.7.3.3.2.png)
+
+###### 3、下载插件错误
+
+![image-20220712200858240](image/5.3.7.3.3.3.1.png)
+
+> https://github.com/visualvm/visualvm.src/releases/download/1.3.9/com-sun-tools-visualvm-modules-visualgc.nbm中出现网络问题  
+
+>  检查代理设置或稍后重试。服务器目前可能不可用。 您可能还需要确保防火墙不会阻塞网络通信。 您的高速缓存可能已过期。请单击“检查更新”以刷新内容。  
+
+这种是githu的这个网址访问不了了，可以换个时间下载，或者使用某些方法下载，也可以通过迅雷下载
+
+依次点击`工具(T)` -> `插件(G)` -> `已下载` -> `添加插件(A)..`即可添加离线插件
+
+![image-20220712202618328](image/5.3.7.3.3.3.2.png)
+
+可以在刚刚那个网址 https://visualvm.github.io/pluginscenters.html 里点击对应版本的链接后，在下面即可看到各个工具的下载地址
+
+![GIF 2022-7-12 20-31-27](image/5.3.7.3.3.3.3.gif)
+
+###### 4、查看`Visual GC`
+
+![image-20220712203426598](image/5.3.7.3.3.3.4.png)
+
+#### 4、测试Nginx
+
+##### 1、准备工作
+
+###### 1、查看docker资源使用情况
+
+使用`docker stats`命令可以查看`docker`里，各容器的`cpu`、内存等的占用情况
+
+```
+docker stats
+```
+
+![image-20220712204640177](image/5.3.7.4.1.1.png)
+
+###### 2、设置线程数
+
+选中`测试计划`，右键依次选择`添加` -> `线程（用户）` -> `线程组`
+
+点击刚刚创建的`线程组`，在`线程属性`里的`线程数`里输入`50`，表示**启动50个线程**
+
+在`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`循环次数`里勾选`永远`，表示如果不点击`停止`按钮，就一直执行
+
+![image-20220712204257142](image/5.3.7.4.1.2.png)
+
+###### 3、修改`http`请求信息
+
+选中`线程组`，右键依次选择 `添加` -> `取样器` -> `http请求`，
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`192.168.56.10`，`端口号：`输入`80`，`路径`输入`/`
+
+![image-20220712204511116](image/5.3.7.4.1.3.png)
+
+###### 4、查看要压测的页面
+
+http://192.168.56.10/
+
+![image-20220712205325631](image/5.3.7.4.1.4.png)
+
+###### 5、添加`察看结果树`、`汇总报告`、`聚合报告`
+
+选中`线程组`，右键依次选择 `添加` -> `监听器` -> `察看结果树`
+
+选中`线程组`，右键依次选择 `添加` -> `监听器` -> `汇总报告`
+
+选中`线程组`，右键依次选择 `添加` -> `监听器` -> `聚合报告`
+
+![image-20220712204615385](image/5.3.7.4.1.5.png)
+
+##### 2、执行测试
+
+先打开`docker`资源页面查看`nginx`的资源占用情况，然后点击工具栏的`清除全部`按钮，然后点击`启动`按钮，切换到docker容器资源页面，查看`nginx`的资源使用情况
+
+![GIF 2022-7-12 20-49-26](image/5.3.7.4.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+###### 1、察看结果树
+
+![image-20220712205531631](image/5.3.7.4.3.1.png)
+
+###### 2、汇总报告
+
+![image-20220712205512240](image/5.3.7.4.3.2.png)
+
+###### 3、聚合报告
+
+![image-20220712205433015](image/5.3.7.4.3.3.png)
+
+#### 5、测试Gateway
+
+##### 1、准备工作
+
+准备压测`gulimall-gateway`模块
+
+![image-20220715110323719](image/5.3.7.5.1.1.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`88`，`路径`输入`/`
+
+![image-20220712205703499](image/5.3.7.5.1.2.png)
+
+要压测的页面：  http://localhost:88/
+
+![image-20220712205736949](image/5.3.7.5.1.3.png)
+
+##### 2、执行测试
+
+先打开`jvisualvm`查看`GulimallGatewayApplication`服务的资源占用情况，然后点击工具栏的`清除全部`按钮，然后点击`启动`按钮，切换到`jvisualvm`查看`GulimallGatewayApplication`服务的资源占用情况，可以看到网关和nginx差不多，都是消耗cpu型
+
+![GIF 2022-7-12 21-07-11](image/5.3.7.5.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220712211847512](image/5.3.7.5.3.1.png)
+
+**汇总报告**
+
+![image-20220712211858104](image/5.3.7.5.3.2.png)
+
+**聚合报告**
+
+![image-20220712211909526](image/5.3.7.5.3.3.png)
+
+#### 6、测试简单服务
+
+##### 1、准备工作
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.web.IndexController`类里添加`hello`方法
+
+```java
+@ResponseBody
+@GetMapping("/hello")
+public String hello(){
+    return "hello";
+}
+```
+
+![image-20220712212223004](image/5.3.7.6.1.1.png)
+
+重启`GulimallProductApplication`服务
+
+要压测的页面： http://localhost:10000/hello
+
+![image-20220712212504526](image/5.3.7.6.1.2.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/hello`
+
+![image-20220712212849827](image/5.3.7.6.1.3.png)
+
+##### 2、执行测试
+
+先打开`jvisualvm`查看`GulimallProductApplication`服务的资源占用情况，然后点击工具栏的`清除全部`按钮，然后点击`启动`按钮，切换到`jvisualvm`查看`GulimallProductApplication`服务的资源占用情况
+
+![GIF 2022-7-12 21-33-41](image/5.3.7.6.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220712213634549](image/5.3.7.6.3.1.png)
+
+**汇总报告**
+
+![image-20220712213653108](image/5.3.7.6.3.2.png)
+
+**聚合报告**
+
+![image-20220712213705375](image/5.3.7.6.3.3.png)
+
+
+
+#### 7、测试`Gateway`+`简单服务`
+
+##### 1、准备工作
+
+在`gulimall-gateway`模块的`src/main/resources/application.yml`配置文件添加路径映射
+
+```yaml
+- id: product_route
+  uri: lb://gulimall-product
+  predicates:
+    - Path=/api/product/**,/hello
+  filters:
+    # (?<segment>/?.*) 和 $\{segment} 为固定写法
+    #http://localhost:88/api/product/category/list/tree 变为 http://localhost:10000/product/category/list/tree
+    - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+```
+
+![image-20220712213939761](image/5.3.7.7.1.1.png)
+
+重启`GulimallGatewayApplication`服务，刷新前端页面： http://localhost:88/hello
+
+![image-20220712214138315](image/5.3.7.7.1.2.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`88`，`路径`输入`/hello`
+
+![image-20220712214237380](image/5.3.7.7.1.3.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-12 21-46-20](image/5.3.7.7.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220712214657329](image/5.3.7.7.3.1.png)
+
+**汇总报告**
+
+![image-20220712214709096](image/5.3.7.7.3.2.png)
+
+**聚合报告**
+
+![image-20220712214719048](image/5.3.7.7.3.3.png)
+
+#### 8、测试全链路简单服务
+
+##### 1、准备工作
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`gulimall.com`，`端口号：`输入`80`，`路径`输入`/hello`
+
+![image-20220712215447489](image/5.3.7.8.1.1.png)
+
+要压测的页面： http://gulimall.com/hello
+
+![image-20220712215521006](image/5.3.7.8.1.2.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-12 21-57-19](image/5.3.7.8.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220712215825563](image/5.3.7.8.3.1.png)
+
+**汇总报告**
+
+![image-20220712215839520](image/5.3.7.8.3.2.png)
+
+**聚合报告**
+
+![image-20220712215851755](image/5.3.7.8.3.3.png)
+
+#### 9、首页一级菜单渲染
+
+##### 1、准备工作
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/`
+
+![image-20220713085131271](image/5.3.7.9.1.1.png)
+
+要压测的页面： http://localhost:10000/
+
+![image-20220713085155651](image/5.3.7.9.1.2.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 8-53-49](image/5.3.7.9.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220713085519971](image/5.3.7.9.3.1.png)
+
+**汇总报告**
+
+![image-20220713085535281](image/5.3.7.9.3.2.png)
+
+**聚合报告**
+
+![image-20220713085549911](image/5.3.7.9.3.3.png)
+
+#### 10、三级分类数据获取
+
+##### 1、准备工作
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/index/catalog.json`
+
+![image-20220713190216851](image/5.3.7.10.1.1.png)
+
+要压测的页面是：http://localhost:10000/index/catalog.json
+
+而不是：http://localhost:10000/index/json/catalog.json
+
+![image-20220713190257988](image/5.3.7.10.1.2.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 19-10-35](image/5.3.7.10.2.gif)
+
+##### 3、**察看结果树**
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**汇总报告**
+
+![image-20220713191148245](image/5.3.7.10.3.1.png)
+
+**汇总报告**
+
+![image-20220713191201840](image/5.3.7.10.3.2.png)
+
+**聚合报告**
+
+![image-20220713191218051](image/5.3.7.10.3.3.png)
+
+#### 11、首页全量数据获取
+
+##### 1、准备工作
+
+在`HTTP请求`的`基本`里的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/`
+
+![image-20220713091414524](image/5.3.7.11.1.1.png)
+
+在`HTTP请求`的`高级`里，勾选`从HTML文件获取所有内含的资源`和`并行下载`(并行下载数量为6)
+
+![image-20220713091431240](image/5.3.7.11.1.2.png)
+
+要压测的页面： http://localhost:10000/
+
+![image-20220713091450595](image/5.3.7.11.1.3.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 9-17-26](image/5.3.7.11.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+在`察看结果树`的`取样器结果`里报了`404`的错误
+
+![image-20220713091958676](image/5.3.7.11.3.1.png)
+
+在`察看结果树`的`响应数据`里的`Response Body`里可以看到页面请求成功了，报`404`是因为有些`图片`、`javascript`没有请求成功
+
+![image-20220713091944626](image/5.3.7.11.3.2.png)
+
+**汇总报告**
+
+![image-20220713092020556](image/5.3.7.11.3.3.png)
+
+**聚合报告**
+
+![image-20220713092032116](image/5.3.7.11.3.4.png)
+
+#### 12、首页渲染（开缓存）
+
+##### 1、准备工作
+
+在`gulimall-product`模块的`src/main/resources/application.yml`配置文件里，把`thymeleaf`缓存打开
+
+```yaml
+spring:
+  thymeleaf:
+    cache: true
+```
+
+重启`GulimallProductApplication`服务
+
+![image-20220713092819303](image/5.3.7.12.1.1.png)
+
+在`线程组`的`线程属性`里的`线程数`里输入`50`，表示**启动50个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里勾选`永远`
+
+![image-20220713092941056](image/5.3.7.12.1.2.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/`
+
+![image-20220713092958127](image/5.3.7.12.1.3.png)
+
+在`HTTP请求`的`高级`里，取消勾选`从HTML文件获取所有内含的资源`
+
+![image-20220713093012837](image/5.3.7.12.1.4.png)
+
+要压测的页面： http://localhost:10000/
+
+![image-20220713093042423](image/5.3.7.12.1.5.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 9-33-24](image/5.3.7.12.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220713093606192](image/5.3.7.12.3.1.png)
+
+**汇总报告**
+
+![image-20220713093616704](image/5.3.7.12.3.2.png)
+
+**聚合报告**
+
+![image-20220713093629776](image/5.3.7.12.3.3.png)
+
+#### 13、首页渲染（开缓存、优化数据库、关日志）
+
+##### 1、修改日志级别
+
+修改`gulimall-product`模块的`src/main/resources/application.yml`配置文件的日志级别
+
+```yaml
+logging:
+  level:
+    com.atguigu.gulimall: error
+```
+
+![image-20220713094701394](image/5.3.7.13.1.png)
+
+##### 2、使用索引
+
+###### 1、没加索引
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类的`getLevel1Categories`方法
+
+```java
+@Override
+public List<CategoryEntity> getLevel1Categories() {
+    LambdaQueryWrapper<CategoryEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.eq(CategoryEntity::getParentCid, 0);
+    lambdaQueryWrapper.select(CategoryEntity::getCatId, CategoryEntity::getName);
+    long start = System.currentTimeMillis();
+    List<CategoryEntity> categoryEntities = this.baseMapper.selectList(lambdaQueryWrapper);
+    long end = System.currentTimeMillis();
+    System.out.println("消耗时间："+(end-start));
+    return categoryEntities;
+}
+```
+
+重启`GulimallProductApplication`服务
+
+![image-20220713094412296](image/5.3.7.13.2.1.1.png)
+
+多刷新几次主页后再测试：http://localhost:10000/
+
+可以看到，消耗的时间都在`2~5`秒
+
+![image-20220713095240494](image/5.3.7.13.2.1.2.png)
+
+###### 2、加索引
+
+打开`navicat`，选择`gulimall_pms`数据库的`pms_category`表，右键选择`设计表`
+
+点击`索引`，在`字段`里选择`parent_cid`，然后点击`保存`，这样就给`parent_cid`添加了一个默认的索引
+
+![image-20220713095524701](image/5.3.7.13.2.2.1.png)
+
+`名`、`索引类型`、`索引方法`都为系统自动生成的
+
+![image-20220713095334084](image/5.3.7.13.2.2.2.png)
+
+多刷新几次主页后再测试：http://localhost:10000/ （不用重启服务。保险起见，也可以重启`GulimallProductApplication`服务）
+
+可以看到，消耗的时间都在`1~3`秒，加索引后速度还是有明显提升的
+
+![image-20220713095807730](image/5.3.7.13.2.2.3.png)
+
+##### 3、执行测试
+
+![GIF 2022-7-13 10-01-01](image/5.3.7.13.3.gif)
+
+##### 4、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220713100251659](image/5.3.7.13.4.1.png)
+
+**汇总报告**
+
+![image-20220713100343229](image/5.3.7.13.4.2.png)
+
+**聚合报告**
+
+![image-20220713100356061](image/5.3.7.13.4.3.png)
+
+#### 14、三级分类（优化业务）
+
+##### 1、准备工作
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/index/catalog.json`
+
+![image-20220713185422580](image/5.3.7.14.1.1.png)
+
+要压测的页面是： http://localhost:10000/index/catalog.json
+
+而不是： http://localhost:10000/index/json/catalog.json
+
+![image-20220713185442346](image/5.3.7.14.1.2.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 18-56-32](image/5.3.7.14.2.gif)
+
+##### 3、查看压测报告
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220713185805721](image/5.3.7.14.3.1.png)
+
+**汇总报告**
+
+![image-20220713185839666](image/5.3.7.14.3.2.png)
+
+**聚合报告**
+
+![image-20220713185857661](image/5.3.7.14.3.3.png)
+
+查询数据库消耗的时间：
+
+![image-20220713190139525](image/5.3.7.14.3.4.png)
+
+#### 15、压测报告表
+
+| 压测内容                               | 压测线程数 | 吞吐量/s | 90%响应时间/ms | 99%响应时间/ms |
+| -------------------------------------- | ---------- | -------- | -------------- | -------------- |
+| Nginx                                  | 50         | 882      | 15             | 1899           |
+| Gateway                                | 50         | 1552     | 47             | 149            |
+| 简单服务                               | 50         | 11431    | 8              | 24             |
+| 首页一级菜单渲染                       | 50         | 202      | 381            | 645            |
+| 首页渲染（开缓存）                     | 50         | 229      | 286            | 497            |
+| 首页渲染（开缓存、优化数据库、关日志） | 50         | 510      | 174            | 333            |
+| 三级分类数据获取                       | 50         | 1.5      | 33628          | 33789          |
+| 三级分类（优化业务）                   | 50         | 4.9      | 13230          | 14285          |
+| 优化三级分类查询(查询一次数据库)       | 5          | 89.3     | 839            | 2047           |
+| 三 级 分 类 （ 使用 redis 作为缓存）   | 50         | 159      | 422            | 842            |
+| 首页全量数据获取                       | 50         | 3        | 33699          | 38237          |
+| Nginx+Gateway                          | 50         |          |                |                |
+| Gateway+简单服务                       | 50         | 793      | 98             | 159            |
+| 全链路                                 | 50         | 346      | 171            | 1240           |
+
+### 5.3.8、配置nginx
+
+#### 1、nginx动静分离
+
+##### 1、复制文件
+
+在虚拟机的`/mydata/nginx/html/`目录里新建`static`目录，用于存放静态文件
+
+```bash
+cd /mydata/nginx/
+ls
+cd html/
+ls
+mkdir static
+ls
+cd static/
+ls
+```
+
+![image-20220713111438938](image/5.3.8.1.1.1.png)
+
+将`gulimall-product\src\main\resources\static`目录下的`index`文件夹复制到虚拟机的`/mydata/nginx/html/static`目录里
+
+复制完后，删除`gulimall-product\src\main\resources\static`目录下的`index`文件夹
+
+![GIF 2022-7-13 14-31-53](image/5.3.8.1.1.2.gif)
+
+##### 2、修改`index.html`
+
+在`gulimall-product`模块的`src/main/resources/templates/index.html`文件里，修改部分代码，在所有请求的路径前都加上`/static/`(第一个`/`表示在当前项目下),使静态资源访问`nigix`
+
+![image-20220713145539244](image/5.3.8.1.2.png)
+
+完整代码：
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="/static/index/css/swiper-3.4.2.min.css">
+  <link rel="stylesheet" href="/static/index/css/GL.css">
+  <script src="/static/index/js/jquery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="/static/index/js/swiper-3.4.2.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="/static/index/js/swiper-3.4.2.min.js"></script>
+
+</head>
+
+<body>
+<div class="top_find">
+  <div class="top_find_son">
+    <img src="/static/index/img/top_find_logo.png" alt="">
+    <div class="input_find">
+      <input type="text" placeholder="卸妆水" />
+      <span style="background: url('/static/index/img/img_12.png') 0 -1px;"></span>
+      <a href="#"><img src="/static/index/img/img_09.png" /></a>
+    </div>
+  </div>
+</div>
+<ul class="left_floor">
+  <li class="left_floor_xiang">享品质</li>
+  <li class="left_floor_fu">服饰美妆</li>
+  <li class="left_floor_jia">家电手机</li>
+  <li class="left_floor_dian">电脑数码</li>
+  <li class="left_floor_3C">3C运动</li>
+  <li class="left_floor_ai">爱吃</li>
+  <li class="left_floor_mu">母婴家居</li>
+  <li class="left_floor_tu">图书汽车</li>
+  <li class="left_floor_you">游戏金融</li>
+  <li class="left_floor_lv">旅行健康</li>
+  <li class="left_floor_hai">还没逛够</li>
+  <li class="left_floor_ding">顶部</li>
+</ul>
+<header>
+  <div class="head">
+    <a href="/static/#"><img src="/static/index/img/img_01.png" /></a>
+    <p>X</p>
+  </div>
+  <!--头部-->
+  <div class="header_head">
+    <div class="header_head_box">
+      <a href="#" class="img"><img src="/static/index/img/logo.jpg" /></a>
+      <b class="header_head_p">
+        <a href="#">
+          <img src="/static/index/img/img_05.png" style="border-radius: 50%;"/>
+          <!--<span class="glyphicon glyphicon-map-marker"></span>-->
+          北京</a>
+        <div class="header_head_p_cs">
+          <a href="#" style="background: #C81623;color: #fff;">北京</a>
+          <a href="#">上海</a>
+          <a href="#">天津</a>
+          <a href="#">重庆</a>
+          <a href="#">河北</a>
+          <a href="#">山西</a>
+          <a href="#">河南</a>
+          <a href="#">辽宁</a>
+          <a href="#">吉林</a>
+          <a href="#">黑龙江</a>
+          <a href="#">内蒙古</a>
+          <a href="#">江苏</a>
+          <a href="#">山东</a>
+          <a href="#">安徽</a>
+          <a href="#">浙江</a>
+          <a href="#">福建</a>
+          <a href="#">湖北</a>
+          <a href="#">湖南</a>
+          <a href="#">广东</a>
+          <a href="#">广西</a>
+          <a href="#">江西</a>
+          <a href="#">四川</a>
+          <a href="#">海南</a>
+          <a href="#">贵州</a>
+          <a href="#">云南</a>
+          <a href="#">西藏</a>
+          <a href="#">陕西</a>
+          <a href="#">甘肃</a>
+          <a href="#">青海</a>
+          <a href="#">宁夏</a>
+          <a href="#">新疆</a>
+          <a href="#">港澳</a>
+          <a href="#">台湾</a>
+          <a href="#">钓鱼岛</a>
+          <a href="#">海外</a>
+        </div>
+      </b>
+      <ul>
+        <li>
+          <a href="/static//登录页面\index.html">你好，请登录</a>
+        </li>
+        <li>
+          <a href="/static//注册页面\index.html" class="li_2">免费注册</a>
+        </li>
+        <span>|</span>
+        <li>
+          <a href="#">我的订单</a>
+        </li>
+
+
+      </ul>
+    </div>
+  </div>
+  <!--搜索导航-->
+  <div class="header_sous">
+    <div class="header_form">
+      <input id="searchText" type="text" placeholder="" />
+      <span style="background: url('/static/index/img/img_12.png') 0 -1px;"></span>
+      <!--<button><i class="glyphicon"></i></button>-->
+      <a href="#" ><img src="/static/index/img/img_09.png" onclick="search()" /></a>
+    </div>
+    <div class="header_ico">
+      <div class="header_gw">
+        <img src="/static/index/img/img_15.png" />
+        <span><a href="/static//购物车\One_JDshop.html">我的购物车</a></span>
+        <span>0</span>
+      </div>
+      <div class="header_ko">
+        <p>购物车中还没有商品，赶紧选购吧！</p>
+      </div>
+    </div>
+    <div class="header_form_nav">
+      <ul>
+        <li>
+          <a href="#" class="aaaaa">满999减300</a>
+        </li>
+        <li>
+          <a href="#">金立S11</a>
+        </li>
+        <li>
+          <a href="#">农用物资</a>
+        </li>
+        <li>
+          <a href="#">保暖特惠</a>
+        </li>
+        <li>
+          <a href="#">洗衣机节</a>
+        </li>
+        <li>
+          <a href="#">七度空间卫生巾</a>
+        </li>
+        <li>
+          <a href="#">自动波箱油</a>
+        </li>
+        <li>
+          <a href="#">超市</a>
+        </li>
+      </ul>
+    </div>
+    <nav>
+      <ul>
+        <li>
+          <a href="#">秒杀</a>
+        </li>
+        <li>
+          <a href="#">优惠券</a>
+        </li>
+        <li>
+          <a href="#">闪购</a>
+        </li>
+        <li>
+          <a href="#">拍卖</a>
+        </li>
+      </ul>
+      <div class="spacer">|</div>
+      <ul>
+        <li>
+          <a href="#">服饰</a>
+        </li>
+        <li>
+          <a href="#">超市</a>
+        </li>
+        <li>
+          <a href="#">生鲜</a>
+        </li>
+        <li>
+          <a href="#">全球购</a>
+        </li>
+      </ul>
+      <div class="spacer">|</div>
+      <ul>
+        <li>
+          <a href="#">金融</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="right">
+      <a href="#"><img src="/static/index/img/img_21.png" /></a>
+    </div>
+  </div>
+  <!--轮播主体内容-->
+  <div class="header_main">
+    <div class="header_banner">
+      <div class="header_main_left">
+        <ul>
+          <li th:each="category : ${categories}">
+            <a href="#" class="header_main_left_a" th:attr="ctg-data=${category.catId}"><b th:text="${category.name}">家用电器</b></a>
+          </li>
+        </ul>
+      </div>
+      <div class="header_main_center">
+        <div class="swiper-container swiper1">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <a href="#"><img src="/static/index/img/lunbo.png" /></a>
+            </div>
+
+            <div class="swiper-slide">
+              <a href="#"><img src="/static/index/img/lunbo3.png" /></a>
+            </div>
+
+            <div class="swiper-slide">
+              <a href="#"><img src="/static/index/img/lunbo6.png" /></a>
+            </div>
+            <div class="swiper-slide">
+              <a href="#"><img src="/static/index/img/lunbo7.png" /></a>
+            </div>
+          </div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-next swiper-button-white"></div>
+          <div class="swiper-button-prev swiper-button-white"></div>
+        </div>
+        <div class="header_main_center_b">
+          <a href="#"><img src="/static/index/img/5a13bf0bNe1606e58.jpg" /></a>
+          <a href="#"><img src="/static/index/img/5a154759N5385d5d6.jpg" /></a>
+        </div>
+      </div>
+      <div class="header_main_right">
+        <div class="header_main_right_user">
+          <div class="user_info">
+            <div class="user_info_tou">
+              <a href="#"><img class="" src="/static/index/img/touxiang.png"></a>
+            </div>
+            <div class="user_info_show">
+              <p class="">Hi, 欢迎来到!</p>
+              <p>
+                <a href="#" class="">登录</a>
+                <a href="#" class="">注册</a>
+              </p>
+            </div>
+          </div>
+          <div class="user_info_hide">
+            <a href="#">新人福利</a>
+            <a href="#">PLUS会员</a>
+          </div>
+        </div>
+        <div class="header_main_right_new">
+          <div class="header_new">
+            <div class="header_new_t">
+              <p class="active">
+                <a href="#">促销</a>
+              </p>
+              <p>
+                <a href="#">公告</a>
+              </p>
+              <a href="#">更多</a>
+            </div>
+            <div class="header_new_connter">
+              <div class="header_new_connter_1">
+                <ul>
+                  <li>
+                    <a href="#">全民纸巾大作战</a>
+                  </li>
+                  <li>
+                    <a href="#">家具建材满999减300元</a>
+                  </li>
+                  <li>
+                    <a href="#">黑科技冰箱，下单立减千元</a>
+                  </li>
+                  <li>
+                    <a href="#">抢102减101神券！</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="header_new_connter_1" style="display: none;">
+                <ul>
+                  <li>
+                    <a href="#">关于召回普利司通（天津）轮胎有限公司2个规格乘用车轮胎的公告</a>
+                  </li>
+                  <li>
+                    <a href="#">物流推出配送员统一外呼电话"95056”</a>
+                  </li>
+                  <li>
+                    <a href="#">天府大件运营中心开仓公告</a>
+                  </li>
+                  <li>
+                    <a href="#">大件物流“送装一体”服务全面升级！</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="header_main_right_ser">
+          <div class="ser_box">
+            <ul>
+              <li class="ser_box_item">
+                <a href="#">
+                  <img src="/static/index/img/huafei.png" />
+                  <span>话费</span>
+                </a>
+              </li>
+              <li class="ser_box_item">
+                <a href="#">
+                  <img src="/static/index/img/jipiao.png" />
+                  <span>机票</span>
+                </a>
+              </li>
+              <li class="ser_box_item">
+                <a href="#">
+                  <img src="/static/index/img/jiudian.png" />
+                  <span>酒店</span>
+                </a>
+              </li>
+              <li class="ser_box_item">
+                <a href="#">
+                  <img src="/static/index/img/youxi.png" />
+                  <span>游戏</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/qiyegou.png" />
+                  <span>企业购</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/jiayouka.png" />
+                  <span>加油卡</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/dianyingpiao.png" />
+                  <span>电影票</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/huochepiao.png" style="height:20px;" />
+                  <span>火车票</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/zhongchou.png" />
+                  <span>众筹</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/licai.png" style="height:22px;" />
+                  <span>理财</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/lipinka.png" style="height:14px;" />
+                  <span>礼品卡</span>
+                </a>
+              </li>
+              <li class="ser_box_item1">
+                <a href="#">
+                  <img src="/static/index/img/baitiao.png" style="height:20px;" />
+                  <span>白条</span>
+                </a>
+              </li>
+            </ul>
+            <div class="ser_box_aaa">
+              <div class="ser_box_aaa_one">
+                <div class="ser_box_aaa_nav">
+                  <ol>
+                    <li class="active">
+                      <a href="#">话费</a>
+                    </li>
+                    <li>
+                      <a href="#">机票</a>
+                    </li>
+                    <li>
+                      <a href="#">酒店</a>
+                    </li>
+                    <li>
+                      <a href="#">游戏</a>
+                    </li>
+                  </ol>
+                  <div class="ser_ol">
+                    <div class="ser_ol_li">
+                      <ul>
+                        <div class="guanbi">X</div>
+                        <a class="active">话费充值</a>
+                        <a>流量充值</a>
+                        <a>套餐变更</a>
+                        <div class="ser_ol_div">
+                          <p>号码<input type="text" /></p>
+                          <p style="margin: 10px 0;">面值
+                            <select name="">
+                              <option value="">100元</option>
+                              <option value="">20元</option>
+                              <option value="">50元</option>
+                              <option value="">10元</option>
+                              <option value="">2元</option>
+                            </select>
+                            <span>￥98.0-￥100.0</span></p>
+                        </div>
+                        <button>快速充值</button>
+                        <p class="p">抢99减50元话费</p>
+                      </ul>
+
+                    </div>
+                    <div class="ser_ol_li">
+                      <ul>
+                        <div class="guanbi">X</div>
+                        <a class="active">国际机票</a>
+                        <a>国际/港澳</a>
+                        <a>特惠活动</a>
+                        <div class="ser_ol_div1">
+                          <p>
+                            <input type="radio" name="a" style="vertical-align:middle;" />单程
+                            <input type="radio" name="a" style="vertical-align:middle;" />往返
+                          </p>
+                          <input type="text" placeholder="出发城市" />
+                          <input type="text" placeholder="到达城市" />
+                          <input type="text" placeholder="日期" />
+                        </div>
+                        <button>机票查询</button>
+                        <span class="p">当季热门特惠机票</span>
+                      </ul>
+                    </div>
+                    <div class="ser_ol_li">
+                      <ul>
+                        <div class="guanbi">X</div>
+                        <a class="active" style="width: 50%;">国内港澳台</a>
+                        <a style="width: 50%;">促销活动</a>
+                        <div class="ser_ol_div1">
+                          <input type="text" placeholder="出发城市" style="margin-top: 10px;" />
+                          <input type="text" placeholder="到达城市" />
+                          <input type="text" placeholder="日期" />
+                          <input type="text" placeholder="酒店 商圈 地标" />
+                        </div>
+                        <button>酒店查询</button>
+                        <span class="p">订酒店到</span>
+                      </ul>
+                    </div>
+                    <div class="ser_ol_li">
+                      <ul>
+                        <div class="guanbi">X</div>
+                        <a class="active">点卡</a>
+                        <a>QQ</a>
+                        <a>页游</a>
+                        <div class="ser_ol_div1">
+                          <input type="text" placeholder="游戏" style="margin-top: 15px;" />
+                          <br />面值
+                          <select name="" style="margin: 8px 0;">
+                            <option value="">面值</option>
+                            <option value="">面值</option>
+                            <option value="">面值</option>
+                          </select><span style="color: #C81623;">￥0.00</span>
+                          <p>
+                            <input type="radio" name="a" style="width: 15px;vertical-align:middle;" />直充
+                            <input type="radio" name="a" style="width: 15px;vertical-align:middle;" />卡密
+                          </p>
+                        </div>
+                        <button>快速充值</button>
+                        <span class="p">吃鸡就要快人一步</span>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="header_banner1">
+      <a href="#" class="a">
+        <img src="/static/index/img/5a1e5ce2N034ce344.png" class="aa" />
+      </a>
+      <div class="header_banner1_div">
+        <p>X</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="section_second">
+  <!-- 第一层 -->
+  <div class="section_second_header">
+    <p class="section_second_header_img"></p>
+    <div class="section_second_header_left">
+      <p></p>
+      <span class="">秒杀</span>
+      <span>总有你想不到的低价</span>
+      <span>
+        </span>
+    </div>
+    <div class="section_second_header_right">
+      <p>当前场次</p>
+      <span class="section_second_header_right_hours">00</span>
+      <span class="section_second_header_right_mao">：</span>
+      <span class="section_second_header_right_minutes">00</span>
+      <span class="section_second_header_right_mao">：</span>
+      <span class="section_second_header_right_second">00</span>
+      <p>后结束</p>
+    </div>
+  </div>
+  <div class="section_second_list">
+    <div class="swiper-container swiper_section_second_list_left">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <ul>
+            <li>
+              <img src="/static/index/img/section_second_list_img1.jpg" alt="">
+              <p>花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千克） （日本官方直采） 花王 (Merries) 妙而舒 纸尿裤 大号 L54片 尿不湿（9-14千</p>
+              <span>¥83.9</span><s>¥99.9</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img2.jpg" alt="">
+              <p>华为mate9 4GB+32GB版 月光银 移动联通电信4G手机 双卡</p>
+              <span>¥17.90</span><s>¥29.90</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img3.jpg" alt="">
+              <p>超能 植翠低泡洗衣液（鲜艳亮丽）2kg/袋装（新老包装随机</p>
+              <span>¥20.70</span><s>¥44.90</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img4.jpg" alt="">
+              <p>长城（GreatWall）红酒 特选5年橡木桶解百纳干红葡萄酒 整</p>
+              <span>¥399.00</span><s>¥599.00</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img5.jpg" alt="">
+              <p>惠普(HP)暗影精灵2代Pro 15.6英寸游戏笔记本电脑(i5-7300H</p>
+              <span>¥5999.00</span><s>¥6499.00</s>
+            </li>
+          </ul>
+        </div>
+        <div class="swiper-slide">
+          <ul>
+            <li>
+              <img src="/static/index/img/section_second_list_img6.jpg" alt="">
+              <p>Apple iMac 21.5英寸一体机（2017新款四核Core i5 处理器/8GB内存/1TB/RP555显卡/4K屏 MNDY2CH/A） Apple iMac 21.5英寸一体机（2017新款四核Core i5 处理</p>
+              <span>¥9588.00</span><s>¥10288.00</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img7.jpg" alt="">
+              <p>中柏（Jumper）EZpad 4S Pro 10.6英寸二合一平板电脑（X5 z</p>
+              <span>¥848.00</span><s>¥899.00</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img8.jpg" alt="">
+              <p>飞利浦（PHILIPS）电动牙刷HX6761/03亮白型成人充电式声波震动牙刷粉色 飞利浦（PHILIPS）电动牙刷HX6761/03亮白型成人充电式声波
+              </p>
+              <span>¥379.00</span><s>¥698.00</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img9.jpg" alt="">
+              <p>美的(Midea) 258升 变频智能三门冰箱 一级能效 风冷无霜 中门</p>
+              <span>¥3088.00</span><s>¥3299.00</s>
+            </li>
+            <li>
+              <img src="/static/index/img/section_second_list_img10.jpg" alt="">
+              <p>【第二件减50元】蒙羊 内蒙古羔羊羊肋排 2.4斤</p>
+              <span>¥99.90</span><s>¥199.00</s>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="swiper-button-prev second_list">
+        <p></p>
+      </div>
+      <div class="swiper-button-next second_list">
+        <p></p>
+      </div>
+    </div>
+    <ul class="section_second_list_right">
+      <li>
+        <img src="/static/index/img/section_second_list_right_img.jpg" alt="">
+      </li>
+      <li>
+        <img src="/static/index/img/section_second_list_right_img.png" alt="">
+      </li>
+      <div class="section_second_list_right_button">
+        <p class="section_second_list_right_button_active"></p>
+        <p></p>
+      </div>
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+</body>
+<script type="text/javascript">
+  function search() {
+    var keyword=$("#searchText").val()
+    window.location.href="http://search.gulimall.com/search.html?keyword="+keyword;
+  }
+
+</script>
+<script type="text/javascript" src="/static/index/js/text.js"></script>
+<script type="text/javascript" src="/static/index/js/header.js"></script>
+<script type="text/javascript" src="/static/index/js/secend.js"></script>
+<script type="text/javascript" src="/static/index/js/zz.js"></script>
+<script type="text/javascript" src="/static/index/jsindex.js"></script>
+<script type="text/javascript" src="/static/index/js/left,top.js"></script>
+<script type="text/javascript" src="/static/index/js/catalogLoader.js"></script>
+</html>
+```
+
+##### 3、关闭缓存
+
+在`gulimall-product`模块的`src/main/resources/application.yml`配置文件里，把`thymeleaf`缓存关闭
+
+```yaml
+spring:
+  thymeleaf:
+    cache: false
+```
+
+重启`GulimallProductApplication`服务
+
+![image-20220713145612544](image/5.3.8.1.3.png)
+
+##### 4、修改`niginx`配置
+
+查看虚拟机的`/mydata/nginx/conf/conf.d/default.conf`文件的配置
+
+```bash
+cd /mydata/nginx/conf/
+ls
+cd conf.d/
+ls
+cat default.conf
+```
+
+![image-20220713150356251](image/5.3.8.1.4.1.png)
+
+复制`default.conf`文件里的`root   /usr/share/nginx/html;`
+
+![image-20220713145904671](image/5.3.8.1.4.2.png)
+
+选中`1 电商`，右键选中`复制会话(D)`
+
+![image-20220713152323017](image/5.3.8.1.4.3.png)
+
+编辑`/mydata/nginx/conf/conf.d/gulimall.conf`文件，然后重启`nginx`
+
+```
+cd "/mydata/nginx/conf/conf.d"
+ls
+vi gulimall.conf
+docker restart nginx
+docker ps
+```
+
+![image-20220713151144140](image/5.3.8.1.4.4.png)
+
+在`/mydata/nginx/conf/conf.d/gulimall.conf`文件里配置以`/static/`开头的路径的访问规则
+
+```
+location /static/ {
+	root   /usr/share/nginx/html;
+}
+```
+
+![image-20220713150219942](image/5.3.8.1.4.5.png)
+
+`/mydata/nginx/conf/conf.d/gulimall.conf`文件的完整内容：
+
+```properties
+server {
+    listen       80;
+    server_name  gulimall.com;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/log/host.access.log  main;
+
+    location /static/ {
+        root   /usr/share/nginx/html;
+    }
+
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://gulimall;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+```
+
+##### 5、访问首页
+
+首先清除浏览器缓存，依次点击`chrome`浏览器的 竖着的三个点 -> `设置` -> `隐私设置和安全性` -> `清吟浏览数据`
+
+![image-20220713154833600](image/5.3.8.1.5.1.png)
+
+访问: http://gulimall.com/
+
+可以看到，绝大部分都可以访问，只有两个不能访问，这两个文件本来就没有，当然无法访问，不用管这两个
+
+![image-20220713154008320](image/5.3.8.1.5.2.png)
+
+可以删掉这两个不能访问的请求
+
+注释掉`<img src="/static/index/img/top_find_logo.png" alt="">`
+
+![image-20220713155237607](image/5.3.8.1.5.3.png)
+
+注释掉`<script type="text/javascript" src="/static/index/jsindex.js"></script>`
+
+![image-20220713155309068](image/5.3.8.1.5.4.png)
+
+#### 2、对`nginx`进行压力测试
+
+##### 1、准备工作
+
+在`gulimall-product`模块的`src/main/resources/application.yml`配置文件里，把`thymeleaf`缓存打开
+
+```yaml
+spring:
+  thymeleaf:
+    cache: true
+```
+
+重启`GulimallProductApplication`服务
+
+![image-20220713154704430](image/5.3.8.2.1.1.png)
+
+在`线程组`的`线程属性`里的`线程数`里输入`50`，表示**启动50个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里勾选`永远`
+
+![image-20220713154553456](image/5.3.8.2.1.2.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`gulimall.com`，`端口号：`输入`80`，`路径`输入`/`
+
+![image-20220713154608124](image/5.3.8.2.1.3.png)
+
+在`HTTP请求`的`高级`里，勾选`从HTML文件获取所有内含的资源`和`并行下载`(并行下载数量为6)
+
+![image-20220713154619058](image/5.3.8.2.1.4.png)
+
+要压测的页面： http://gulimall.com/
+
+![image-20220713154918926](image/5.3.8.2.1.5.png)
+
+##### 2、执行测试
+
+如果在`查看结果树`里全是异常也不要紧，只是没有把`想要访问不存在的资源`的语句删掉而已
+
+![GIF 2022-7-13 16-02-21](image/5.3.8.2.2.1.gif)
+
+在测试期间，使用`jvisualvm`查看`CPU`、`堆`等的资源消耗情况
+
+![GIF 2022-7-13 16-12-34](image/5.3.8.2.2.2.gif)
+
+##### 3、查看压测报告
+
+这次结果虽然比以前好一点，但是`jmeter`卡死了几次，以前都没卡死过
+
+把压测报告写入压测报告表中（在`5.3.7.15、压测报告表`里面)
+
+**察看结果树**
+
+![image-20220713160459499](image/5.3.8.2.3.1.png)
+
+**汇总报告**
+
+![image-20220713160510090](image/5.3.8.2.3.2.png)
+
+**聚合报告**
+
+![image-20220713160520393](image/5.3.8.2.3.3.png)
+
+#### 3、OOM
+
+##### 1、调大线程数
+
+在`线程组`的`线程属性`里的`线程数`里输入`200`，表示**启动200个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里勾选`永远`
+
+![image-20220713164142976](image/5.3.8.3.1.1.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/`
+
+![image-20220713164154508](image/5.3.8.3.1.2.png)
+
+在`HTTP请求`的`高级`里，勾选`从HTML文件获取所有内含的资源`和`并行下载`(并行下载数量为6)
+
+![image-20220713164205572](image/5.3.8.3.1.3.png)
+
+要压测的页面： http://localhost:10000/
+
+![image-20220713164247057](image/5.3.8.3.1.4.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 16-29-17](image/5.3.8.3.2.1.gif)
+
+![GIF 2022-7-13 16-51-59](image/5.3.8.3.2.2.gif)
+
+##### 3、查看压测报告
+
+报`java.lang.OutOfMemoryError`异常
+
+```
+Exception in thread "RMI TCP Connection(idle)" java.lang.OutOfMemoryError: Java heap space
+Exception in thread "http-nio-10000-Acceptor" java.lang.OutOfMemoryError: Java heap space
+Exception in thread "http-nio-10000-BlockPoller" Exception in thread "File Watcher" java.lang.OutOfMemoryError: Java heap space
+java.lang.OutOfMemoryError: Java heap space
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message can't create name string at JPLISAgent.c line: 807
+Exception in thread "http-nio-10000-ClientPoller" java.lang.OutOfMemoryError: Java heap space
+
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "com.alibaba.nacos.client.Worker.fixed-127.0.0.1_8848-d6d03bd1-5815-4fa1-8caf-93b09462fd45"
+
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "http-nio-10000-exec-206"
+Exception in thread "http-nio-10000-exec-490" 
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "http-nio-10000-exec-329"
+java.lang.OutOfMemoryError: Java heap space
+Exception in thread "http-nio-10000-exec-304" java.lang.OutOfMemoryError: Java heap space
+```
+
+![image-20220713163701403](image/5.3.8.3.3.1.png)
+
+刷新 http://localhost:10000/ 页面，可以发现无法访问
+
+![image-20220713163906526](image/5.3.8.3.3.2.png)
+
+此时堆使用的内存已满
+
+![image-20220713163930108](image/5.3.8.3.3.3.png)
+
+`CPU`和`堆`资源占用都非常高
+
+![image-20220713164002784](image/5.3.8.3.3.4.png)
+
+##### 4、调大堆内存
+
+> -Xss 设置每个线程可使用的内存大小，即栈的大小。
+> -Xms 堆内存的最小值，默认为物理内存的1/64。
+> -Xmx 堆内存的最大值，默认为物理内存的1/4。
+> -Xmn 堆内新生代(Eden+两个Survior)的大小，一般占据堆的 1/3 空间。通过这个值也可以得到老生代的大小：-Xmx减去-Xmn。
+
+```
+-Xmx1024m -Xms1024m -Xmn512m
+```
+
+在`GulimallProductApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx1024m -Xms1024m -Xmn512m`，限制`GulimallProductApplication`模块的最大内存占用为`1024m`，最小内存占用为`1024m`，新生代的内存占用为`512m`
+
+![image-20220713165813319](image/5.3.8.3.4.png)
+
+##### 5、重新测试
+
+![GIF 2022-7-13 17-08-53](image/5.3.8.3.5.gif)
+
+##### 6、查看压测报告
+
+**察看结果树**
+
+![image-20220713171228131](image/5.3.8.3.6.1.png)
+
+**汇总报告**
+
+![image-20220713171240146](image/5.3.8.3.6.2.png)
+
+**聚合报告**
+
+![image-20220713171253126](image/5.3.8.3.6.3.png)
+
+`Visual GC`里显示，过了很久也没出现内存不足的情况
+
+![image-20220713172145919](image/5.3.8.3.6.4.png)
+
+`堆`在使用峰值时，也没有超过规定的`1024m`
+
+![image-20220713172159697](image/5.3.8.3.6.5.png)
+
+`GulimallProductApplication`服务的控制台也没报任何异常，说明调大内存可以很好地解决请求数过多的情况
+
+![image-20220713172253880](image/5.3.8.3.6.6.png)
+
+#### 4、优化三级分类查询
+
+##### 1、修改`getCatalogJson`方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里修改`getCatalogJson`方法
+
+```java
+@Override
+public Map<String, List<Catelog2Vo>> getCatalogJson() {
+
+    //一次查询所有
+    List<CategoryEntity> categoryEntities = this.baseMapper.selectList(null);
+    //1、查出所有一级分类
+    List<CategoryEntity> level1Categories = this.getLevel1Categories();
+    Map<String, List<Catelog2Vo>> result = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), l1 -> {
+        //2、该一级分类的所有二级分类
+        List<CategoryEntity> category2Entities = getCategoryEntities(categoryEntities,l1);
+        List<Catelog2Vo> catelog2VoList = null;
+        if (category2Entities != null) {
+            catelog2VoList = category2Entities.stream().map(l2 -> {
+                Catelog2Vo catelog2Vo = new Catelog2Vo();
+                catelog2Vo.setCatalog1Id(l1.getCatId().toString());
+                catelog2Vo.setId(l2.getCatId().toString());
+                catelog2Vo.setName(l2.getName());
+                //3、当前二级分类的所有三级分类
+                List<CategoryEntity> category3Entities = getCategoryEntities(categoryEntities,l2);
+                List<Catelog2Vo.Catelog3Vo> catelog3VoList = null;
+                if (category3Entities!=null){
+                    catelog3VoList = category3Entities.stream().map(l3 -> {
+                        Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
+                        catelog3Vo.setId(l3.getCatId().toString());
+                        catelog3Vo.setName(l3.getName());
+                        catelog3Vo.setCatalog2Id(l2.getCatId().toString());
+                        return catelog3Vo;
+                    }).collect(Collectors.toList());
+                }
+                catelog2Vo.setCatalog3List(catelog3VoList);
+                return catelog2Vo;
+            }).collect(Collectors.toList());
+        }
+        return catelog2VoList;
+    }));
+    return result;
+}
+
+private List<CategoryEntity> getCategoryEntities(List<CategoryEntity> categoryEntities,CategoryEntity l) {
+    //LambdaQueryWrapper<CategoryEntity> category2QueryWrapper = new LambdaQueryWrapper<>();
+    //category2QueryWrapper.eq(CategoryEntity::getParentCid, l1.getCatId());
+    //return this.baseMapper.selectList(category2QueryWrapper);
+    List<CategoryEntity> collect = categoryEntities.stream().filter(categoryEntity -> {
+        return categoryEntity.getParentCid().equals(l.getCatId());
+    }).collect(Collectors.toList());
+    return collect;
+}
+```
+
+![image-20220713183352367](image/5.3.8.4.1.png)
+
+##### 2、准备工作
+
+在`GulimallProductApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx100m`，重新限制`GulimallProductApplication`模块的最大内存占用为`100m`
+
+```
+-Xmx100m
+```
+
+![image-20220713183513139](image/5.3.8.4.2.1.png)
+
+要压测的请求： http://localhost:10000/index/catalog.json
+
+![image-20220713183630444](image/5.3.8.4.2.2.png)
+
+在`线程组`的`线程属性`里的`线程数`里输入`50`，表示**启动50个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里勾选`永远`
+
+![image-20220713183932382](image/5.3.8.4.2.3.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/index/catalog.json`
+
+![image-20220713183947336](image/5.3.8.4.2.4.png)
+
+在`HTTP请求`的`高级`里，取消勾选`从HTML文件获取所有内含的资源`
+
+![image-20220713183958623](image/5.3.8.4.2.5.png)
+
+##### 3、执行测试
+
+![GIF 2022-7-13 18-45-40](image/5.3.8.4.3.gif)
+
+##### 4、查看压测报告
+
+**察看结果树**
+
+![image-20220713184654867](image/5.3.8.4.4.1.png)
+
+**汇总报告**
+
+![image-20220713184706250](image/5.3.8.4.4.2.png)
+
+**聚合报告**
+
+![image-20220713184720393](image/5.3.8.4.4.3.png)
+
+## 5.4、商城业务-缓存，锁
+
+### 5.4.1、缓存-缓存使用
+
+#### 1、本地缓存
+
+把从数据库中查询的数据放到本类的属性里面，再次有请求进入后，发现该类已存储从数据库中查询的数据，直接返回即可
+
+<img src="image/5.4.1.1.0.png" alt="image-20220713195239272" style="zoom:50%;" />
+
+
+
+##### 1、修改`CategoryServiceImpl`类
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里修改部分方法，使把查出的数据放到本地的`cache`里
+
+```java
+private Map<String, List<Catelog2Vo>> cache = null;
+
+@Override
+public Map<String, List<Catelog2Vo>> getCatalogJson() {
+    if (cache!=null){
+        return cache;
+    }
+    Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+    cache = catalogJsonForDb;
+    return catalogJsonForDb;
+}
+
+
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDb() {
+    //一次查询所有
+    List<CategoryEntity> categoryEntities = this.baseMapper.selectList(null);
+    //1、查出所有一级分类
+    List<CategoryEntity> level1Categories = this.getLevel1Categories();
+    Map<String, List<Catelog2Vo>> result = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), l1 -> {
+        //2、该一级分类的所有二级分类
+        List<CategoryEntity> category2Entities = getCategoryEntities(categoryEntities,l1);
+        List<Catelog2Vo> catelog2VoList = null;
+        if (category2Entities != null) {
+            catelog2VoList = category2Entities.stream().map(l2 -> {
+                Catelog2Vo catelog2Vo = new Catelog2Vo();
+                catelog2Vo.setCatalog1Id(l1.getCatId().toString());
+                catelog2Vo.setId(l2.getCatId().toString());
+                catelog2Vo.setName(l2.getName());
+                //3、当前二级分类的所有三级分类
+                List<CategoryEntity> category3Entities = getCategoryEntities(categoryEntities,l2);
+                List<Catelog2Vo.Catelog3Vo> catelog3VoList = null;
+                if (category3Entities!=null){
+                    catelog3VoList = category3Entities.stream().map(l3 -> {
+                        Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
+                        catelog3Vo.setId(l3.getCatId().toString());
+                        catelog3Vo.setName(l3.getName());
+                        catelog3Vo.setCatalog2Id(l2.getCatId().toString());
+                        return catelog3Vo;
+                    }).collect(Collectors.toList());
+                }
+                catelog2Vo.setCatalog3List(catelog3VoList);
+                return catelog2Vo;
+            }).collect(Collectors.toList());
+        }
+        return catelog2VoList;
+    }));
+    return result;
+}
+
+private List<CategoryEntity> getCategoryEntities(List<CategoryEntity> categoryEntities,CategoryEntity l) {
+    //LambdaQueryWrapper<CategoryEntity> category2QueryWrapper = new LambdaQueryWrapper<>();
+    //category2QueryWrapper.eq(CategoryEntity::getParentCid, l1.getCatId());
+    //return this.baseMapper.selectList(category2QueryWrapper);
+    List<CategoryEntity> collect = categoryEntities.stream().filter(categoryEntity -> {
+        return categoryEntity.getParentCid().equals(l.getCatId());
+    }).collect(Collectors.toList());
+    return collect;
+}
+```
+
+![image-20220713194616644](image/5.4.1.1.1.png)
+
+##### 2、准备工作
+
+在`线程组`的`线程属性`里的`线程数`里输入`50`，表示**启动50个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里勾选`永远`
+
+![image-20220713194704485](image/5.4.1.1.2.1.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/index/catalog.json`
+
+![image-20220713194722501](image/5.4.1.1.2.2.png)
+
+在`HTTP请求`的`高级`里，取消勾选`从HTML文件获取所有内含的资源`
+
+![image-20220713194735626](image/5.4.1.1.2.3.png)
+
+要压测的接口： http://localhost:10000/index/catalog.json
+
+![image-20220713194807049](image/5.4.1.1.2.4.png)
+
+##### 3、执行测试
+
+![GIF 2022-7-13 19-44-33](image/5.4.1.1.3.gif)
+
+##### 4、查看压测报告
+
+可以看到，使用本地缓存的方式接口的吞吐量非常高
+
+**察看结果树**
+
+![image-20220713194911408](image/5.4.1.1.4.1.png)
+
+**汇总报告**
+
+![image-20220713194923340](image/5.4.1.1.4.2.png)
+
+**聚合报告**
+
+![image-20220713194935181](image/5.4.1.1.4.3.png)
+
+##### 5、问题
+
+在`集群`环境下，每一个`gulimall-product`服务都存储自己的一份`cache`，这极大的浪费了`堆`的内存，
+
+而且更严重的是当其中一个`gulimall-product`服务修改了数据后，其他服务感知不到修改，其他服务还在使用旧的数据，这样就违反了数据的最终一致性。
+
+<img src="image/5.4.1.1.5.png" alt="image-20220713195353065" style="zoom: 50%;" />
+
+#### 2、分布式缓存
+
+在分布式项目中，应使用分布式缓存技术，所有`gulimall-product`服务都向`缓存中间件`里获取数据，这样防止浪费了本地缓存，最重要的是当其中一个服务修改了数据后，其他服务也能获取最新的数据(虽然不能达到严格的一致性，但可以确保数据的最终一致性)
+
+<img src="image/5.4.1.2.0.png" alt="image-20220713195507412" style="zoom:50%;" />
+
+##### 1、添加依赖
+
+在`gulimall-product`模块的`pom.xml`文件内添加`redis`依赖
+
+```xml
+<!--引入redis-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
+![image-20220713200117460](image/5.4.1.2.1.png)
+
+##### 2、配置`redis`主机地址和端口
+
+在`gulimall-product`模块的`src/main/resources/application.yml`配置文件内配置`redis`主机地址和端口
+
+```yaml
+spring:
+  redis:
+    host: 192.168.56.10
+    port: 6379
+```
+
+![image-20220713200015211](image/5.4.1.2.2.png)
+
+##### 3、可使用的对象
+
+在`org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration`类里提供了`RedisTemplate`和`StringRedisTemplate`两个对象来操作`redis`
+
+```java
+@Bean
+@ConditionalOnMissingBean(name = "redisTemplate")
+public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory)
+      throws UnknownHostException {
+   RedisTemplate<Object, Object> template = new RedisTemplate<>();
+   template.setConnectionFactory(redisConnectionFactory);
+   return template;
+}
+
+@Bean
+@ConditionalOnMissingBean
+public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory)
+      throws UnknownHostException {
+   StringRedisTemplate template = new StringRedisTemplate();
+   template.setConnectionFactory(redisConnectionFactory);
+   return template;
+}
+```
+
+![image-20220713200342377](image/5.4.1.2.3.1.png)
+
+由于`String`类型在`redis`里非常常用，因此封装了继承`RedisTemplate`类的`StringRedisTemplate`用于操作`redis`
+
+![image-20220713200628278](image/5.4.1.2.3.2.png)
+
+##### 4、简单使用
+
+常用方法：
+
+```java
+//操作字符串
+stringRedisTemplate.opsForValue();
+//操作hash
+stringRedisTemplate.opsForHash();
+//操作list
+stringRedisTemplate.opsForList();
+//操作set
+stringRedisTemplate.opsForSet();
+//操作有序set
+stringRedisTemplate.opsForZSet();
+```
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.GulimallProductApplicationTests`测试类里添加如下测试代码，在`redis`里添加`key`为`hello`的数据，然后执行测试
+
+```java
+@Autowired
+StringRedisTemplate stringRedisTemplate;
+@Test
+public void stringRedisTemplateTest(){
+   ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+   //保存
+   ops.set("hello","world"+ UUID.randomUUID());
+   //查询
+   String hello = ops.get("hello");
+   System.out.println("之前保存的数据是："+ hello);
+}
+```
+
+![image-20220713201403494](image/5.4.1.2.4.1.png)
+
+打开`Redis Desktop Manager`可以看到`key`为`hello`的数据已经存进`redis`里了
+
+![image-20220713202139733](image/5.4.1.2.4.2.png)
+
+#### 3、测试
+
+##### 1、准备工作
+
+在`线程组`的`线程属性`里的`线程数`里输入`50`，表示**启动50个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里勾选`永远`
+
+![image-20220713221119905](image/5.4.1.3.1.1.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`localhost`，`端口号：`输入`10000`，`路径`输入`/index/catalog.json`
+
+![image-20220713221142043](image/5.4.1.3.1.2.png)
+
+在`HTTP请求`的`高级`里，取消勾选`从HTML文件获取所有内含的资源`
+
+![image-20220713221159131](image/5.4.1.3.1.3.png)
+
+要压测的接口： http://localhost:10000/index/catalog.json
+
+![image-20220713221912300](image/5.4.1.3.1.4.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-13 22-29-14](image/5.4.1.3.2.gif)
+
+##### 3、堆外内存溢出
+
+可以看到`http://localhost:10000/index/catalog.json`已无法访问
+
+![image-20220713223323423](image/5.4.1.3.3.1.png)
+
+**察看结果树**
+
+![image-20220713223350313](image/5.4.1.3.3.2.png)
+
+**汇总报告**
+
+![image-20220713223400875](image/5.4.1.3.3.3.png)
+
+**聚合报告**
+
+![image-20220713223414080](image/5.4.1.3.3.4.png)
+
+控制台报`堆外内存溢出`
+
+```
+2022-07-13 22:34:29.065  WARN 8940 --- [ioEventLoop-4-2] io.lettuce.core.protocol.CommandHandler  : null Unexpected exception during request: io.netty.util.internal.OutOfDirectMemoryError: failed to allocate 37748736 byte(s) of direct memory (used: 67108864, max: 100663296)
+
+io.netty.util.internal.OutOfDirectMemoryError: failed to allocate 37748736 byte(s) of direct memory (used: 67108864, max: 100663296)
+	at io.netty.util.internal.PlatformDependent.incrementMemoryCounter(PlatformDependent.java:725) ~[netty-common-4.1.39.Final.jar:4.1.39.Final]
+	at io.netty.util.internal.PlatformDependent.allocateDirectNoCleaner(PlatformDependent.java:680) ~[netty-common-4.1.39.Final.jar:4.1.39.Final]
+	at io.netty.buffer.PoolArena$DirectArena.allocateDirect(PoolArena.java:772) ~[netty-buffer-4.1.39.Final.jar:4.1.39.Final]
+	at io.netty.buffer.PoolArena$DirectArena.newUnpooledChunk(PoolArena.java:762) ~[netty-buffer-4.1.39.Final.jar:4.1.39.Final]
+```
+
+![image-20220713223441846](image/5.4.1.3.3.5.png)
+
+##### 4、原因
+
+因为`spring-boot-starter-data-redis-2.1.8.RELEASE`在操作`redis`时，使用了`lettuce`
+
+```xml
+<dependency>
+  <groupId>io.lettuce</groupId>
+  <artifactId>lettuce-core</artifactId>
+  <version>5.1.8.RELEASE</version>
+  <scope>compile</scope>
+</dependency>
+```
+
+![image-20220715103407245](image/5.4.1.3.4.1.png)
+
+而`lettuce-core-5.1.8.RELEASE`引用了`netty`
+
+```xml
+<dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-common</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-handler</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-transport</artifactId>
+</dependency>
+```
+
+![image-20220715103430255](image/5.4.1.3.4.2.png)
+
+所以会报`netty`相关的异常
+
+##### 5、报错的类
+
+在`io.netty.util.internal.OutOfDirectMemoryError.java`类里报了这个异常
+
+```java
+/**
+ * {@link OutOfMemoryError} that is throws if {@link PlatformDependent#allocateDirectNoCleaner(int)} can not allocate
+ * a new {@link ByteBuffer} due memory restrictions.
+ */
+public final class OutOfDirectMemoryError extends OutOfMemoryError {
+    private static final long serialVersionUID = 4228264016184011555L;
+
+    OutOfDirectMemoryError(String s) {
+        super(s);
+    }
+}
+```
+
+![image-20220715150401848](image/5.4.1.3.5.1.png)
+
+在`io.netty.util.internal.PlatformDependent.java`类里当`newUsedMemory`(新的已用内存) `>` `DIRECT_MEMORY_LIMIT`(直接内存限制)，就会抛出异常。(这个直接内存是`netty`自己在底层计数)
+
+```java
+private static void incrementMemoryCounter(int capacity) {
+    if (DIRECT_MEMORY_COUNTER != null) {
+        long newUsedMemory = DIRECT_MEMORY_COUNTER.addAndGet(capacity);
+        if (newUsedMemory > DIRECT_MEMORY_LIMIT) {
+            DIRECT_MEMORY_COUNTER.addAndGet(-capacity);
+            throw new OutOfDirectMemoryError("failed to allocate " + capacity
+                    + " byte(s) of direct memory (used: " + (newUsedMemory - capacity)
+                    + ", max: " + DIRECT_MEMORY_LIMIT + ')');
+        }
+    }
+}
+```
+
+![image-20220715150701735](image/5.4.1.3.5.2.png)
+
+在当前类申明了`DIRECT_MEMORY_LIMIT`
+
+```java
+private static final long DIRECT_MEMORY_LIMIT;
+```
+
+![image-20220715151444404](image/5.4.1.3.5.3.png)
+
+可以通过`-Dio.netty.maxDirectMemory`这个虚拟机参数设置最大内存，如果不设置默认就和堆内存大小`-Xmx参数`一样
+
+通过`-Dio.netty.maxDirectMemory`这个虚拟机参数调大内存、或修改堆内存`-Xmx参数`后，可以延缓异常抛出的时间，但不能解决问题
+
+```java
+logger.debug("-Dio.netty.maxDirectMemory: {} bytes", maxDirectMemory);
+DIRECT_MEMORY_LIMIT = maxDirectMemory >= 1 ? maxDirectMemory : MAX_DIRECT_MEMORY;
+```
+
+![image-20220715151559659](image/5.4.1.3.5.4.png)
+
+#### 4、调大内存后重试
+
+##### 1、修改运行参数
+
+在`GulimallProductApplication`模块的运行配置里的`Environment`栏的`VM options`里的右方框里输入`-Xmx300m`，重新限制`GulimallProductApplication`模块的最大内存占用为`300m`
+
+```
+-Xmx300m
+```
+
+重新启动`GulimallProductApplication`服务
+
+![image-20220715153737538](image/5.4.1.4.1.png)
+
+##### 2、执行测试
+
+可以看到调大`-Xmx参数`后，异常出现时间明显延后，但是还是不能从根本上解决问题
+
+![GIF 2022-7-15 15-46-29](image/5.4.1.4.2.gif)
+
+##### 3、查看压测报告
+
+**察看结果树**
+
+![image-20220715155239718](image/5.4.1.4.3.1.png)
+
+**汇总报告**
+
+![image-20220715155249984](image/5.4.1.4.3.2.png)
+
+**聚合报告**
+
+![image-20220715155301898](image/5.4.1.4.3.3.png)
+
+在`jvisualvm`的`com.atguigu.gulimall.product.GulimallProductApplication`服务的`Visual GC`里查看`新生代`和`老年代`使用情况
+
+![image-20220715155209605](image/5.4.1.4.3.4.png)
+
+在`jvisualvm`的`com.atguigu.gulimall.product.GulimallProductApplication`服务的`监视`里查看`CPU`、`堆`等资源使用情况
+
+![image-20220715155151814](image/5.4.1.4.3.5.png)
+
+#### 5、根本上解决对外内存异常
+
+##### 1、使用`jedis`
+
+在`spring-boot-starter-data-redis-2.1.8.RELEASE`里使用了`lettuce`
+
+```xml
+<dependency>
+  <groupId>io.lettuce</groupId>
+  <artifactId>lettuce-core</artifactId>
+  <version>5.1.8.RELEASE</version>
+  <scope>compile</scope>
+</dependency>
+```
+
+![image-20220713224440576](image/5.4.1.5.1.1.png)
+
+因此只需要排除`lettuce`，并重新引入`jedis`即可
+
+```xml
+<!--引入redis-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+</dependency>
+```
+
+![image-20220713224540175](image/5.4.1.5.1.2.png)
+
+在`org\springframework\boot\spring-boot-dependencies\2.1.8.RELEASE\spring-boot-dependencies-2.1.8.RELEASE.pom`
+
+里指定了`jedis`的版本，因此我们并不需要指定`jedis`的版本
+
+![GIF 2022-7-13 22-50-50](image/5.4.1.5.1.3.gif)
+
+要压测的接口： http://localhost:10000/index/catalog.json
+
+![image-20220715152455155](image/5.4.1.5.1.4.png)
+
+##### 2、执行测试
+
+![GIF 2022-7-15 15-27-41](image/5.4.1.5.2.gif)
+
+##### 3、查看压测报告
+
+可以发现`jedis`比`lettuce`在性能上差了不少
+
+**察看结果树**
+
+![image-20220715152929879](image/5.4.1.5.3.1.png)
+
+**汇总报告**
+
+![image-20220715153026558](image/5.4.1.5.3.2.png)
+
+**聚合报告**
+
+![image-20220715153043208](image/5.4.1.5.3.3.png)
+
+在`jvisualvm`的`com.atguigu.gulimall.product.GulimallProductApplication`服务的`Visual GC`里查看`新生代`和`老年代`使用情况
+
+![image-20220715153055591](image/5.4.1.5.3.4.png)
+
+在`jvisualvm`的`com.atguigu.gulimall.product.GulimallProductApplication`服务的`监视`里查看`CPU`、`堆`等资源使用情况
+
+![image-20220715153112065](image/5.4.1.5.3.5.png)
+
+##### 4、内存调大`-Xmx300m`又测试了一次
+
+**察看结果树**
+
+![image-20220715160023816](image/5.4.1.5.4.1.png)
+
+**汇总报告**
+
+![image-20220715160047736](image/5.4.1.5.4.2.png)
+
+**聚合报告**
+
+![image-20220715160103038](image/5.4.1.5.4.3.png)
+
+#### 6、说明
+
+在`org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration`类里导入了`LettuceConnectionConfiguration.class`和`JedisConnectionConfiguration.class`
+
+```java
+@Import({ LettuceConnectionConfiguration.class, JedisConnectionConfiguration.class })
+```
+
+![image-20220715160337658](image/5.4.1.6.1.png)
+
+在`org.springframework.boot.autoconfigure.data.redis.LettuceConnectionConfiguration`类里如果`RedisConnectionFactory.class`类在`ioc`容器中不存在，则向`ioc`容器注入`RedisConnectionFactory`
+
+```java
+@Bean
+@ConditionalOnMissingBean(RedisConnectionFactory.class)
+public LettuceConnectionFactory redisConnectionFactory(ClientResources clientResources)
+      throws UnknownHostException {
+   LettuceClientConfiguration clientConfig = getLettuceClientConfiguration(clientResources,
+         this.properties.getLettuce().getPool());
+   return createLettuceConnectionFactory(clientConfig);
+}
+```
+
+![image-20220715160551114](image/5.4.1.6.2.png)
+
+在`org.springframework.boot.autoconfigure.data.redis.JedisConnectionConfiguration`类里如果`RedisConnectionFactory.class`类在`ioc`容器中不存在，则向`ioc`容器注入`RedisConnectionFactory`
+
+```java
+@Bean
+@ConditionalOnMissingBean(RedisConnectionFactory.class)
+public JedisConnectionFactory redisConnectionFactory() throws UnknownHostException {
+   return createJedisConnectionFactory();
+}
+```
+
+![image-20220715160746996](image/5.4.1.6.3.png)
+
+在`org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration`类里则会使用它们其中一个注入到`ioc`容器的`RedisConnectionFactory`来操作`redis`
+
+相当于`lettuce`和` jedis`都是操作`redis`底层的客户端，`spring`再次封装成了`redisTemplate`
+
+```java
+@Bean
+@ConditionalOnMissingBean(name = "redisTemplate")
+public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory)
+      throws UnknownHostException {
+   RedisTemplate<Object, Object> template = new RedisTemplate<>(`;
+   template.setConnectionFactory(redisConnectionFactory);
+   return template;
+}
+
+@Bean
+@ConditionalOnMissingBean
+public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory)
+      throws UnknownHostException {
+   StringRedisTemplate template = new StringRedisTemplate();
+   template.setConnectionFactory(redisConnectionFactory);
+   return template;
+}
+```
+
+![image-20220715161018842](image/5.4.1.6.4.png)
+
+### 5.4.2、缓存-redis锁
+
+#### 1、常见问题
+
+##### 1、缓存穿透
+
+**缓存穿透**： 指查询一个一定不存在的数据，由于缓存是不命中，将去查询数据库，但是 数据库也无此记录，我们没有将这次查询的null写入缓存，这将导致这个不 存在的数据每次请求都要到存储层去查询，失去了缓存的意义 
+
+**风险**： 利用不存在的数据进行攻击，数据库瞬时压力增大，最终导致崩溃
+
+**解决**： null结果缓存，并加入短暂过期时间
+
+<img src="image/5.4.2.1.1.png" alt="image-20220715162001456" style="zoom: 50%;" />
+
+##### 2、缓存雪崩
+
+**缓存雪崩**： 缓存雪崩是指在我们设置缓存时key采用了相同的过期时间， 导致缓存在某一时刻同时失效，请求全部转发到DB，DB瞬时 压力过重雪崩。
+
+**解决**： 原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这 样每一个缓存的过期时间的重复率就会降低，就很难引发集体 失效的事件。
+
+<img src="image/5.4.2.1.2.png" alt="image-20220715162139708" style="zoom: 50%;" />
+
+##### 3、缓存穿透
+
+**缓存穿透**： 
+
+- 对于一些设置了过期时间的key，如果这些key可能会在某些 时间点被超高并发地访问，是一种非常“热点”的数据。
+
+-  如果这个key在大量请求同时进来前正好失效，那么所有对 这个key的数据查询都落到db，我们称为缓存击穿。 
+
+**解决**： 加锁 
+
+大量并发只让一个去查，其他人等待，查到以后释放锁，其他 人获取到锁，先查缓存，就会有数据，不用去db
+
+<img src="image/5.4.2.1.3.png" alt="image-20220715162219429" style="zoom:50%;" />
+
+#### 2、本地锁(单体架构)
+
+通过本地锁(性能高)，只能锁住当前进程，在分布式环境下如果部署了100台机器，如果只锁当前进程，虽然放行了100个线程查询数据库，看起来性能也还行。但是如果一台机器修改该数据，其他机器却感知不到数据被修改了，这就引起了数据最终不一致的问题。因此在分布式架构下，应使用分布式锁(性能低)。
+
+##### 1、本地锁代码
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类的代码
+
+```java
+/**
+ * 1、空结果缓存:解诀缓存穿透
+ * 2、设置过期时间(加随机值) :解诀缓存雪崩
+ * 3、加锁:解决缓存击穿
+ */
+@Override
+public Map<String, List<Catelog2Vo>> getCatalogJson() {
+    //1、加入缓存逻辑,缓存中存的数据是json字符串。
+    //JSON跨语言，跨平台兼容。
+    ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+    String catalogJson = ops.get("catalogJson");
+    if (!StringUtils.hasText(catalogJson)) {
+        //2、缓存中没有,查询数据库
+        System.out.println("缓存不命中...查询数据库...");
+        Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+        //3.查到的数据再放入缓存，将对象转为json放在缓存中
+        String s = JSON.toJSONString(catalogJsonForDb);
+        ops.set("catalogJson",s);
+        return catalogJsonForDb;
+    }
+    System.out.println("缓存命中...直接返回");
+    TypeReference<Map<String, List<Catelog2Vo>>> typeReference = new TypeReference<Map<String, List<Catelog2Vo>>>() {
+    };
+    return JSON.parseObject(catalogJson,typeReference);
+}
+
+
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDb() {
+    //得到锁以后，我们应该再去缓存中确定一 次，如果没有才需要继续查询(双检锁)
+    //只要是同一把锁，就能锁住需要这个锁的所有线程
+    //synchronized (this): SpringBoot所有的组件在容器中都是单例的。
+    //TODO 本地锁: synchronized, JUC(Lock) 在分布式情况下，想要锁住所有，必须使用分布式锁
+    synchronized (this) {
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        String catalogJson = ops.get("catalogJson");
+        if (StringUtils.hasText(catalogJson)) {
+            TypeReference<Map<String, List<Catelog2Vo>>> typeReference = new TypeReference<Map<String, List<Catelog2Vo>>>() {
+            };
+            return JSON.parseObject(catalogJson,typeReference);
+        }
+        System.out.println("查询了数据库......");
+        //一次查询所有
+        List<CategoryEntity> categoryEntities = this.baseMapper.selectList(null);
+        //1、查出所有一级分类
+        List<CategoryEntity> level1Categories = this.getLevel1Categories();
+        Map<String, List<Catelog2Vo>> result = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), l1 -> {
+            //2、该一级分类的所有二级分类
+            List<CategoryEntity> category2Entities = getCategoryEntities(categoryEntities, l1);
+            List<Catelog2Vo> catelog2VoList = null;
+            if (category2Entities != null) {
+                catelog2VoList = category2Entities.stream().map(l2 -> {
+                    Catelog2Vo catelog2Vo = new Catelog2Vo();
+                    catelog2Vo.setCatalog1Id(l1.getCatId().toString());
+                    catelog2Vo.setId(l2.getCatId().toString());
+                    catelog2Vo.setName(l2.getName());
+                    //3、当前二级分类的所有三级分类
+                    List<CategoryEntity> category3Entities = getCategoryEntities(categoryEntities, l2);
+                    List<Catelog2Vo.Catelog3Vo> catelog3VoList = null;
+                    if (category3Entities != null) {
+                        catelog3VoList = category3Entities.stream().map(l3 -> {
+                            Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
+                            catelog3Vo.setId(l3.getCatId().toString());
+                            catelog3Vo.setName(l3.getName());
+                            catelog3Vo.setCatalog2Id(l2.getCatId().toString());
+                            return catelog3Vo;
+                        }).collect(Collectors.toList());
+                    }
+                    catelog2Vo.setCatalog3List(catelog3VoList);
+                    return catelog2Vo;
+                }).collect(Collectors.toList());
+            }
+            return catelog2VoList;
+        }));
+        return result;
+    }
+}
+```
+
+![image-20220715163745249](image/5.4.2.2.1.png)
+
+
+##### 2、删除`redis`中`key`为`catalogJson`的数据
+
+使用`Redis Desktop Manager`工具，删除`redis`中`key`为`catalogJson`的数据
+
+![image-20220716085225713](image/5.4.2.2.2.png)
+
+##### 3、重新测试
+
+重新运行`GulimallProductApplication`服务，**不要**刷新前端页面，确保在压力测试之前、`redis`里面没有`catalogJson`的数据
+
+可以发现查询了两次数据库，这是因为加锁加小了，查询完数据库后就释放锁了，释放锁以后才把最新数据发送给`redis`，在发送给`redis`的这段时间内，又一个线程进来了它从`redis`获取数据发现没有获取到(此时先查询数据库的线程还未完全把数据放到`redis`里)，因此查询了两次数据库
+
+![GIF 2022-7-16 8-58-13](image/5.4.2.2.3.gif)
+
+##### 4、修改`CategoryServiceImpl`类代码
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类，把`getCatalogJson`方法里的以下代码
+
+```java
+//3.查到的数据再放入缓存，将对象转为json放在缓存中
+String s = JSON.toJSONString(result);
+ops.set("catalogJson", s);
+```
+
+放到`getCatalogJsonForDb`方法的锁里面，保证只有一个线程查询数据库
+
+![image-20220716091107158](image/5.4.2.2.4.1.png)
+
+最后我又修改成了这样：
+
+```java
+/**
+ * 1、空结果缓存:解诀缓存穿透
+ * 2、设置过期时间(加随机值) :解诀缓存雪崩
+ * 3、加锁:解决缓存击穿
+ */
+@Override
+public Map<String, List<Catelog2Vo>> getCatalogJson() {
+    //1、加入缓存逻辑,缓存中存的数据是json字符串。
+    //JSON跨语言，跨平台兼容。
+    ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+    String catalogJson = ops.get("catalogJson");
+    if (!StringUtils.hasText(catalogJson)) {
+        //2、缓存中没有,查询数据库
+        System.out.println("缓存不命中...查询数据库...");
+        Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDbWithLocalLock();
+        //3.查到的数据再放入缓存，将对象转为json放在缓存中
+        String s = JSON.toJSONString(catalogJsonForDb);
+        ops.set("catalogJson",s);
+        return catalogJsonForDb;
+    }
+    System.out.println("缓存命中...直接返回");
+    TypeReference<Map<String, List<Catelog2Vo>>> typeReference = new TypeReference<Map<String, List<Catelog2Vo>>>() {
+    };
+    return JSON.parseObject(catalogJson,typeReference);
+}
+
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithLocalLock() {
+    //得到锁以后，我们应该再去缓存中确定一 次，如果没有才需要继续查询(双检锁)
+    //只要是同一把锁，就能锁住需要这个锁的所有线程
+    //synchronized (this): SpringBoot所有的组件在容器中都是单例的。
+    //TODO 本地锁: synchronized, JUC(Lock) 在分布式情况下，想要锁住所有，必须使用分布式锁
+    synchronized (this) {
+        return getCatalogJsonForDb();
+    }
+}
+
+private Map<String, List<Catelog2Vo>> getCatalogJsonForDb() {
+    ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+    String catalogJson = ops.get("catalogJson");
+    if (StringUtils.hasText(catalogJson)) {
+        TypeReference<Map<String, List<Catelog2Vo>>> typeReference = new TypeReference<Map<String, List<Catelog2Vo>>>() {
+        };
+        return JSON.parseObject(catalogJson, typeReference);
+    }
+    System.out.println("查询了数据库......");
+    //一次查询所有
+    List<CategoryEntity> categoryEntities = this.baseMapper.selectList(null);
+    //1、查出所有一级分类
+    List<CategoryEntity> level1Categories = this.getLevel1Categories();
+    Map<String, List<Catelog2Vo>> result = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), l1 -> {
+        //2、该一级分类的所有二级分类
+        List<CategoryEntity> category2Entities = getCategoryEntities(categoryEntities, l1);
+        List<Catelog2Vo> catelog2VoList = null;
+        if (category2Entities != null) {
+            catelog2VoList = category2Entities.stream().map(l2 -> {
+                Catelog2Vo catelog2Vo = new Catelog2Vo();
+                catelog2Vo.setCatalog1Id(l1.getCatId().toString());
+                catelog2Vo.setId(l2.getCatId().toString());
+                catelog2Vo.setName(l2.getName());
+                //3、当前二级分类的所有三级分类
+                List<CategoryEntity> category3Entities = getCategoryEntities(categoryEntities, l2);
+                List<Catelog2Vo.Catelog3Vo> catelog3VoList = null;
+                if (category3Entities != null) {
+                    catelog3VoList = category3Entities.stream().map(l3 -> {
+                        Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
+                        catelog3Vo.setId(l3.getCatId().toString());
+                        catelog3Vo.setName(l3.getName());
+                        catelog3Vo.setCatalog2Id(l2.getCatId().toString());
+                        return catelog3Vo;
+                    }).collect(Collectors.toList());
+                }
+                catelog2Vo.setCatalog3List(catelog3VoList);
+                return catelog2Vo;
+            }).collect(Collectors.toList());
+        }
+        return catelog2VoList;
+    }));
+    //3.查到的数据再放入缓存，将对象转为json放在缓存中
+    String s = JSON.toJSONString(result);
+    ops.set("catalogJson", s);
+    return result;
+}
+```
+
+![image-20220716191130234](image/5.4.2.2.4.2.png)
+
+##### 5、重新测试
+
+重启`GulimallProductApplication`服务，删除`redis`里的`catalogJson`的数据，开始测试。这时就只有一个线程查询了数据库
+
+![GIF 2022-7-16 9-13-46](image/5.4.2.2.5.gif)
+
+#### 3、集群测试
+
+##### 1、启动多个`product`服务
+
+选中`Service`里的`GulimallProductApplication`服务，右键选择`Copy Configuration..`或者按`Ctrl+D `快捷键，复制一个配置
+
+在`name`里输入`GulimallProductApplication - 10001`，在`Program arguments:`里输入`--server.port=10001`用于在启动的参数里指定运行的端口
+
+同理在复制2个
+
+```
+GulimallProductApplication - 10001
+--server.port=10001
+
+GulimallProductApplication - 10002
+--server.port=10002
+
+GulimallProductApplication - 10003
+--server.port=10003
+```
+
+![GIF 2022-7-16 9-29-47](image/5.4.2.3.1.1.gif)
+
+一共复制了3个配置
+
+![image-20220716191356029](image/5.4.2.3.1.2.png)
+
+##### 2、启动这些服务
+
+启动`GulimallProductApplication - 10001`服务、`GulimallProductApplication - 10002`服务、`GulimallProductApplication - 10003`服务
+
+![GIF 2022-7-16 9-36-02](image/5.4.2.3.2.gif)
+
+##### 3、准备工作
+
+使用`Redis Desktop Manager`工具，删除`redis`中`key`为`catalogJson`的数据
+
+![5.4.1.7.2.9](image/5.4.2.3.3.1.png)
+
+在`线程组`的`线程属性`里的`线程数`里输入`100`，表示**启动100个线程**
+
+在`线程组`的`线程属性`里的`Ramp-Up时间(秒) :`里输入`1`，表示**1秒内启动完成**
+
+在`线程组`的`循环次数`里输入`5`
+
+![image-20220716093748583](image/5.4.2.3.3.2.png)
+
+在`HTTP请求`的`基本`里的`Web服务器`里 `协议：`输入`http`，`服务器名称或IP:`输入`gulimall`，`端口号：`输入`80`，`路径`输入`/index/catalog.json`
+
+通过`nginx`负载均衡到这些`project`服务
+
+![image-20220716094914063](image/5.4.2.3.3.3.png)
+
+##### 4、执行测试
+
+![GIF 2022-7-16 9-52-32](image/5.4.2.3.4.gif)
+
+##### 5、查看结果
+
+可以看到这次只查询了一次数据库
+
+![GIF 2022-7-16 9-54-15](image/5.4.2.3.5.1.gif)
+
+**察看结果树**
+
+![image-20220716100401468](image/5.4.2.3.5.2.png)
+
+**汇总报告**
+
+![image-20220716100423673](image/5.4.2.3.5.3.png)
+
+**聚合报告**
+
+![image-20220716100440990](image/5.4.2.3.5.4.png)
+
+#### 4、手动分布式锁
+
+##### 1、参考文档
+
+中文文档地址： https://www.redis.com.cn/commands/set.html
+
+> **SET key value [EX seconds|PX milliseconds|KEEPTTL] [NX|XX] [GET]**
+>
+> Redis SET 命令用于将键 `key` 设定为指定的“字符串”值。
+>
+> 如果 `key` 已经保存了一个值，那么这个操作会直接覆盖原来的值，并且忽略原始类型。
+>
+> 当 `set` 命令执行成功之后，之前设置的过期时间都将失效
+>
+> **选项**
+>
+> 从2.6.12版本开始，redis为`SET`命令增加了一系列选项:
+>
+> - `EX` *seconds* – 设置键key的过期时间，单位时秒
+> - `PX` *milliseconds* – 设置键key的过期时间，单位时毫秒
+> - `NX` – 只有键key不存在的时候才会设置key的值
+> - `XX` – 只有键key存在的时候才会设置key的值
+> - `KEEPTTL` -- 获取 key 的过期时间
+> - [GET](https://www.redis.com.cn/commands/get.html) -- 返回 key 存储的值，如果 key 不存在返回空
+>
+> **注意:** 由于`SET`命令加上选项已经可以完全取代`SETNX`, [SETEX](https://www.redis.com.cn/commands/setex.html), [PSETEX](https://www.redis.com.cn/commands/psetex.html), [GETSET](https://www.redis.com.cn/commands/getset.html),的功能，所以在将来的版本中，redis可能会不推荐使用并且最终抛弃这几个命令。
+>
+> **返回值**
+>
+> [字符串](https://www.redis.com.cn/topics/protocol.html#simple-string-reply): 如果`SET`命令正常执行那么回返回`OK` [多行字符串](https://www.redis.com.cn/topics/protocol.html#bulk-string-reply): 使用 GET 选项，返回 key 存储的值，如果 key 不存在返回空 [空](https://www.redis.com.cn/topics/protocol.html#nil-reply): 否则如果加了`NX` 或者 `XX`选项，[SET](https://www.redis.com.cn/commands/set.html) 没执行，那么会返回nil。
+>
+> **历史**
+>
+> - `>= 2.6.12`: Added the `EX`, `PX`, `NX` and `XX` options.
+> - `>= 6.0`: Added the `KEEPTTL` option.
+> - `>= 6.2`: Added the [GET](https://www.redis.com.cn/commands/get.html) option.
+>
+> **例子**
+>
+> ```bash
+> redis> SET mykey "Hello"
+> "OK"
+> redis> GET mykey
+> "Hello"
+> redis> SET anotherkey "will expire in a minute" EX 60
+> "OK"
+> redis>
+> ```
+>
+> **[SET](https://www.redis.com.cn/commands/set.html)**
+>
+> **Note:** 下面这种设计模式并不推荐用来实现redis分布式锁。应该参考 [the Redlock algorithm](https://redis.io/topics/distlock) 的实现，虽然这个方法只是复杂一点，但是却能保证更好的使用效果。
+>
+> 命令 `SET resource-name anystring NX EX max-lock-time` 是一种用 Redis 来实现锁机制的简单方法。
+>
+> 如果上述命令返回`OK`，那么客户端就可以获得锁（如果上述命令返回Nil，那么客户端可以在一段时间之后重新尝试），并且可以通过`DEL`命令来释放锁。
+>
+> 客户端加锁之后，如果没有主动释放，会在过期时间之后自动释放。
+>
+> 可以通过如下优化使得上面的锁系统变得更加鲁棒：
+>
+> - 不要设置固定的字符串，而是设置为随机的大字符串，可以称为token。
+> - 通过脚步删除指定锁的key，而不是`DEL`命令。
+>
+> 上述优化方法会避免下述场景：a客户端获得的锁（键key）已经由于过期时间到了被redis服务器删除，但是这个时候a客户端还去执行`DEL`命令。而b客户端已经在a设置的过期时间之后重新获取了这个同样key的锁，那么a执行`DEL`就会释放了b客户端加好的锁。
+>
+> 解锁脚本的一个例子将类似于以下：
+>
+> ```
+> if redis.call("get",KEYS[1]) == ARGV[1]
+> then
+>     return redis.call("del",KEYS[1])
+> else
+>     return 0
+> end
+> ```
+>
+> 这个脚本执行方式如下：
+>
+> ```
+> EVAL ...script... 1 resource-name token-value
+> ```
+>
+> **可用版本>= 1.0.0.**
+>
+> **时间复杂度:** O(1)
+
+ 
+
+![GIF 2022-7-16 10-00-15](image/5.4.2.4.1.gif)
+
+##### 2、`redis`命令获取锁
+
+进入`redis`的客户端，执行`set lock haha NX`即可获取锁
+
+```
+docker exec -it redis redis-cli
+set lock haha NX
+```
+
+###### 1、复制当前会话
+
+点击`1 电商` ，右键选择`复制会话(D)`即可复制当前会话
+
+双击`1 电商` 也可以复制当前会话
+
+![GIF 2022-7-16 10-16-12](image/5.4.2.4.2.1.gif)
+
+###### 2、多个会话同时执行命令
+
+在`Xshell`里依次点击 `查看(V)` -> `撰写(C)` -> `撰写栏(B)`  即可在`Xshell`下方打开`撰写栏`
+
+点击`撰写栏`的左边，选择`全部会话(A)`，在`撰写栏`发送的所有命名都会发送给所有会话
+
+如在`撰写栏`里输入`docker exec -it redis redis-cli`命令，所有会话都执行了该命令
+
+![GIF 2022-7-16 10-19-01](image/5.4.2.4.2.2.1.gif)
+
+在`Xshell`里点击`工具(T)`里 的`发送键输入到所有会话(K)`，在一个会话里输入的命令，也会同步发送给其他`发送键输入到所有会话。`状态为`开`的会话
+
+![GIF 2022-7-16 10-22-25](image/5.4.2.4.2.2.2.gif)
+
+在一个会话的输入命令的地方右键选择`发送键输入到所有会话(K)`，在这个会话里输入的命令，也会同步发送给其他`发送键输入到所有会话。`状态为`开`的会话
+
+![GIF 2022-7-16 10-25-22](image/5.4.2.4.2.2.3.gif)
+
+点击`发送键输入到所有会话。`右侧的`OFF`按钮后，别的会话发送`发送键输入到所有会话(K)`类型的命令该会话不会执行
+
+![GIF 2022-7-16 20-11-40](image/5.4.2.4.2.2.4.png)
+
+###### 3、获取锁
+
+所有会话执行`set lock haha NX`命令，可以看到只有`2 电商`获取到了锁
+
+![GIF 2022-7-16 10-20-14](image/5.4.2.4.2.3.gif)
+
+##### 3、简单分布式锁
+
+本次可以完成分布式锁的功能，但是`getCatalogJsonForDb()`方法有可能抛出异常 `stringRedisTemplate.delete("lock");`删除锁就无法执行，导致锁一直无法释放，从而导致死锁
+
+即使把`stringRedisTemplate.delete("lock");`删除锁的代码放到`finally`里面，也有可能出现机器`宕机`、`停电`等意外情况，导致`finally`里面的代码无法执行，从而导致无法删除锁
+
+在`org.springframework.data.redis.core.ValueOperations`接口里的`setIfAbsent`方法相当于`SETNX`命令(与`set key value NX`一样)
+
+![image-20220716104241003](image/5.4.2.4.3.1.png)
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里，添加`getCatalogJsonForDbWithRedisLock`方法
+
+```java
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithRedisLock() {
+    //获取redis锁
+    Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", "111");
+    if (lock){
+        Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+        //删除锁
+        stringRedisTemplate.delete("lock");
+        return catalogJsonForDb;
+    }else {
+        //加锁失败，休眠100ms后重试，synchronized
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //自旋锁
+        return getCatalogJsonForDbWithRedisLock();
+    }
+}
+```
+
+![image-20220716105028700](image/5.4.2.4.3.2.png)
+
+完整代码：
+
+```java
+package com.atguigu.gulimall.product.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.utils.PageUtils;
+import com.atguigu.common.utils.Query;
+import com.atguigu.gulimall.product.dao.CategoryDao;
+import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
+import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.Catelog2Vo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+
+@Service("categoryService")
+public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    CategoryBrandRelationService categoryBrandRelationService;
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<CategoryEntity> page = this.page(
+                new Query<CategoryEntity>().getPage(params),
+                new QueryWrapper<CategoryEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public List<CategoryEntity> listWithTree() {
+        //baseMapper就是ServiceImpl<CategoryDao, CategoryEntity>中的CategoryDao
+        //查询所有分类
+        List<CategoryEntity> list = baseMapper.selectList(null);
+        List<CategoryEntity> topCategory = list.stream()
+                //查出一级分类
+                .filter(categoryEntity -> categoryEntity.getParentCid() == 0)
+                //映射方法，改变对象结构
+                .map((menu) -> {
+                    menu.setChildren(getAllChildren(menu, list));
+                    return menu;
+                })
+                //根据sort字段排序
+                .sorted(Comparator.comparingInt((menu) -> menu.getSort() != null ? menu.getSort() : 0))
+                //搜集
+                .collect(Collectors.toList());
+
+        return topCategory;
+    }
+
+    @Override
+    public void removeMenuByIds(List<Long> asList) {
+        //TODO 检查当前删除的菜单是否被别的地方引用
+
+        //逻辑删除(show_status作为标志位，置为0表示删除)
+        baseMapper.deleteBatchIds(asList);
+    }
+
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> paths = new ArrayList<>();
+
+        List<Long> parentPath = findParentPath(catelogId, paths);
+        //先加入节点id后再递归求解其父分类，所有求出的完整路径是反的，需要转置一下
+        Collections.reverse(parentPath);
+        return parentPath.toArray(new Long[0]);
+    }
+
+    /**
+     * 级联更新所有的数据
+     *
+     * @param category
+     */
+    @Transactional
+    @Override
+    public void updateCascade(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationService.updateCategory(category);
+    }
+
+    @Override
+    public List<CategoryEntity> getLevel1Categories() {
+        LambdaQueryWrapper<CategoryEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(CategoryEntity::getParentCid, 0);
+        lambdaQueryWrapper.select(CategoryEntity::getCatId, CategoryEntity::getName);
+        //long start = System.currentTimeMillis();
+        List<CategoryEntity> categoryEntities = this.baseMapper.selectList(lambdaQueryWrapper);
+        //long end = System.currentTimeMillis();
+        //System.out.println("消耗时间："+(end-start));
+        return categoryEntities;
+    }
+
+    /**
+     * 1、空结果缓存:解诀缓存穿透
+     * 2、设置过期时间(加随机值) :解诀缓存雪崩
+     * 3、加锁:解决缓存击穿
+     */
+    @Override
+    public Map<String, List<Catelog2Vo>> getCatalogJson() {
+        //1、加入缓存逻辑,缓存中存的数据是json字符串。
+        //JSON跨语言，跨平台兼容。
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        String catalogJson = ops.get("catalogJson");
+        if (!StringUtils.hasText(catalogJson)) {
+            //2、缓存中没有,查询数据库
+            System.out.println("缓存不命中...查询数据库...");
+            Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDbWithRedisLock();
+            return catalogJsonForDb;
+        }
+        System.out.println("缓存命中...直接返回");
+        TypeReference<Map<String, List<Catelog2Vo>>> typeReference = new TypeReference<Map<String, List<Catelog2Vo>>>() {
+        };
+        return JSON.parseObject(catalogJson,typeReference);
+    }
+
+    public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithRedisLock() {
+        //获取redis锁
+        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", "111");
+        if (lock){
+            Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+            //删除锁
+            stringRedisTemplate.delete("lock");
+            return catalogJsonForDb;
+        }else {
+            //加锁失败，休眠100ms后重试，synchronized
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //自旋锁
+            return getCatalogJsonForDbWithRedisLock();
+        }
+    }
+
+    public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithLocalLock() {
+        //得到锁以后，我们应该再去缓存中确定一 次，如果没有才需要继续查询(双检锁)
+        //只要是同一把锁，就能锁住需要这个锁的所有线程
+        //synchronized (this): SpringBoot所有的组件在容器中都是单例的。
+        //TODO 本地锁: synchronized, JUC(Lock) 在分布式情况下，想要锁住所有，必须使用分布式锁
+        synchronized (this) {
+            return getCatalogJsonForDb();
+        }
+    }
+
+    private Map<String, List<Catelog2Vo>> getCatalogJsonForDb() {
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        String catalogJson = ops.get("catalogJson");
+        if (StringUtils.hasText(catalogJson)) {
+            TypeReference<Map<String, List<Catelog2Vo>>> typeReference = new TypeReference<Map<String, List<Catelog2Vo>>>() {
+            };
+            return JSON.parseObject(catalogJson, typeReference);
+        }
+        System.out.println("查询了数据库......");
+        //一次查询所有
+        List<CategoryEntity> categoryEntities = this.baseMapper.selectList(null);
+        //1、查出所有一级分类
+        List<CategoryEntity> level1Categories = this.getLevel1Categories();
+        Map<String, List<Catelog2Vo>> result = level1Categories.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), l1 -> {
+            //2、该一级分类的所有二级分类
+            List<CategoryEntity> category2Entities = getCategoryEntities(categoryEntities, l1);
+            List<Catelog2Vo> catelog2VoList = null;
+            if (category2Entities != null) {
+                catelog2VoList = category2Entities.stream().map(l2 -> {
+                    Catelog2Vo catelog2Vo = new Catelog2Vo();
+                    catelog2Vo.setCatalog1Id(l1.getCatId().toString());
+                    catelog2Vo.setId(l2.getCatId().toString());
+                    catelog2Vo.setName(l2.getName());
+                    //3、当前二级分类的所有三级分类
+                    List<CategoryEntity> category3Entities = getCategoryEntities(categoryEntities, l2);
+                    List<Catelog2Vo.Catelog3Vo> catelog3VoList = null;
+                    if (category3Entities != null) {
+                        catelog3VoList = category3Entities.stream().map(l3 -> {
+                            Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
+                            catelog3Vo.setId(l3.getCatId().toString());
+                            catelog3Vo.setName(l3.getName());
+                            catelog3Vo.setCatalog2Id(l2.getCatId().toString());
+                            return catelog3Vo;
+                        }).collect(Collectors.toList());
+                    }
+                    catelog2Vo.setCatalog3List(catelog3VoList);
+                    return catelog2Vo;
+                }).collect(Collectors.toList());
+            }
+            return catelog2VoList;
+        }));
+        //3.查到的数据再放入缓存，将对象转为json放在缓存中
+        String s = JSON.toJSONString(result);
+        ops.set("catalogJson", s);
+        return result;
+    }
+
+    private List<CategoryEntity> getCategoryEntities(List<CategoryEntity> categoryEntities, CategoryEntity l) {
+        //LambdaQueryWrapper<CategoryEntity> category2QueryWrapper = new LambdaQueryWrapper<>();
+        //category2QueryWrapper.eq(CategoryEntity::getParentCid, l1.getCatId());
+        //return this.baseMapper.selectList(category2QueryWrapper);
+        List<CategoryEntity> collect = categoryEntities.stream().filter(categoryEntity -> {
+            return categoryEntity.getParentCid().equals(l.getCatId());
+        }).collect(Collectors.toList());
+        return collect;
+    }
+
+
+    /**
+     * 例如：[413,50,5]
+     * 根据最后一级分类的id递归求解完整分类id(最后一级分类的所有父分类id+最后一级分类id)
+     *
+     * @param catelogId 当前分类id
+     * @param paths     分类id数组
+     * @return 完整分类id
+     */
+    private List<Long> findParentPath(Long catelogId, List<Long> paths) {
+        paths.add(catelogId);
+        CategoryEntity categoryEntity = this.getById(catelogId);
+        Long parentCid = categoryEntity.getParentCid();
+        if (parentCid != 0) {
+            findParentPath(parentCid, paths);
+        }
+        return paths;
+    }
+
+
+    /**
+     * 从list集合中获得当前菜单的子菜单
+     *
+     * @param root 当前菜单
+     * @param list 菜单集合
+     * @return
+     */
+    private List<CategoryEntity> getAllChildren(CategoryEntity root, List<CategoryEntity> list) {
+        List<CategoryEntity> collect = list.stream()
+                .filter(categoryEntity -> root.getCatId().equals(categoryEntity.getParentCid()))
+                //
+                .map((menu) -> {
+                    //递归求解其子菜单
+                    menu.setChildren(getAllChildren(menu, list));
+                    return menu;
+                })
+                //根据sort字段排序
+                .sorted(Comparator.comparingInt((menu) -> menu.getSort() != null ? menu.getSort() : 0))
+                .collect(Collectors.toList());
+        return collect;
+
+    }
+
+}
+```
+
+##### 4、添加过期时间
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里，修改`getCatalogJsonForDbWithRedisLock`方法
+
+获取锁后可以修改该锁的过期时间，这样看似解决了机器`宕机`、`停电`等意外情况，导致无法删除锁的问题。
+
+但是有可能在获取锁后，`stringRedisTemplate.expire("lock",30, TimeUnit.SECONDS);`修改该锁的过期时间之前机器`宕机`了，这样锁还是不会释放
+
+```java
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithRedisLock() {
+    //获取redis锁
+    Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", "111");
+    if (lock){
+        //设置过期时间，必须和加锁是同步的，原子的
+        stringRedisTemplate.expire("lock",30, TimeUnit.SECONDS);
+        Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+        //删除锁
+        stringRedisTemplate.delete("lock");
+        return catalogJsonForDb;
+    }else {
+        //加锁失败，休眠100ms后重试，synchronized
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //自旋锁
+        return getCatalogJsonForDbWithRedisLock();
+    }
+}
+```
+
+![image-20220716105732979](image/5.4.2.4.4.png)
+
+##### 5、获取锁并设置过期时间
+
+上一步不能解决问题的原因根本上是`获取锁`和`设置过期时间`不是原子操作，这样就确保这两步`都执行`或`都不执行`
+
+因此设置过期时间，必须和加锁是同步的，原子的
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里，修改`getCatalogJsonForDbWithRedisLock`方法，保证`获取锁`和`设置过期时间`是原子的
+
+```java
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithRedisLock() {
+    //获取redis锁
+    Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", "111",30, TimeUnit.SECONDS);
+    if (lock){
+        Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+        //删除锁
+        stringRedisTemplate.delete("lock");
+        return catalogJsonForDb;
+    }else {
+        //加锁失败，休眠100ms后重试，synchronized
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //自旋锁
+        return getCatalogJsonForDbWithRedisLock();
+    }
+}
+```
+
+![image-20220716105834671](image/5.4.2.4.5.1.png)
+
+执行语句大概相当于以下命令
+
+```bash
+#进入redis的客户端
+docker exec -it redis redis-cli
+#获取锁并设置过期时间为30s
+set lock 111 EX 30 NX
+#查看该锁的过期时间(最终为-2)
+ttl lcok
+```
+
+![GIF 2022-7-16 21-05-26](image/5.4.2.4.5.2.gif)
+
+##### 6、释放锁之前先判断
+
+有可能当前线程获取的锁已经过期了。然后别的线程也进来了，此时别的线程获取了这把锁。然后当前线程执行完业务代码后，把别的线程获取的锁给释放了。因此释放锁之前应先判断是不是自己的锁
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里，修改`getCatalogJsonForDbWithRedisLock`方法，释放锁之前应先判断是不是自己的锁
+
+```java
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithRedisLock() {
+    //获取redis锁
+    String uuid = UUID.randomUUID().toString();
+    Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,30, TimeUnit.SECONDS);
+    if (lock){
+        Map<String, List<Catelog2Vo>> catalogJsonForDb = getCatalogJsonForDb();
+        //删除锁
+        String lockValue = stringRedisTemplate.opsForValue().get("lock");
+        if (uuid.equals(lockValue)) {
+            stringRedisTemplate.delete("lock");
+        }
+        return catalogJsonForDb;
+    }else {
+        //加锁失败，休眠100ms后重试，synchronized
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //自旋锁
+        return getCatalogJsonForDbWithRedisLock();
+    }
+}
+```
+
+![image-20220716110950969](image/5.4.2.4.6.png)
+
+##### 7、判断并删除
+
+在`释放锁之前应先判断是不是自己的锁`这个阶段，先获取当前锁的值，在当前线程获取到该锁的值后，有可能当前线程获取的锁到了过期时间，此时别的线程进入后，重新获取到了锁，此时当前线程获取的锁的值还是自己锁的值，从而导致删除了别的线程的锁
+
+出现这种情况的原因还是因为`判断锁的值`和`删除该锁`不是原子操作，可以使用`lua`脚本，保证`判断锁的值`和`删除该锁`是原子操作
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.service.impl.CategoryServiceImpl`类里，修改`getCatalogJsonForDbWithRedisLock`方法，保证`判断锁的值`和`删除该锁`是原子操作
+
+该操作可以保证不会`死锁`和`释放了别的线程的锁`，但是当前线程未执行完，锁有可能已经过期了，此时别的线程就可以占用了这个锁，因此应加上`自动续期`续期的功能
+
+中文文档： [Redis SET 命令](https://www.redis.com.cn/commands/set.html)
+
+```lua
+if redis.call("get",KEYS[1]) == ARGV[1]
+then
+    return redis.call("del",KEYS[1])
+else
+    return 0
+end
+```
+
+![image-20220716121842148](image/5.4.2.4.7.1.png)
+
+```java
+public Map<String, List<Catelog2Vo>> getCatalogJsonForDbWithRedisLock() {
+    //获取redis锁
+    String uuid = UUID.randomUUID().toString();
+    Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid,30, TimeUnit.SECONDS);
+    if (lock){
+        Map<String, List<Catelog2Vo>> catalogJsonForDb;
+        try {
+            catalogJsonForDb = getCatalogJsonForDb();
+        }finally {
+            //删除锁
+            String script = "if redis.call('get',KEYS[1]) == ARGV[1] then  return redis.call('del',KEYS[1]) else return 0 end";
+            // KEYS[1] 为 Arrays.asList("lock") ；ARGV[1] 为 uuid
+            Long lockValue = stringRedisTemplate.execute(new DefaultRedisScript<Long>(script,Long.class)
+                    ,Arrays.asList("lock"),uuid);
+            if (lockValue!=null && lockValue==1){
+                System.out.println("删除成功...");
+            }else {
+                System.out.println("删除失败...");
+            }
+        }
+        return catalogJsonForDb;
+    }else {
+        //加锁失败，休眠100ms后重试，synchronized
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //自旋锁
+        return getCatalogJsonForDbWithRedisLock();
+    }
+}
+```
+
+![image-20220716123404456](image/5.4.2.4.7.2.png)
+
+### 5.4.3、缓存-Redisson分布式锁
+
+官方文档： https://github.com/redisson/redisson/wiki/
+
+![GIF 2022-7-16 14-36-13](image/5.4.3.0.gif)
+
+#### 1、使用`Redisson`
+
+可以使用`Redisson`(Redis Java client with features of In-Memory Data Grid)来操作`redis`，进而了解`Redisson`的使用过程
+
+后续可以使用`Redisson/Spring Boot Starter`来操作`redis`
+
+##### 1、引入依赖
+
+在`Maven Repository `里查找`Redisson`： https://mvnrepository.com/artifact/org.redisson/redisson
+
+![image-20220716145200593](image/5.4.3.1.1.1.png)
+
+引入`redisson`，做分布式锁和分布式对象
+
+```xml
+<!-- 引入redisson，做分布式锁和分布式对象 -->
+<dependency>
+    <groupId>org.redisson</groupId>
+    <artifactId>redisson</artifactId>
+    <version>3.12.0</version>
+</dependency>
+```
+
+![image-20220716145354907](image/5.4.3.1.1.2.png)
+
+##### 2、添加配置
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.config`包里新建`MyRedissonConfig`类，在`MyRedissonConfig`类里新建`redisson`方法
+
+```java
+package com.atguigu.gulimall.product.config;
+
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+
+/**
+ * @author 无名氏
+ * @date 2022/7/16
+ * @Description:
+ */
+@Configuration
+public class MyRedissonConfig {
+
+    /**
+     * 所有对Redisson的使用都是通过RedissonClient对象
+     * @return
+     * @throws IOException
+     */
+    @Bean(destroyMethod="shutdown")
+    RedissonClient redisson() throws IOException {
+        //1、创建配置
+        Config config = new Config();
+        //config.useSingleServer().setAddress("192.168.56.10:6379").setPassword("");
+        config.useSingleServer().setAddress("192.168.56.10:6379");
+        //2、根据Config创建出RedissonClient示例
+        return Redisson.create(config);
+    }
+
+}
+```
+
+![image-20220716150239076](image/5.4.3.1.2.1.png)
+
+**第三方框架整合的参考文档：**
+
+```
+https://github.com/redisson/redisson/wiki/14.-第三方框架整合
+```
+
+```java
+@Configuration
+@ComponentScan
+@EnableCaching
+public static class Application {
+
+    @Bean(destroyMethod="shutdown")
+    RedissonClient redisson() throws IOException {
+        Config config = new Config();
+        config.useClusterServers()
+              .addNodeAddress("127.0.0.1:7004", "127.0.0.1:7001");
+        return Redisson.create(config);
+    }
+
+    @Bean
+    CacheManager cacheManager(RedissonClient redissonClient) {
+        Map<String, CacheConfig> config = new HashMap<String, CacheConfig>();
+        // 创建一个名称为"testMap"的缓存，过期时间ttl为24分钟，同时最长空闲时maxIdleTime为12分钟。
+        config.put("testMap", new CacheConfig(24*60*1000, 12*60*1000));
+        return new RedissonSpringCacheManager(redissonClient, config);
+    }
+
+}
+```
+
+![image-20220716150830328](image/5.4.3.1.2.2.png)
+
+**单Redis节点模式的参考文档：**
+
+```
+https://github.com/redisson/redisson/wiki/2.-配置方法#26-单redis节点模式
+```
+
+```java
+// 默认连接地址 127.0.0.1:6379
+RedissonClient redisson = Redisson.create();
+
+Config config = new Config();
+config.useSingleServer().setAddress("myredisserver:6379");
+RedissonClient redisson = Redisson.create(config);
+```
+
+![image-20220716150909929](image/5.4.3.1.2.3.png)
+
+##### 3、添加测试方法
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.GulimallProductApplicationTests`测试类里添加如下代码
+
+```java
+@Autowired
+RedissonClient redissonClient;
+@Test
+public void redissonTest(){
+   System.out.println(redissonClient);
+}
+```
+
+![image-20220716150604827](image/5.4.3.1.3.png)
+
+##### 4、执行测试
+
+执行`redissonTest`方法，可以看到报了如下错误：错误的原因也指出来了`java.lang.IllegalArgumentException: Redis url should start with redis:// or rediss:// (for SSL connection)`
+
+```log
+java.lang.IllegalStateException: Failed to load ApplicationContext
+
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:125)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:108)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:190)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:132)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:246)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.createTest(SpringJUnit4ClassRunner.java:227)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner$1.runReflectiveCall(SpringJUnit4ClassRunner.java:289)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.methodBlock(SpringJUnit4ClassRunner.java:291)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:246)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:97)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61)
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:190)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:69)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:33)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:220)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:53)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'redisson' defined in class path resource [com/atguigu/gulimall/product/config/MyRedissonConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.redisson.api.RedissonClient]: Factory method 'redisson' threw exception; nested exception is java.lang.IllegalArgumentException: Redis url should start with redis:// or rediss:// (for SSL connection)
+```
+
+![image-20220716150731143](image/5.4.3.1.4.1.png)
+
+参考文档：`https://github.com/redisson/redisson/wiki/2.-配置方法#21-程序化配置方法`
+
+```java
+Config config = new Config();
+config.setTransportMode(TransportMode.EPOLL);
+config.useClusterServers()
+      //可以用"rediss://"来启用SSL连接
+      .addNodeAddress("redis://127.0.0.1:7181");
+```
+
+![image-20220716151118513](image/5.4.3.1.4.2.png)
+
+##### 5、修改配置
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.config.MyRedissonConfig`类里修改`redisson`方法
+
+```java
+/**
+ * 所有对Redisson的使用都是通过RedissonClient对象
+ * @return
+ * @throws IOException
+ */
+@Bean(destroyMethod="shutdown")
+RedissonClient redisson() throws IOException {
+    //1、创建配置
+    Config config = new Config();
+    //Redis url should start with redis:// or rediss:// (for SSL connection)
+    //config.useSingleServer().setAddress("192.168.56.10:6379").setPassword("");
+    config.useSingleServer().setAddress("redis://192.168.56.10:6379");
+    //2、根据Config创建出RedissonClient示例
+    return Redisson.create(config);
+}
+```
+
+![image-20220716213623896](image/5.4.3.1.5.png)
+
+##### 6、重新测试
+
+在`gulimall-product`模块的`com.atguigu.gulimall.product.GulimallProductApplicationTests`测试类里执行`redissonTest`方法，可以看到这次执行成功了
+
+![image-20220716151536203](image/5.4.3.1.6.png)
+
+#### 2、
+
+修改`gulimall-product`模块的`com.atguigu.gulimall.product.web.IndexController`类的`hello`方法
+
+```java
+@ResponseBody
+@GetMapping("/hello")
+public String hello(){
+    //1、获取一把锁，只要锁的名字一样，就是同一把锁
+    RLock lock = redissonClient.getLock("my-lock");
+    //2、加锁
+    //阻塞式等待(其他线程不断地尝试获取这把锁)。默认加的锁都是30s时间。
+    //1)、锁的自动续期，如果业务超长，运行期间自动给锁续上新的30s。不用担心业务时间长，锁自动过期被删掉
+    //2)、加锁的业务只要运行完成，就不会给当前锁续期，即使不手动解锁，锁默认在30s以后自动删除。
+    lock.lock();
+    try {
+        System.out.println("加锁成功。。。执行业务。。。"+Thread.currentThread().getId());
+        Thread.sleep(30000);
+    }catch (Exception e){
+        e.printStackTrace();
+    }finally {
+        //3、解锁
+        System.out.println("释放锁。。。"+Thread.currentThread().getId());
+        lock.unlock();
+    }
+    return "hello";
+}
+```
+
+![image-20220716153633748](image/5.4.3.2.1.png)
+
+
+
+
+
