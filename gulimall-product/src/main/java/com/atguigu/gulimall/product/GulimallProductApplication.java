@@ -55,6 +55,26 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *  @ControllerAdvice
  *  1）、编写异常处理类，使用@ControllerAdvice。
  *  2）、使用@ExceptionHandler标注方法可以处理的异常。
+ *
+ * 8、整合SpringCache简化缓存开发
+ * 1)、引入依赖
+ *    spring- boot-starter-cache、spring- boot-starter-data-redis
+ * 2)、写配置
+ *    (1)、自动配置了哪些
+ *        CacheAuroConfiguration会导入RedisCacheConfiguration;
+ *       自动配好了缓存管理器RedisCacheManager
+ *    (2)、配置使用redis作为缓存
+ *        spring. cache. type=redis
+ *    (3)、测试使用缓存
+ *       @Cacheable: Triggers cache population.: 触发将数据保存到缓存的操作
+ *       @CacheEvict: Triggers cache eviction.:  触发将数据从缓存删除的操作
+ *       @CachePut: Updates the cache without interfering with the method execution.:不影响方法执行更新缓存
+ *       @Caching: Regroups multiple cache operations to be applied on a method.: 组合以上多个操作
+ *       @CacheConfig: Shares some common cache-related settings at class-level.: 在类级别共享缓存的相同配置
+ *       1)、开启缓存功能@EnableCaching
+ *       2)、只需要使用注解就能完成缓存操作
+ *    (4)、原理:
+ *       CacheAutoConfiguration -> RedisCacheConfiguration ->自动配置了
  */
 @EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
 @EnableDiscoveryClient

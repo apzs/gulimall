@@ -294,7 +294,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 skuEsModel.setHasStock(finalIsSkuStock.get(skuInfoEntity.getSkuId()));
             }
             //skuPrice
+            skuEsModel.setSkuPrice(skuInfoEntity.getPrice());
             //skuImg
+            skuEsModel.setSkuImg(skuInfoEntity.getSkuDefaultImg());
             //hasStock      是否还有库存
             //TODO 2、热度评分，默认为 0
             skuEsModel.setHotScore(0L);

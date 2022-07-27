@@ -16,7 +16,7 @@ spring:
     time-zone: GMT+8
   thymeleaf:
     #关闭thymeleaf的缓存
-    cache: true
+    cache: false
     prefix: classpath:/templates/
     suffix: .html
   redis:

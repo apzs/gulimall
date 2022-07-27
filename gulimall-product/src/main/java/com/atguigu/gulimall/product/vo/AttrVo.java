@@ -1,6 +1,5 @@
 package com.atguigu.gulimall.product.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**

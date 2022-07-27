@@ -3,3 +3,7 @@ server:
 spring:
   application:
     name: gulimall-search
+
+  thymeleaf:
+    #关闭thymeleaf缓存
+    cache: false
