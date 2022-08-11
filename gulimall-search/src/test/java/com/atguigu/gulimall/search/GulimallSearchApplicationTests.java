@@ -25,8 +25,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -174,5 +177,20 @@ GET bank/_search
 	@Test
 	public void contextLoads() {
 		System.out.println(client);
+	}
+
+
+	@Test
+	public void testCoder() throws Exception{
+		//jdk自带编码 java.net.URLDecoder; java.net.URLEncoder;
+		System.out.println("jdk自带编码：");
+		System.out.println("错误的编码： " + URLEncoder.encode("1_A13 plus加强版","UTF-8"));
+		System.out.println("正确的编码： " + URLEncoder.encode("1_A13 plus加强版","UTF-8").replace("+","%20"));
+		System.out.println(URLDecoder.decode("attrs=1_A13%20plus%E5%8A%A0%E5%BC%BA%E7%89%88","UTF-8"));
+		//Spring提供的编码 org.springframework.web.util.UriUtils;
+		System.out.println();
+		System.out.println("Spring提供编码：");
+		System.out.println(UriUtils.encode("1_A13 plus加强版", "UTF-8"));
+		System.out.println(UriUtils.decode("attrs=1_A13%20plus%E5%8A%A0%E5%BC%BA%E7%89%88","UTF-8"));
 	}
 }

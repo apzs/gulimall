@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * @author 无名氏
@@ -76,6 +77,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *    (4)、原理:
  *       CacheAutoConfiguration -> RedisCacheConfiguration ->自动配置了
  */
+@EnableRedisHttpSession
 @EnableFeignClients(basePackages = "com.atguigu.gulimall.product.feign")
 @EnableDiscoveryClient
 @MapperScan("com.atguigu.gulimall.product.dao")

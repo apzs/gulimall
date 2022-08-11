@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author 无名氏
  * @date 2022/7/22
@@ -24,8 +26,8 @@ public class SearchController {
      * @return
      */
     @RequestMapping("/list.html")
-    public String listPage(SearchParam searchParam, Model model){
-
+    public String listPage(SearchParam searchParam, Model model, HttpServletRequest httpServletRequest){
+        searchParam.setQueryString(httpServletRequest.getQueryString());
         SearchResult result = mallSearchService.search(searchParam);
         model.addAttribute("result",result);
         return "list";

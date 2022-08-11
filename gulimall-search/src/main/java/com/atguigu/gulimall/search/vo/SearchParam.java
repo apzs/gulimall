@@ -72,4 +72,9 @@ public class SearchParam {
      */
     private Integer pageNum;
 
+    /**
+     * 调用原生的方法，获取所有参数的字符串
+     */
+    private String queryString;
+
 }

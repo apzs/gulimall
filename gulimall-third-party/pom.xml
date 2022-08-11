@@ -55,6 +55,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<!--添加注释处理器(使用idea添加自定义配置会有提示)-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!--邮件服务-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

@@ -6,8 +6,10 @@ import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.AttrGroupService;
 import com.atguigu.gulimall.product.service.BrandService;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.service.SkuSaleAttrValueService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -164,6 +166,21 @@ public class GulimallProductApplicationTests {
 	@Test
 	public void redissonTest(){
 		System.out.println(redissonClient);
+	}
+
+
+	@Autowired
+	AttrGroupService attrGroupService;
+	@Test
+	public void attrGroupServiceTest(){
+		System.out.println(attrGroupService.getAttrGroupWithAttrsBySpuIdAndCatalogId(1L, 225L));
+	}
+
+	@Autowired
+	SkuSaleAttrValueService skuSaleAttrValueService;
+	@Test
+	public void skuSaleAttrValueServiceTest(){
+		System.out.println(skuSaleAttrValueService.getSaleAttrsBySpuId(1L));
 	}
 
 }

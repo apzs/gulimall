@@ -1,9 +1,13 @@
 package com.atguigu.gulimall.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.atguigu.common.to.AttrRespTo;
 import com.atguigu.common.to.es.SkuEsModel;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.search.constant.EsConstant;
+import com.atguigu.gulimall.search.feign.ProductFeignService;
 import com.atguigu.gulimall.search.service.MallSearchService;
+import com.atguigu.gulimall.search.vo.BrandEntity;
 import com.atguigu.gulimall.search.vo.SearchParam;
 import com.atguigu.gulimall.search.vo.SearchResult;
 import org.apache.lucene.search.join.ScoreMode;
@@ -35,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +56,8 @@ public class MallSearchServiceImpl implements MallSearchService {
 
     @Autowired
     private RestHighLevelClient client;
+    @Autowired
+    ProductFeignService productFeignService;
 
     @Override
     public SearchResult search(SearchParam searchParam) {
@@ -195,7 +202,7 @@ public class MallSearchServiceImpl implements MallSearchService {
                 //s[0]=1   s[1]=安卓:其他
                 String[] s = attr.split("_");
                 // "1_安卓:其他" ==> [1,安卓:其他]  length=2
-                // "_安卓:其他"  ==>  [,_安卓:其他]  length=2
+                // "_安卓:其他"  ==>  [,安卓:其他]  length=2
                 if (s.length==2 && !attr.startsWith("_")){
                     String attrId = s[0];
                     //安卓:其他
@@ -213,8 +220,10 @@ public class MallSearchServiceImpl implements MallSearchService {
         }
         //是否有库存
         //"filter": [{"term": {"hasStock": {"value": "true"}}}]
-        boolean hasStock = searchParam.getHasStock()==null ||  searchParam.getHasStock()==1;
-        boolQueryBuilder.filter(QueryBuilders.termQuery("hasStock",hasStock));
+        if (searchParam.getHasStock()!=null) {
+            boolean hasStock =  searchParam.getHasStock() == 1;
+            boolQueryBuilder.filter(QueryBuilders.termQuery("hasStock", hasStock));
+        }
         //按照价格区间查询
         //"filter": [{"range": {"skuPrice": {"gte": 0,"lte": 6000}}}]
         if (StringUtils.hasText(searchParam.getSkuPrice())){
@@ -361,7 +370,104 @@ public class MallSearchServiceImpl implements MallSearchService {
         }
         searchResult.setTotalPages((int)totalPage);
 
+        //面包屑
+        List<SearchResult.NavVo> navs = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(searchParam.getAttrs())) {
+            navs = searchParam.getAttrs().stream().map(attr -> {
+                SearchResult.NavVo navVo = new SearchResult.NavVo();
+                //attrs=1_安卓:其他
+                //s[0]=1   s[1]=安卓:其他
+                String[] s = attr.split("_");
+                // "1_安卓:其他" ==> [1,安卓:其他]  length=2
+                // "_安卓:其他"  ==>  [,_安卓:其他]  length=2
+                if (s.length==2 && !attr.startsWith("_")){
+                    String attrId = s[0];
+                    searchResult.getAttrIds().add(Long.parseLong(attrId));
+                    //如果远程服务调用失败，就用id作为属性值
+                    String name = attrId;
+                    try {
+                        R r = productFeignService.attrInfo(Long.parseLong(attrId));
+                        if (r.getCode()==0){
+                            Object attrVo = r.get("attr");
+                            String attrString = JSON.toJSONString(attrVo);
+                            AttrRespTo attrRespTo = JSON.parseObject(attrString, AttrRespTo.class);
+                            name = attrRespTo.getAttrName();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    navVo.setNavName(name);
+                    //设置属性值
+                    navVo.setNavValue(s[1]);
+
+                    //取消这个导航栏需要跳转到的url
+                    String queryString = searchParam.getQueryString();
+                    String value = UriUtils.encode(attr,"UTF-8");
+                    String replace = replaceQueryString(queryString,"attrs", value);
+                    if (StringUtils.hasText(replace)){
+                        navVo.setLink(EsConstant.searchURI + "?" + replace);
+                    }else {
+                        navVo.setLink(EsConstant.searchURI);
+                    }
+
+                }
+                return navVo;
+            }).collect(Collectors.toList());
+        }
+
+
+        //品牌、分类
+        if (!CollectionUtils.isEmpty(searchParam.getBrandId())) {
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+            navVo.setNavName("品牌");
+            //远程查询所有品牌
+            R r = productFeignService.branInfo(searchParam.getBrandId());
+            if (r.getCode() == 0) {
+                StringBuffer stringBuffer = new StringBuffer();
+                Object brand = r.get("brand");
+                String brandListString = JSON.toJSONString(brand);
+                List<BrandEntity> brandEntities = JSON.parseArray(brandListString, BrandEntity.class);
+                String replace = "";
+                for (BrandEntity brandEntity : brandEntities) {
+                    stringBuffer.append(brandEntity.getName()+";");
+                    replace = replaceQueryString(searchParam.getQueryString(),"brandId",brandEntity.getBrandId()+"");
+                }
+                navVo.setNavValue(stringBuffer.toString());
+                if (StringUtils.hasText(replace)){
+                    navVo.setLink(EsConstant.searchURI + "?" + replace);
+                }else {
+                    navVo.setLink(EsConstant.searchURI);
+                }
+            }
+            navs.add(navVo);
+        }
+        //TODO 分类不需要导航取消
+        searchResult.setNavs(navs);
+
         return searchResult;
+    }
+
+    private String replaceQueryString(String queryString,String key,String value) {
+        String param = key + "=" + value;
+        String replace;
+        int attrIndex = queryString.indexOf(param);
+        if (queryString.startsWith(param)) {
+            //判断该参数后面还有没有参数
+            if (queryString.indexOf("&",attrIndex+1) >=0) {
+                //该属性是第一个参数，且不是最后一个参数
+                //http://search.gulimall.com/list.html?attrs=1_A2100&sort=saleCount_asc
+                replace = queryString.replace(key +"=" + value +"&", "");
+            }else {
+                //该参数是第一个参数，也是最后一个参数
+                //http://search.gulimall.com/list.html?attrs=1_A2100
+                replace = queryString.replace(key+"=" + value, "");
+            }
+        }else {
+            //该属性不是第一个参数
+            //http://search.gulimall.com/list.html?hasStock=1&attrs=1_A2100
+            replace = queryString.replace("&"+key+"=" + value, "");
+        }
+        return replace;
     }
 
 

@@ -3,6 +3,7 @@ package com.atguigu.gulimall.search.vo;
 import com.atguigu.common.to.es.SkuEsModel;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,6 +48,32 @@ public class SearchResult {
      *  当前查询到的结果涉及到的所有属性
      */
     private List<AttrVo> attrs;
+
+    /**
+     * 面包屑导航
+     */
+    private List<NavVo> navs = new ArrayList<>();
+
+    /**
+     * 路径是否包含该attr，如果包含该attr，在面包屑上就已经显示了，不需要在筛选里面显示了
+     */
+    private List<Long> attrIds = new ArrayList<>();
+
+    @Data
+    public static class NavVo{
+        /**
+         * 导航名
+         */
+        private String navName;
+        /**
+         * 导航值
+         */
+        private String navValue;
+        /**
+         * 导航链接，取消这个导航栏需要跳转到的url
+         */
+        private String link;
+    }
 
     /**
      * 品牌vo

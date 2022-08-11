@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -50,6 +51,13 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
 
             //TODO 更新其他关联
         }
+    }
+
+    @Override
+    public List<BrandEntity> getBrandsByIds(List<Long> brandIds) {
+        LambdaQueryWrapper<BrandEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(BrandEntity::getBrandId, brandIds);
+        return this.baseMapper.selectList(lambdaQueryWrapper);
     }
 
 }

@@ -15,5 +15,12 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+  type-aliases-package: com.atguigu.gulimall.member.entity
+  #方式一：仅配置指定包内的枚举类使用 MybatisEnumTypeHandler
+  # 支持统配符 * 或者 ; 分割
+#  type-enums-package: com.atguigu.gulimall.member.constant
+  #方式二：全局 修改 mybatis 使用的 EnumTypeHandler(还需配置mybatisPlusPropertiesCustomizer)
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 server:
   port: 8000

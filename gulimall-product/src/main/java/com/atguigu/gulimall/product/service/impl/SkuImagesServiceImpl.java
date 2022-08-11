@@ -1,16 +1,18 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
-
 import com.atguigu.gulimall.product.dao.SkuImagesDao;
 import com.atguigu.gulimall.product.entity.SkuImagesEntity;
 import com.atguigu.gulimall.product.service.SkuImagesService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Service("skuImagesService")
@@ -24,6 +26,14 @@ public class SkuImagesServiceImpl extends ServiceImpl<SkuImagesDao, SkuImagesEnt
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuImagesEntity> getImagesBySkuId(Long skuId) {
+
+       LambdaQueryWrapper<SkuImagesEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+       lambdaQueryWrapper.eq(SkuImagesEntity::getSkuId, skuId);
+        return this.baseMapper.selectList(lambdaQueryWrapper);
     }
 
 }

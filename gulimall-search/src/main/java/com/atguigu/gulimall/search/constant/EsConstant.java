@@ -14,6 +14,11 @@ public class EsConstant {
     /**
      * 分页大小
      */
-    public static final Integer PRODUCT_PAGE_SIZE = 16;
+    public static final Integer PRODUCT_PAGE_SIZE = 6;
+
+    /**
+     * 检索页的url
+     */
+    public static final String searchURI = "http://search.gulimall.com/list.html";
 
 }
