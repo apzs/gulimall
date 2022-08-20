@@ -51,6 +51,12 @@
         <!--    <groupId>com.alibaba.cloud</groupId>-->
         <!--    <artifactId>spring-cloud-starter-alicloud-oss</artifactId>-->
         <!--</dependency>-->
+
+        <!--导入seata-->
+        <!--<dependency>-->
+        <!--    <groupId>com.alibaba.cloud</groupId>-->
+        <!--    <artifactId>spring-cloud-starter-alibaba-seata</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>

@@ -16,6 +16,7 @@ package com.atguigu.common.exception;
  * 13: 购物车
  * 14: 物流
  * 15:用户
+ * 20:库存
  */
 public enum BizCodeException{
     /**
@@ -49,7 +50,11 @@ public enum BizCodeException{
     /**
      * 通过gitee登录失败
      */
-    GITEE_LOGIN_EXCEPTION(15004,"通过gitee登录失败");
+    GITEE_LOGIN_EXCEPTION(15004,"通过gitee登录失败"),
+    /**
+     * 下订单锁库存，没有库存的异常
+     */
+    NO_STOCK_EXCEPTION(21000,"商品库存不足");
 
 
     private int code;

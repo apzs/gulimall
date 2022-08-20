@@ -1,16 +1,18 @@
 package com.atguigu.gulimall.ware.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
-
 import com.atguigu.gulimall.ware.dao.WareOrderTaskDetailDao;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskDetailEntity;
 import com.atguigu.gulimall.ware.service.WareOrderTaskDetailService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Service("wareOrderTaskDetailService")
@@ -25,5 +27,15 @@ public class WareOrderTaskDetailServiceImpl extends ServiceImpl<WareOrderTaskDet
 
         return new PageUtils(page);
     }
+
+    @Override
+    public List<WareOrderTaskDetailEntity> getOrderTaskDetailsByTaskId(Long taskId) {
+        LambdaQueryWrapper<WareOrderTaskDetailEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WareOrderTaskDetailEntity::getTaskId,taskId)
+                .eq(WareOrderTaskDetailEntity::getLockStatus, 1);
+        return this.list(lambdaQueryWrapper);
+
+    }
+
 
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -58,7 +59,7 @@ public class OssController {
             policyConds.addConditionItem(MatchMode.StartWith, PolicyConditions.COND_KEY, dir);
 
             String postPolicy = ossClient.generatePostPolicy(expiration, policyConds);
-            byte[] binaryData = postPolicy.getBytes("utf-8");
+            byte[] binaryData = postPolicy.getBytes(StandardCharsets.UTF_8);
             String encodedPolicy = BinaryUtil.toBase64String(binaryData);
             String postSignature = ossClient.calculatePostSignature(postPolicy);
 
