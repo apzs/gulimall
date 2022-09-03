@@ -21,6 +21,15 @@ spring:
             #http://localhost:88/api/product/category/list/tree 变为 http://localhost:10000/product/category/list/tree
             - RewritePath=/api/(?<segment>/?.*),/$\{segment}
 
+        - id: coupon_route
+          uri: lb://gulimall-coupon
+          predicates:
+            - Path=/api/coupon/**
+          filters:
+            # (?<segment>/?.*) 和 $\{segment} 为固定写法
+            #http://localhost:88/api/coupon/seckillsession/list 变为 http://localhost:7000/coupon/seckillsession/list
+            - RewritePath=/api/(?<segment>/?.*),/$\{segment}
+
         - id: third_party_route
           uri: lb://gulimall-third-party
           predicates:
@@ -83,6 +92,16 @@ spring:
           uri: lb://gulimall-order
           predicates:
             - Host=order.gulimall.com
+
+        - id: gulimall_member_route
+          uri: lb://gulimall-member
+          predicates:
+            - Host=member.gulimall.com
+
+        - id: gulimall_seckill_route
+          uri: lb://gulimall-seckill
+          predicates:
+            - Host=seckill.gulimall.com
 
 logging:
   level:

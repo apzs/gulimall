@@ -21,7 +21,7 @@ public class SmsSendController {
     SmsComponent smsComponent;
 
     @GetMapping("/sendCode")
-    public R sendCode(@RequestParam("phone") String phone,@RequestParam("code") String code){
+    public R sendCode(@RequestParam("phone") String phone, @RequestParam("code") String code){
         smsComponent.sendSms(phone,code);
         return R.ok();
     }

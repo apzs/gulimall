@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 无名氏
@@ -32,7 +33,7 @@ public class MyMQConfig {
         Map<String, Object> arguments = new HashMap<>();
         arguments.put("x-dead-letter-exchange","order-event-exchange");
         arguments.put("x-dead-letter-routing-key", "order.release.order");
-        arguments.put("x-message-ttl",60000);
+        arguments.put("x-message-ttl", TimeUnit.MINUTES.toMillis(1));
         //Queue(String name, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> arguments)
         return new Queue("order.delay.queue",true,false,false,arguments);
     }
@@ -69,6 +70,19 @@ public class MyMQConfig {
     public Binding orderReleaseOtherBinding(){
         return new Binding("stock.release.stock.queue", Binding.DestinationType.QUEUE,
                 "order-event-exchange","order.release.other.#",null);
+    }
+
+    @Bean
+    public Queue orderSeckillOrderQueue(){
+        //String name, boolean durable, boolean exclusive, boolean autoDelete
+        return new Queue("order.seckill.order.queue",true,false,false);
+    }
+
+    @Bean
+    public Binding orderSeckillOrderBinding(){
+        //String destination, DestinationType destinationType, String exchange, String routingKey,Map<String, Object> arguments
+        return new Binding("order.seckill.order.queue", Binding.DestinationType.QUEUE,
+                "order-event-exchange", "order.seckill.order", null);
     }
 
 }

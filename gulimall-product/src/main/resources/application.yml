@@ -45,7 +45,9 @@ server:
   port: 10001
 logging:
   level:
-    com.atguigu.gulimall: error
+    com.atguigu.gulimall: info
+    com.alibaba.nacos.client.naming: off
+
 
 ribbon:
   ReadTimeout: 5000

@@ -31,13 +31,13 @@ public class AlipayTemplate {
      * 服务器[异步通知]页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
      * 支付宝会悄悄的给我们发送一个请求，告诉我们支付成功的信息
      */
-    private String notifyUrl;
+    private String notifyUrl="http://1661133527191.free.aeert.com/payed/notify";
 
     /**
      * 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
      * 同步通知，支付成功，一般跳转到成功页
      */
-    private String returnUrl;
+    private String returnUrl="http://member.gulimall.com/memberOrder.html";
 
     /**
      * 签名方式
@@ -48,6 +48,8 @@ public class AlipayTemplate {
      * 字符编码格式
      */
     private String charset = "utf-8";
+
+    private String timeout = "1m";
 
     /**
      * 支付宝网关； https://openapi.alipaydev.com/gateway.do
@@ -67,9 +69,9 @@ public class AlipayTemplate {
         alipayRequest.setNotifyUrl(notifyUrl);
 
         //商户订单号，商户网站订单系统中唯一订单号，必填
-        String outTradeNo = vo.getOut_trade_no();
+        String outTradeNo = vo.getOutTradeNo();
         //付款金额，必填
-        String totalAmount = vo.getTotal_amount();
+        String totalAmount = vo.getTotalAmount();
         //订单名称，必填
         String subject = vo.getSubject();
         //商品描述，可空
@@ -79,12 +81,12 @@ public class AlipayTemplate {
                 + "\"total_amount\":\"" + totalAmount + "\","
                 + "\"subject\":\"" + subject + "\","
                 + "\"body\":\"" + body + "\","
+                + "\"timeout_express\":\"" + timeout + "\","
                 + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
 
         String result = alipayClient.pageExecute(alipayRequest).getBody();
-
         //会收到支付宝的响应，响应的是一个页面，只要浏览器显示这个页面，就会自动来到支付宝的收银台页面
-        System.out.println("支付宝的响应：" + result);
+        //System.out.println("支付宝的响应：" + result);
 
         return result;
 

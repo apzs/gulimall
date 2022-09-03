@@ -32,6 +32,10 @@ public enum BizCodeException{
      */
     SMS_CODE_EXCEPTION(10002,"验证码获取频率太高，请稍后再试"),
     /**
+     * 同一个接口QPS每秒发送的请求数过多
+     */
+    TOO_MANY_REQUEST(10003,"请求流量过大异常"),
+    /**
      * 商品上架异常（向ElasticSearch里保存数据出错）
      */
     PRODUCT_UP_EXCEPTION(11000,"商品上架异常"),

@@ -3,6 +3,7 @@ package com.atguigu.gulimall.order.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.atguigu.common.to.MemberEntityTo;
 import com.atguigu.common.to.OrderTo;
+import com.atguigu.common.to.SecKillOrderTo;
 import com.atguigu.common.to.SkuHasStockTo;
 import com.atguigu.common.to.ware.WareSkuLockTo;
 import com.atguigu.common.utils.PageUtils;
@@ -13,6 +14,7 @@ import com.atguigu.gulimall.order.constant.OrderConstant;
 import com.atguigu.gulimall.order.dao.OrderDao;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.entity.OrderItemEntity;
+import com.atguigu.gulimall.order.entity.PaymentInfoEntity;
 import com.atguigu.gulimall.order.enume.OrderStatusEnum;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
@@ -21,6 +23,7 @@ import com.atguigu.gulimall.order.feign.WmsFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginUserInterceptor;
 import com.atguigu.gulimall.order.service.OrderItemService;
 import com.atguigu.gulimall.order.service.OrderService;
+import com.atguigu.gulimall.order.service.PaymentInfoService;
 import com.atguigu.gulimall.order.to.OrderCreateTo;
 import com.atguigu.gulimall.order.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -70,6 +73,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     OrderItemService orderItemService;
     @Autowired
     RabbitTemplate rabbitTemplate;
+    @Autowired
+    PaymentInfoService paymentInfoService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -211,6 +216,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         OrderEntity orderEntity = this.getById(entity.getId());
         if (OrderStatusEnum.CREATE_NEW.getCode().equals(orderEntity.getStatus())) {
             OrderEntity update = new OrderEntity();
+            update.setId(entity.getId());
             update.setStatus(OrderStatusEnum.CANCLED.getCode());
             this.updateById(update);
             OrderTo orderTo = new OrderTo();
@@ -225,6 +231,95 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 e.printStackTrace();
             }
         }
+    }
+
+
+    @Override
+    public PayVo getOrderPay(String orderSn) {
+        PayVo payVo = new PayVo();
+        OrderEntity orderEntity = this.getOrderStatusByOrderSn(orderSn);
+
+        BigDecimal totalAmount = orderEntity.getPayAmount().setScale(2, BigDecimal.ROUND_UP);
+        payVo.setTotalAmount(totalAmount.toString());
+        payVo.setOutTradeNo(orderEntity.getOrderSn());
+
+        LambdaQueryWrapper<OrderItemEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(OrderItemEntity::getOrderSn,orderSn).last(" limit 1");;
+        OrderItemEntity orderItemEntity = orderItemService.getOne(lambdaQueryWrapper);
+        payVo.setSubject(orderItemEntity.getSkuName());
+        payVo.setBody(orderItemEntity.getSkuAttrsVals());
+
+        return payVo;
+    }
+
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        MemberEntityTo memberEntityTo = LoginUserInterceptor.loginUser.get();
+
+        LambdaQueryWrapper<OrderEntity> orderQueryWrapper = new LambdaQueryWrapper<>();
+        orderQueryWrapper.eq(OrderEntity::getMemberId,memberEntityTo.getId());
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                orderQueryWrapper
+        );
+        List<OrderEntity> collect = page.getRecords().stream().map(orderEntity -> {
+            LambdaQueryWrapper<OrderItemEntity> orderItemQueryWrapper = new LambdaQueryWrapper<>();
+            orderItemQueryWrapper.eq(OrderItemEntity::getOrderSn, orderEntity.getOrderSn());
+            List<OrderItemEntity> list = orderItemService.list(orderItemQueryWrapper);
+            orderEntity.setItemEntities(list);
+            return orderEntity;
+        }).collect(Collectors.toList());
+
+        page.setRecords(collect);
+        return new PageUtils(page);
+    }
+
+    @Override
+    public boolean handlePayResult(PayAsyncVo vo) {
+        //保存交易流水
+        PaymentInfoEntity infoEntity = new PaymentInfoEntity();
+        //设置支付宝流水号
+        infoEntity.setAlipayTradeNo(vo.getTrade_no());
+        //设置订单号
+        infoEntity.setOrderSn(vo.getOut_trade_no());
+        //设置交易状态
+        infoEntity.setPaymentStatus(vo.getTrade_status());
+        //设置回调时间
+        infoEntity.setCallbackTime(vo.getNotify_time());
+        paymentInfoService.save(infoEntity);
+
+        String status = vo.getTrade_status();
+        if ("TRADE_SUCCESS".equals(status) || "TRADE_FINISHED".equals(status)) {
+            //支付成功
+            String orderSn = vo.getOut_trade_no();
+            this.baseMapper.updateOrderStatus(orderSn,OrderStatusEnum.PAYED.getCode());
+        }
+
+        return true;
+    }
+
+    /**
+     * 简略的创建秒杀单
+     * @param secKillOrderTo 秒杀单数据
+     */
+    @Override
+    public void createSeckillOrder(SecKillOrderTo secKillOrderTo) {
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderSn(secKillOrderTo.getOrderSn());
+        orderEntity.setMemberId(secKillOrderTo.getMemberId());
+        BigDecimal payAmount = secKillOrderTo.getSeckillPrice().multiply(new BigDecimal("" + secKillOrderTo.getNum()));
+        orderEntity.setPayAmount(payAmount);
+        orderEntity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        this.save(orderEntity);
+        //保存订单项信息(秒杀的订单只有一个订单项)
+        OrderItemEntity orderItemEntity = new OrderItemEntity();
+        orderItemEntity.setOrderSn(orderEntity.getOrderSn());
+        orderItemEntity.setRealAmount(payAmount);
+        orderItemEntity.setSkuQuantity(secKillOrderTo.getNum());
+        //TODO 获取当前sku的详细信息
+        //productFeignService.getSpuInfoBySkuId(secKillOrderTo.getSkuId());
+
+        orderItemService.save(orderItemEntity);
     }
 
     /**

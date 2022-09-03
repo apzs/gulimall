@@ -45,6 +45,10 @@ public class SkuItemVo {
      * 获取spu的规格参数信息
      */
     List<SpuItemAttrGroupVo> groupAttrs;
+    /**
+     * 当前商品的秒杀优惠信息
+     */
+    SeckillInfoVo seckillInfo;
 
     /**
      * sku的销售属性(比如可以选择的 颜色、内存容量 等)

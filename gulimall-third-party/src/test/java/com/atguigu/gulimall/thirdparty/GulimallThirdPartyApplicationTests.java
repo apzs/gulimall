@@ -6,7 +6,7 @@ import com.atguigu.gulimall.thirdparty.component.SmsComponent;
 import com.atguigu.gulimall.thirdparty.util.HttpUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.Random;
 
 @SpringBootTest
-class GulimallThirdPartyApplicationTests {
+public class GulimallThirdPartyApplicationTests {
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
 
 
     }
