@@ -20,82 +20,6 @@
 
 谷粒商城项目是一套电商项目，包括前台商城系统以及后台管理系统，基于 SpringCloud、SpringCloud Alibaba、MyBatis Plus实现。前台商城系统包括：用户登录、注册、商品搜索、商品详情、购物车、订单、秒杀活动等模块。后台管理系统包括：系统管理、商品系统、优惠营销、库存系统、订单系统、用户系统、内容管理等七大模块。
 
-## 项目演示
-
-### 前台商品系统
-
-#### 首页
-
-![](https://i.loli.net/2021/02/18/HPezsS6oYxJ5yRI.png)
-
-#### 商品检索
-
-![](https://i.loli.net/2021/02/18/ki2AWeMRIxKqlVm.png)
-
-#### 认证
-
-![](https://i.loli.net/2021/02/18/iO2cCXNGvLsptnh.png)
-
-<img src="https://i.loli.net/2021/02/18/OIt4FbsUwqV8gZL.png" style="zoom:38%;" />
-
-#### 商品详情
-
-![](https://i.loli.net/2021/02/18/B8qjpkwcT5Potzh.png)
-
-#### 购物车
-
-![](https://i.loli.net/2021/02/18/uEYqnQ2Kx7WZy1G.png)
-
-#### 结算页
-
-#### ![](https://i.loli.net/2021/02/18/T3mVbdpfqKsrNJC.png)支付
-
-![](https://i.loli.net/2021/02/18/SvP1oUVmrnx8cET.png)
-
-![](https://i.loli.net/2021/02/18/QqWzVtk1ZwvrURl.png)
-
-![](https://i.loli.net/2021/02/18/jfKRiLH4trSpwYe.png)
-
-
-
-### 后台管理系统
-
-#### 登录
-
-![](https://i.loli.net/2021/02/18/6KVEbFZMrgnUet3.png)
-
-#### 商品系统
-
-**分类管理**
-
-![](https://i.loli.net/2021/02/18/gsTcQRKDEWnUzIY.png)
-
-**品牌管理**
-
-![](https://i.loli.net/2021/02/18/FCKNfMTs9Pt3oVj.png)**平台属性**
-
-![ss](https://i.loli.net/2021/02/18/vCSnt1KjOyghB57.png)
-
-**商品管理**
-
-![](https://i.loli.net/2021/02/18/H6YkoCVOLQyfBN7.png)
-
-**发布商品**
-
-![](https://i.loli.net/2021/02/18/I1WtlCAb9hHUwky.png)
-
-#### 其他系统
-
-<div>
-     <img src="docs/images/Snipaste_2021-02-18_16-58-44.png" style="zoom:40%;" />
-    <img src="docs/images/Snipaste_2021-02-18_16-47-40.png" style="zoom:40%;" />
-    <img src="docs/images/Snipaste_2021-02-18_16-57-06.png" style="zoom:50%;" />
-    <img src="docs/images/Snipaste_2021-02-18_16-57-43.png" style="zoom:50%;" />
-    <img src="docs/images/Snipaste_2021-02-18_16-57-58.png" style="zoom:50%;" />
-</div>
-
-
-
 ## 组织结构
 
 ```
@@ -242,4 +166,78 @@ server {
 - 克隆整个后端项目 `gulimall` ，并导入 IDEA 中完成编译
 
 
+
+## 项目演示
+
+### 前台商品系统
+
+#### 首页
+
+![](https://i.loli.net/2021/02/18/HPezsS6oYxJ5yRI.png)
+
+#### 商品检索
+
+![](https://i.loli.net/2021/02/18/ki2AWeMRIxKqlVm.png)
+
+#### 认证
+
+![](https://i.loli.net/2021/02/18/iO2cCXNGvLsptnh.png)
+
+<img src="https://i.loli.net/2021/02/18/OIt4FbsUwqV8gZL.png" style="zoom:38%;" />
+
+#### 商品详情
+
+![](https://i.loli.net/2021/02/18/B8qjpkwcT5Potzh.png)
+
+#### 购物车
+
+![](https://i.loli.net/2021/02/18/uEYqnQ2Kx7WZy1G.png)
+
+#### 结算页
+
+#### ![](https://i.loli.net/2021/02/18/T3mVbdpfqKsrNJC.png)支付
+
+![](https://i.loli.net/2021/02/18/SvP1oUVmrnx8cET.png)
+
+![](https://i.loli.net/2021/02/18/QqWzVtk1ZwvrURl.png)
+
+![](https://i.loli.net/2021/02/18/jfKRiLH4trSpwYe.png)
+
+
+
+### 后台管理系统
+
+#### 登录
+
+![](https://i.loli.net/2021/02/18/6KVEbFZMrgnUet3.png)
+
+#### 商品系统
+
+**分类管理**
+
+![](https://i.loli.net/2021/02/18/gsTcQRKDEWnUzIY.png)
+
+**品牌管理**
+
+![](https://i.loli.net/2021/02/18/FCKNfMTs9Pt3oVj.png)**平台属性**
+
+![ss](https://i.loli.net/2021/02/18/vCSnt1KjOyghB57.png)
+
+**商品管理**
+
+![](https://i.loli.net/2021/02/18/H6YkoCVOLQyfBN7.png)
+
+**发布商品**
+
+![](https://i.loli.net/2021/02/18/I1WtlCAb9hHUwky.png)
+
+#### 其他系统
+
+<div>
+     <img src="docs/images/Snipaste_2021-02-18_16-58-44.png" style="zoom:40%;" />
+    <img src="docs/images/Snipaste_2021-02-18_16-47-40.png" style="zoom:40%;" />
+    <img src="docs/images/Snipaste_2021-02-18_16-57-06.png" style="zoom:50%;" />
+    <img src="docs/images/Snipaste_2021-02-18_16-57-43.png" style="zoom:50%;" />
+    <img src="docs/images/Snipaste_2021-02-18_16-57-58.png" style="zoom:50%;" />
+</div>
 
